@@ -1,3 +1,4 @@
+.ipynb_checkpoints
 .pytest_cache/*
 .vscode/*
 src/__pytest__/*
