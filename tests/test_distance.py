@@ -12,17 +12,22 @@ def test_euclidean_distance():
     assert euclidean_distance(a, b) == approx(expected_distance, abs=1e-3)
 
 
-def test_get_neighbors_returns_only_close_items():
+def test_get_neighbors_returns_indices_only_of_close_items():
     x = np.array([4, 4])
     close_item_1 = np.array([1, 4])
     close_item_2 = np.array([4, 2])
     far_item = np.array([10, 11])
 
-    close_items = [close_item_1, close_item_2]
-    far_items = [far_item]
-    items = close_items + far_items
+    index_close_item_1 = 0
+    index_close_item_2 = 1
+    index_far_item = 2
+
+    items = [None] * 3
+    items[index_close_item_1] = close_item_1
+    items[index_close_item_2] = close_item_2
+    items[index_far_item] = far_item
 
     neighbors = \
         get_neighbors(x, items, radius=3, distance_function=euclidean_distance)
 
-    assert neighbors == close_items
+    assert neighbors == [index_close_item_1, index_close_item_2]
