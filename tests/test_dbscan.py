@@ -45,4 +45,4 @@ def test_dbscan_marks_singleton_point_as_noise(circle_data):
     clustering = DBSCAN(eps=0.3, min_samples=5)
     clustering.fit(X)
 
-    assert clustering.labels[-1] == DBSCAN.cluster_label_noise
+    assert clustering.labels[-1] == DBSCAN.CLUSTER_LABEL_NOISE

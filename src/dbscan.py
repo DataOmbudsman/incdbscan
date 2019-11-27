@@ -9,9 +9,9 @@ class DBSCAN:
     Spatial Databases with Noise" by Ester et al. 1996.
     """
 
-    cluster_label_unclassified = -2
-    cluster_label_noise = -1
-    cluster_label_first_cluster = 0
+    CLUSTER_LABEL_UNCLASSIFIED = -2
+    CLUSTER_LABEL_NOISE = -1
+    CLUSTER_LABEL_FIRST_CLUSTER = 0
 
     def __init__(self, eps, min_samples):
         self.eps = eps
@@ -19,14 +19,14 @@ class DBSCAN:
         self.labels = None
 
     def _init_fit(self, X):
-        self.labels = np.repeat([DBSCAN.cluster_label_unclassified], len(X))
-        self._next_cluster_label = DBSCAN.cluster_label_first_cluster
+        self.labels = np.repeat([DBSCAN.CLUSTER_LABEL_UNCLASSIFIED], len(X))
+        self._next_cluster_label = DBSCAN.CLUSTER_LABEL_FIRST_CLUSTER
 
     def _is_point_unclassified(self, ix):
-        return self.labels[ix] == DBSCAN.cluster_label_unclassified
+        return self.labels[ix] == DBSCAN.CLUSTER_LABEL_UNCLASSIFIED
 
     def _is_point_noise(self, ix):
-        return self.labels[ix] == DBSCAN.cluster_label_noise
+        return self.labels[ix] == DBSCAN.CLUSTER_LABEL_NOISE
 
     def _assign_label(self, ix, label):
         self.labels[ix] = label
@@ -36,7 +36,7 @@ class DBSCAN:
         seeds = set(get_neighbors(point, X, self.eps))
 
         if len(seeds) < self.min_samples:
-            self._assign_label(ix, DBSCAN.cluster_label_noise)
+            self._assign_label(ix, DBSCAN.CLUSTER_LABEL_NOISE)
             return
 
         for seed in seeds:
