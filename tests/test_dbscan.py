@@ -2,23 +2,7 @@ import pytest
 from sklearn.datasets.samples_generator import make_circles
 
 from src.dbscan import DBSCAN
-
-
-def _are_lists_isomorphic(list_1, list_2):
-    if len(list_1) != len(list_2):
-        return False
-
-    distinct_elements_1 = set(list_1)
-    distinct_elements_2 = set(list_2)
-
-    if len(distinct_elements_1) != len(distinct_elements_2):
-        return False
-
-    mappings = [(item_1, item_2) for (item_1, item_2)
-                in zip(list_1, list_2)]
-    distinct_mappings = set(mappings)
-
-    return len(distinct_elements_1) == len(distinct_mappings)
+from src.utils import are_lists_isomorphic
 
 
 @pytest.fixture
@@ -35,7 +19,7 @@ def test_dbscan_finds_correct_cluster_labels(circle_data):
     clustering = DBSCAN(eps=0.3, min_samples=5)
     clustering.fit(X)
 
-    assert _are_lists_isomorphic(true_labels, clustering.labels)
+    assert are_lists_isomorphic(true_labels, clustering.labels)
 
 
 def test_dbscan_marks_singleton_point_as_noise(circle_data):
