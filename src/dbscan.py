@@ -1,26 +1,20 @@
 import numpy as np
 
+from src.dbscanbase import DBSCANBase
 from src.distance import get_neighbors
 
 
-class DBSCAN:
+class DBSCAN(DBSCANBase):
     """
     Based on "A Density-Based Algorithm for Discovering Clusters in Large
     Spatial Databases with Noise" by Ester et al. 1996.
     """
 
-    CLUSTER_LABEL_UNCLASSIFIED = -2
-    CLUSTER_LABEL_NOISE = -1
-    CLUSTER_LABEL_FIRST_CLUSTER = 0
-
     def __init__(self, eps, min_samples):
-        self.eps = eps
-        self.min_samples = min_samples
-        self.labels = None
+        super().__init__(eps, min_samples)
 
     def _init_fit(self, X):
         self.labels = np.repeat([DBSCAN.CLUSTER_LABEL_UNCLASSIFIED], len(X))
-        self._next_cluster_label = DBSCAN.CLUSTER_LABEL_FIRST_CLUSTER
 
     def _is_point_unclassified(self, ix):
         return self.labels[ix] == DBSCAN.CLUSTER_LABEL_UNCLASSIFIED
