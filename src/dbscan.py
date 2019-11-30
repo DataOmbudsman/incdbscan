@@ -10,8 +10,8 @@ class DBSCAN(DBSCANBase):
     Spatial Databases with Noise" by Ester et al. 1996.
     """
 
-    def __init__(self, eps, min_samples):
-        super().__init__(eps, min_samples)
+    def __init__(self, eps, min_pts):
+        super().__init__(eps, min_pts)
 
     def _init_fit(self, X):
         self.labels = np.repeat([DBSCAN.CLUSTER_LABEL_UNCLASSIFIED], len(X))
@@ -29,7 +29,7 @@ class DBSCAN(DBSCANBase):
         point = X[ix]
         seeds = set(get_neighbors(point, X, self.eps))
 
-        if len(seeds) < self.min_samples:
+        if len(seeds) < self.min_pts:
             self._assign_label(ix, DBSCAN.CLUSTER_LABEL_NOISE)
             return
 
@@ -42,7 +42,7 @@ class DBSCAN(DBSCANBase):
             seed_point = X[seeds.pop()]  # called currentP in paper
             neighbors_of_seed = get_neighbors(seed_point, X, self.eps)
 
-            if len(neighbors_of_seed) >= self.min_samples:
+            if len(neighbors_of_seed) >= self.min_pts:
                 for neighbor in neighbors_of_seed:
                     if self._is_point_unclassified(neighbor):
                         seeds.add(neighbor)
