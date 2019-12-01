@@ -1,7 +1,7 @@
 import numpy as np
+from sklearn.neighbors import NearestNeighbors
 
 from src.dbscanbase import DBSCANBase
-from src.distance import get_neighbors
 
 
 class DBSCAN(DBSCANBase):
@@ -15,6 +15,7 @@ class DBSCAN(DBSCANBase):
 
     def _init_fit(self, X):
         self.labels = np.repeat([DBSCAN.CLUSTER_LABEL_UNCLASSIFIED], len(X))
+        self._nn = NearestNeighbors(radius=self.eps).fit(X)
 
     def _is_point_unclassified(self, ix):
         return self.labels[ix] == DBSCAN.CLUSTER_LABEL_UNCLASSIFIED
@@ -25,9 +26,14 @@ class DBSCAN(DBSCANBase):
     def _assign_label(self, ix, label):
         self.labels[ix] = label
 
+    def _get_neighbors(self, query_point):
+        neighbors = \
+            self._nn.radius_neighbors([query_point], return_distance=False)[0]
+        return set(neighbors)
+
     def _expand_cluster(self, ix, X):
         point = X[ix]
-        seeds = set(get_neighbors(point, X, self.eps))
+        seeds = self._get_neighbors(point)
 
         if len(seeds) < self.min_pts:
             self._assign_label(ix, DBSCAN.CLUSTER_LABEL_NOISE)
@@ -40,7 +46,7 @@ class DBSCAN(DBSCANBase):
 
         while len(seeds) > 0:
             seed_point = X[seeds.pop()]  # called currentP in paper
-            neighbors_of_seed = get_neighbors(seed_point, X, self.eps)
+            neighbors_of_seed = self._get_neighbors(seed_point)
 
             if len(neighbors_of_seed) >= self.min_pts:
                 for neighbor in neighbors_of_seed:

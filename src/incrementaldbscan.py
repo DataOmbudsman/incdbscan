@@ -69,6 +69,8 @@ class IncrementalDBSCAN(DBSCANBase):
         FAKE_CLUSTER_ID = 888
         self.labels[object_id] = FAKE_CLUSTER_ID  # TODO remove faking
 
+def euclidean_distance(x, y):
+    return np.linalg.norm(x - y)
     def _update_clustering_due_to_deletion(self, object_id):
         _ = self.labels.pop(object_id)
 
