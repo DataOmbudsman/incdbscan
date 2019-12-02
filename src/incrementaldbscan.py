@@ -13,6 +13,7 @@ class Object():
     def __init__(self, object_value, object_id):
         self.value = object_value
         self.id = object_id
+        self.neighbor_count = 1
 
 
 class IncrementalDBSCAN(DBSCANBase):
@@ -80,7 +81,15 @@ class IncrementalDBSCAN(DBSCANBase):
         self._object_store[object_to_insert.id] = object_to_insert
 
         neighbors = self._get_neighbors(object_to_insert)
-        # TODO eldönteni milyen típusból mennyi van
+        for neighbor in neighbors:
+            neighbor.neighbor_count += 1
+
+        update_seeds = self._get_update_seeds_during_insertion(neighbors)
+
+        # Noise
+        if not update_seeds:
+            self.labels[object_to_insert.id] = self.CLUSTER_LABEL_NOISE
+            return
 
         FAKE_CLUSTER_ID = 888  # TODO remove faking
         self.labels[object_to_insert.id] = FAKE_CLUSTER_ID
@@ -89,11 +98,27 @@ class IncrementalDBSCAN(DBSCANBase):
         # Do lot of stuff
         del self.labels[object_id]
 
-    def _get_neighbors(self, query_object):
+    def _get_neighbors(self, query_object, only_cores=False):
         return [
             obj for obj in self._object_store.values()
             if euclidean_distance(query_object.value, obj.value) <= self.eps
+            and (not only_cores or obj.neighbor_count >= self.min_pts)
         ]
+
+    def _get_update_seeds_during_insertion(self, neighbors):
+        update_seeds = set()
+
+        new_core_objects = [obj for obj in neighbors
+                            if obj.neighbor_count == self.min_pts]
+        update_seeds.update(new_core_objects)
+
+        for new_core in new_core_objects:
+            # TODO this can be more efficient as described by the paper
+            core_neighbors_of_new_core = \
+                self._get_neighbors(new_core, only_cores=True)
+            update_seeds.update(core_neighbors_of_new_core)
+
+        return update_seeds
 
 
 def euclidean_distance(x, y):
