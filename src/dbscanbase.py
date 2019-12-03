@@ -1,4 +1,4 @@
-class DBSCANBase(object):
+class _DBSCANBase(object):
 
     CLUSTER_LABEL_UNCLASSIFIED = -2
     CLUSTER_LABEL_NOISE = -1

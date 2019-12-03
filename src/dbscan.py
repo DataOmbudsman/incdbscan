@@ -1,10 +1,10 @@
 import numpy as np
 from sklearn.neighbors import NearestNeighbors
 
-from src.dbscanbase import DBSCANBase
+from src.dbscanbase import _DBSCANBase
 
 
-class DBSCAN(DBSCANBase):
+class DBSCAN(_DBSCANBase):
     """
     Based on "A Density-Based Algorithm for Discovering Clusters in Large
     Spatial Databases with Noise" by Ester et al. 1996.
