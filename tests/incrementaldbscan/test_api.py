@@ -1,6 +1,9 @@
 import pytest
 
-from src.incrementaldbscan import IncrementalDBSCAN, IncrementalDBSCANWarning
+from src.incrementaldbscan.incrementaldbscan import (
+    IncrementalDBSCAN,
+    IncrementalDBSCANWarning
+)
 
 
 @pytest.fixture

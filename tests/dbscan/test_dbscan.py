@@ -1,7 +1,7 @@
 import pytest
 from sklearn.datasets.samples_generator import make_circles
 
-from src.dbscan import DBSCAN
+from src.dbscan.dbscan import DBSCAN
 from src.utils import are_lists_isomorphic
 
 

@@ -1,5 +1,6 @@
 .ipynb_checkpoints
 .pytest_cache/*
 .vscode/*
+.ignore/*
 src/__pytest__/*
 *pyc

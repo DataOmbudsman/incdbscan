@@ -1,7 +1,7 @@
 import numpy as np
 from sklearn.neighbors import NearestNeighbors
 
-from src.dbscanbase import _DBSCANBase
+from src.dbscan._dbscanbase import _DBSCANBase
 
 
 class DBSCAN(_DBSCANBase):
