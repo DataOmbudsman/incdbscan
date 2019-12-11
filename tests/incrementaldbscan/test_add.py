@@ -51,6 +51,25 @@ def test_new_object_far_from_cluster_is_labeled_as_noise(
     assert incdbscan.labels[object_id] == incdbscan.CLUSTER_LABEL_NOISE
 
 
+def test_new_border_object_gets_label_from_core(incdbscan):
+    cluster = np.array([
+        [1, 1],
+        [0, 1],
+        [1, 0],
+        [0, 0],
+    ])
+    ids_in_cluster = list(range(len(cluster)))
+
+    new_border_object_value = np.array([1 + incdbscan.eps, 1])
+    new_border_object_id = max(ids_in_cluster) + 1
+
+    incdbscan.add_objects(cluster, ids_in_cluster)
+    incdbscan.add_object(new_border_object_value, new_border_object_id)
+
+    assert incdbscan.labels[new_border_object_id] == \
+        incdbscan.labels[ids_in_cluster[-1]]
+
+
 def test_labels_are_noise_until_not_enough_objects_in_cluster(
         incdbscan,
         blob_in_middle):

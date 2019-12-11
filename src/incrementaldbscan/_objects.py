@@ -32,11 +32,9 @@ class _Objects:
     def get_neighbors(
             self,
             query_object,
-            radius,
-            min_pts=0):
+            radius):
 
         return [
             object_ for object_ in self.get_all()
             if self._distance(query_object.value, object_.value) <= radius
-            and object_.neighbor_count >= min_pts
         ]

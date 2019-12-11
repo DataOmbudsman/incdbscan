@@ -77,9 +77,7 @@ class IncrementalDBSCAN(_DBSCANBase):
             object_to_insert, self.CLUSTER_LABEL_UNCLASSIFIED)
 
         neighbors = self._objects.get_neighbors(object_to_insert, self.eps)
-        for neighbor in neighbors:
-            neighbor.neighbor_count += 1
-        object_to_insert.neighbor_count = len(neighbors)
+        self._update_neighbor_counts_after_insert(object_to_insert, neighbors)
 
         new_core_neighbors, old_core_neighbors = \
             self._filter_core_objects_split_by_novelty(neighbors)
@@ -114,7 +112,11 @@ class IncrementalDBSCAN(_DBSCANBase):
 
         update_seeds = self._get_update_seeds(neighbors_of_new_core_neighbors)
 
-        for component in self._get_connected_components(update_seeds):
+        connected_components_in_update_seeds = \
+            self._get_connected_components_in_update_seeds(
+                update_seeds, neighbors_of_new_core_neighbors)
+
+        for component in connected_components_in_update_seeds:
             max_cluster_label = max([
                 self._labels.get_label(obj) for obj in component
             ])
@@ -147,6 +149,11 @@ class IncrementalDBSCAN(_DBSCANBase):
             for neighbor in neighbors:
                 self._labels.set_label(neighbor, label)
 
+    def _update_neighbor_counts_after_insert(self, new_object, neighbors):
+        for neighbor in neighbors:
+            neighbor.neighbor_count += 1
+        new_object.neighbor_count = len(neighbors)
+
     def _filter_core_objects_split_by_novelty(self, objects):
         new_cores = set()
         old_cores = set()
@@ -159,12 +166,12 @@ class IncrementalDBSCAN(_DBSCANBase):
 
         return new_cores, old_cores
 
-    def _get_neighbors_of_objects(self, objects, min_pts=0):
+    def _get_neighbors_of_objects(self, objects):
         neighbors = dict()
 
         for obj in objects:
             neighbors[obj] = \
-                self._objects.get_neighbors(obj, self.eps, min_pts)
+                self._objects.get_neighbors(obj, self.eps)
 
         return neighbors
 
@@ -176,16 +183,26 @@ class IncrementalDBSCAN(_DBSCANBase):
                               if obj.neighbor_count >= self.min_pts]
             seeds.update(core_neighbors)
 
-        return core_neighbors
+        return seeds
 
-    def _get_connected_components(self, objects):
+    def _get_connected_components_in_update_seeds(
+            self,
+            update_seeds: Iterable,
+            stored_neighbors: Dict):
+
         G = nx.Graph()
 
-        for obj in objects:
-            neighbors = \
-                self._objects.get_neighbors(obj, self.eps, self.min_pts)
+        for seed in update_seeds:
+
+            if seed in stored_neighbors:
+                neighbors = stored_neighbors[seed]
+            else:
+                neighbors = \
+                    self._objects.get_neighbors(seed, self.eps)
+
             for neighbor in neighbors:
-                G.add_edge(obj, neighbor)
+                if neighbor.neighbor_count >= self.min_pts:
+                    G.add_edge(seed, neighbor)
 
         return nx.connected_components(G)
 
