@@ -11,7 +11,7 @@ from src.dbscan._dbscanbase import _DBSCANBase
 class IncrementalDBSCAN(_DBSCANBase):
     """
     Based (mostly but not completely) on "Incremental Clustering for Mining
-    in a Data Warehousing Environment by Ester et al. 1998.
+    in a Data Warehousing Environment" by Ester et al. 1998.
     """
 
     def __init__(self, eps, min_pts):
@@ -91,7 +91,7 @@ class IncrementalDBSCAN(_DBSCANBase):
                 print('old_core_neighbors')
                 # If there are already core objects near to the new object,
                 # the new object is put in the most recent cluster.
-                # n.b. This is a case not defined by the paper.
+                # n.b. This is a case not defined in the paper.
                 label_of_new_object = max([
                     self._labels.get_label(obj) for obj in old_core_neighbors
                 ])
@@ -124,7 +124,7 @@ class IncrementalDBSCAN(_DBSCANBase):
             if max_cluster_label < 0:
                 print('max_cluster_label < 0')  # TODO
                 # If in a connected component of update seeds there are only
-                # noise objects, a new cluster is created.
+                # unclassified and noise objects, a new cluster is created.
                 # Similar to case "Creation" in the paper
                 for obj in component:
                     self._labels.set_label(obj, self._next_cluster_label)

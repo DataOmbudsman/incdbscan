@@ -66,6 +66,9 @@ def test_new_border_object_gets_label_from_core(incdbscan):
     incdbscan.add_objects(cluster, ids_in_cluster)
     incdbscan.add_object(new_border_object_value, new_border_object_id)
 
+    assert incdbscan._objects.objects[new_border_object_id].neighbor_count < \
+        incdbscan.min_pts
+
     assert incdbscan.labels[new_border_object_id] == \
         incdbscan.labels[ids_in_cluster[-1]]
 
@@ -89,7 +92,6 @@ def test_labels_are_noise_until_not_enough_objects_in_cluster(
 
 
 def test_new_clusters_get_new_labels(incdbscan, blob_in_middle):
-    distance = 10
     cluster_1_values, cluster_1_ids = blob_in_middle
     cluster_1_expected_label = incdbscan.CLUSTER_LABEL_FIRST_CLUSTER
 
@@ -97,8 +99,9 @@ def test_new_clusters_get_new_labels(incdbscan, blob_in_middle):
     for object_id in cluster_1_ids:
         assert incdbscan.labels[object_id] == cluster_1_expected_label
 
-    cluster_2_values = cluster_1_values + distance * 1
-    cluster_2_ids = cluster_1_ids + len(cluster_1_ids) * 1
+    distance = 10
+    cluster_2_values = cluster_1_values + distance
+    cluster_2_ids = cluster_1_ids + len(cluster_1_ids)
     cluster_2_expected_label = incdbscan.CLUSTER_LABEL_FIRST_CLUSTER + 1
 
     incdbscan.add_objects(cluster_2_values, cluster_2_ids)
@@ -112,3 +115,46 @@ def test_new_clusters_get_new_labels(incdbscan, blob_in_middle):
     incdbscan.add_objects(cluster_3_values, cluster_3_ids)
     for object_id in cluster_3_ids:
         assert incdbscan.labels[object_id] == cluster_3_expected_label
+
+
+def test_two_clusters_can_be_born_at_the_same_time(incdbscan):
+    growing_cluster_1_values = np.array([
+        [incdbscan.eps, 0],
+        [incdbscan.eps * 2, 0],
+        [incdbscan.eps * 2, 0],
+    ])
+    growing_cluster_1_ids = np.arange(len(growing_cluster_1_values))
+
+    growing_cluster_2_values = np.array([
+        [-incdbscan.eps, 0],
+        [-incdbscan.eps * 2, 0],
+        [-incdbscan.eps * 2, 0],
+    ])
+    growing_cluster_2_ids = growing_cluster_1_ids + len(growing_cluster_1_ids)
+
+    new_object_value = np.array([0, 0])
+    new_object_id = max(growing_cluster_2_ids) + 1
+
+    incdbscan.add_objects(growing_cluster_1_values, growing_cluster_1_ids)
+    incdbscan.add_objects(growing_cluster_2_values, growing_cluster_2_ids)
+
+    for object_id in growing_cluster_1_ids:
+        assert incdbscan.labels[object_id] == incdbscan.CLUSTER_LABEL_NOISE
+
+    for object_id in growing_cluster_2_ids:
+        assert incdbscan.labels[object_id] == incdbscan.CLUSTER_LABEL_NOISE
+
+    incdbscan.add_object(new_object_value, new_object_id)
+
+    cluster_1_label = incdbscan.labels[growing_cluster_1_ids[0]]
+    for object_id in growing_cluster_1_ids:
+        assert incdbscan.labels[object_id] == cluster_1_label
+
+    expected_cluster_2_label = 1 - cluster_1_label
+    for object_id in growing_cluster_2_ids:
+        assert incdbscan.labels[object_id] == expected_cluster_2_label
+
+    assert incdbscan.labels[new_object_id] in set((
+        cluster_1_label,
+        expected_cluster_2_label
+    ))
