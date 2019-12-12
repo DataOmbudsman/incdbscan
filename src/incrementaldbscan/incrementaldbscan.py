@@ -90,8 +90,9 @@ class IncrementalDBSCAN(_DBSCANBase):
             if old_core_neighbors:
                 print('old_core_neighbors')
                 # If there are already core objects near to the new object,
-                # the new object is put in the most recent cluster.
-                # n.b. This is a case not defined in the paper.
+                # the new object is put in the most recent cluster. This is
+                # alike to case "Absorption" in the paper but not defined
+                # there.
                 label_of_new_object = max([
                     self._labels.get_label(obj) for obj in old_core_neighbors
                 ])
@@ -125,7 +126,7 @@ class IncrementalDBSCAN(_DBSCANBase):
                 print('max_cluster_label < 0')  # TODO
                 # If in a connected component of update seeds there are only
                 # unclassified and noise objects, a new cluster is created.
-                # Similar to case "Creation" in the paper
+                # Corresponds to case "Creation" in the paper.
                 for obj in component:
                     self._labels.set_label(obj, self._next_cluster_label)
                 self._next_cluster_label += 1
@@ -135,19 +136,18 @@ class IncrementalDBSCAN(_DBSCANBase):
                 # If in a connected component of updates seeds there are
                 # already clustered objects, all objects in the component
                 # will be merged into the most recent cluster.
-                # Similar to case "Absorption" and case "Merge" in the paper
+                # Corresponds to cases "Absorption" and "Merge" in the paper.
                 for obj in component:
                     self._labels.set_label(obj, max_cluster_label)
 
                 # TODO környezetet is ???
                 # Mindet update-eljük vagy mergeöket számon tartjuk
 
-        # Finally all neighbors of each new core object will get a label
-        # corresponding to the new core to cover border objects
-        for new_core, neighbors in neighbors_of_new_core_neighbors.items():
-            label = self._labels.get_label(new_core)
-            for neighbor in neighbors:
-                self._labels.set_label(neighbor, label)
+        # Finally all neighbors of each new core object inherits a label from
+        # its new core neighbor, thereby covering border and noise objects.
+        self._set_cluster_label_to_that_of_new_core_neighbor(
+            neighbors_of_new_core_neighbors
+        )
 
     def _update_neighbor_counts_after_insert(self, new_object, neighbors):
         for neighbor in neighbors:
@@ -206,6 +206,15 @@ class IncrementalDBSCAN(_DBSCANBase):
 
         return nx.connected_components(G)
 
+    def _set_cluster_label_to_that_of_new_core_neighbor(
+            self,
+            neighbors_of_new_core_neighbors):
+
+        for new_core, neighbors in neighbors_of_new_core_neighbors.items():
+            label = self._labels.get_label(new_core)
+            for neighbor in neighbors:
+                self._labels.set_label(neighbor, label)
+
     def _deletion(self, object_id):
         # Do lot of stuff, then:
         self._labels.delete_label(object_id)
@@ -215,3 +224,6 @@ class IncrementalDBSCANWarning(Warning):
     pass
 
 # TODO notebook import fails now
+# TODO pipenv
+# TODO make file?
+# TODO __init__ file setup?
