@@ -14,7 +14,7 @@ class _Updater():
         self.objects = incdbscan._objects
 
     def insertion(self, object_to_insert: _Object):
-        # print('\nInserting', object_to_insert.id)  # TODO
+        print('\nInserting', object_to_insert.id)  # TODO
         self.objects.add_object(object_to_insert)
         self.labels.set_label(
             object_to_insert, self.incdbscan.CLUSTER_LABEL_UNCLASSIFIED)
