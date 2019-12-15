@@ -1,7 +1,7 @@
 import warnings
 from typing import Dict, Iterable
 
-from src.incrementaldbscan._labels import ClusterId, _Labels
+from src.incrementaldbscan._labels import ClusterLabel, _Labels
 from src.incrementaldbscan._objects import _Object, _Objects, ObjectId
 from src.incrementaldbscan._updater import _Updater
 from src.dbscan._dbscanbase import _DBSCANBase
@@ -19,7 +19,8 @@ class IncrementalDBSCAN(_DBSCANBase):
         self._objects = _Objects()
         self._updater = _Updater(self)
 
-        self.labels: Dict[ObjectId, ClusterId] = self._labels.get_all_labels()
+        self.labels: Dict[ObjectId, ClusterLabel] = \
+            self._labels.get_all_labels()
 
     def add_object(self, object_value, object_id: ObjectId):
         """

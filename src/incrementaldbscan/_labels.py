@@ -2,12 +2,12 @@ from typing import Dict
 
 from src.incrementaldbscan._objects import ObjectId
 
-ClusterId = int
+ClusterLabel = int
 
 
 class _Labels:
     def __init__(self):
-        self._labels: Dict[ObjectId, ClusterId] = dict()
+        self._labels: Dict[ObjectId, ClusterLabel] = dict()
 
     def set_label(self, object_, label):
         self._labels[object_.id] = label
@@ -23,3 +23,8 @@ class _Labels:
 
     def delete_label(self, object_id):
         del self._labels[object_id]
+
+    def change_labels(self, change_from, change_to):
+        for object_id, cluster_label in self._labels.items():
+            if cluster_label == change_from:
+                self._labels[object_id] = change_to

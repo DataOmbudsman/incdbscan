@@ -63,12 +63,11 @@ class _Updater():
                 update_seeds, neighbors_of_new_core_neighbors)
 
         for component in connected_components_in_update_seeds:
-            max_cluster_label = max([
-                self.labels.get_label(obj) for obj in component
-            ])
+            real_cluster_labels = \
+                self._get_real_cluster_labels_of_objects(component)
 
-            if max_cluster_label < 0:
-                print('max_cluster_label < 0')  # TODO
+            if not real_cluster_labels:
+                print('not real_cluster_labels')  # TODO
                 # If in a connected component of update seeds there are only
                 # unclassified and noise objects, a new cluster is created.
                 # Corresponds to case "Creation" in the paper.
@@ -79,17 +78,19 @@ class _Updater():
                 self.incdbscan._next_cluster_label += 1
 
             else:
-                print('max_cluster_label >= 0')  # TODO
+                print('real_cluster_labels')  # TODO
                 # If in a connected component of updates seeds there are
                 # already clustered objects, all objects in the component
                 # will be merged into the most recent cluster.
                 # Corresponds to cases "Absorption" and "Merge" in the paper.
 
-                for obj in component:
-                    self.labels.set_label(obj, max_cluster_label)
+                max_label = max(real_cluster_labels)
 
-                # TODO környezetet is ???
-                # Mindet update-eljük vagy mergeöket számon tartjuk
+                for obj in component:
+                    self.labels.set_label(obj, max_label)
+
+                for label in real_cluster_labels:
+                    self.labels.change_labels(label, max_label)
 
         # Finally all neighbors of each new core object inherits a label from
         # its new core neighbor, thereby covering border and noise objects.
@@ -154,6 +155,20 @@ class _Updater():
 
         return nx.connected_components(G)
 
+    def _get_real_cluster_labels_of_objects(self, objects):
+        fake_cluster_labels = set([
+            self.incdbscan.CLUSTER_LABEL_NOISE,
+            self.incdbscan.CLUSTER_LABEL_UNCLASSIFIED
+        ])
+        real_cluster_labels = set()
+
+        for obj in objects:
+            label = self.labels.get_label(obj)
+            if label not in fake_cluster_labels:
+                real_cluster_labels.add(label)
+
+        return real_cluster_labels
+
     def _set_cluster_label_to_that_of_new_core_neighbor(
             self,
             neighbors_of_new_core_neighbors):
@@ -164,5 +179,5 @@ class _Updater():
                 self.labels.set_label(neighbor, label)
 
     def deletion(self, object_id):
-        # Do lot of stuff, then:
+        # Remove object
         self.labels.delete_label(object_id)
