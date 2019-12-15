@@ -262,3 +262,68 @@ def test_merge_two_clusters(incdbscan3, point_at_origin):
         cluster_1_ids, incdbscan3, merged_cluster_expected_label)
     assert_cluster_label_of_ids(
         cluster_2_ids, incdbscan3, merged_cluster_expected_label)
+
+
+def test_merger_and_creation_can_happen_at_the_same_time(
+        incdbscan4,
+        point_at_origin):
+
+    cluster_1_values = np.array([
+        [EPS, EPS],
+        [EPS, EPS * 2],
+        [EPS, EPS * 2],
+    ])
+    cluster_1_ids = [0, 1, 2]
+    cluster_1_expected_label = incdbscan4.CLUSTER_LABEL_FIRST_CLUSTER
+
+    cluster_2_values = np.array([
+        [EPS, -EPS],
+        [EPS, -EPS * 2],
+        [EPS, -EPS * 2],
+    ])
+    cluster_2_ids = [3, 4, 5]
+    cluster_2_expected_label = cluster_1_expected_label + 1
+
+    bridge_point_value, bridge_point_id = np.array([EPS, 0]), 'bridge'
+
+    incdbscan4.add_objects(cluster_1_values, cluster_1_ids)
+    incdbscan4.add_object(bridge_point_value, bridge_point_id)
+    incdbscan4.add_objects(cluster_2_values, cluster_2_ids)
+
+    assert_cluster_label_of_ids(
+        cluster_1_ids, incdbscan4, cluster_1_expected_label)
+    assert_cluster_label_of_ids(
+        cluster_2_ids, incdbscan4, cluster_2_expected_label)
+    assert incdbscan4.labels[bridge_point_id]\
+        in {cluster_2_expected_label, cluster_2_expected_label}
+
+    merged_cluster_expected_label = incdbscan4.labels[bridge_point_id]
+
+    pre_cluster_values = np.array([
+        [-EPS, 0],
+        [-EPS * 2, 0],
+        [-EPS * 2, 0],
+    ])
+    pre_cluster_ids = [6, 7, 8]
+    cluster_3_expected_label = cluster_2_expected_label + 1
+
+    add_values_to_clustering_and_assert(
+        incdbscan4,
+        pre_cluster_values,
+        pre_cluster_ids,
+        incdbscan4.CLUSTER_LABEL_NOISE
+    )
+
+    new_object_value, new_object_id = point_at_origin
+    incdbscan4.add_object(new_object_value, new_object_id)
+
+    assert_cluster_label_of_ids(
+        cluster_1_ids, incdbscan4, merged_cluster_expected_label)
+    assert_cluster_label_of_ids(
+        cluster_2_ids, incdbscan4, merged_cluster_expected_label)
+    assert_cluster_label_of_ids(
+        [bridge_point_id], incdbscan4, merged_cluster_expected_label)
+    assert_cluster_label_of_ids(
+        pre_cluster_ids, incdbscan4, cluster_3_expected_label)
+    assert incdbscan4.labels[new_object_id]\
+        in {merged_cluster_expected_label, cluster_3_expected_label}
