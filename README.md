@@ -2,7 +2,7 @@ IncrementalDBSCAN
 -----------------
 
 # Additions to Ester et al. 1998
-The work by Ester et al. 1998 lays the groundwork for making the incremental version of DBSCAN. However, two edge cases are not covered in the paper. In this section, these holes will be identified, and solutions are proposed to fill them.  
+The work by Ester et al. 1998 lays the groundwork for the incremental version of DBSCAN. However, two edge cases are not covered in the paper. In this section, these holes will be identified, and solutions are proposed to fill them.  
 
 Notations used:
 - _N<sub>Eps</sub>(p)_: the set of all objects that are in the _Eps_-neighborhood of _p_.

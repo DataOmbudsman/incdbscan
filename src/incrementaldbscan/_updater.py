@@ -34,7 +34,7 @@ class _Updater():
                 print('old_core_neighbors')
                 # If there are already core objects near to the new object,
                 # the new object is put in the most recent cluster. This is
-                # akin to case "Absorption" in the paper but not defined
+                # similar to case "Absorption" in the paper but not defined
                 # there.
 
                 label_of_new_object = max([
@@ -69,8 +69,8 @@ class _Updater():
             if not real_cluster_labels:
                 print('not real_cluster_labels')  # TODO
                 # If in a connected component of update seeds there are only
-                # unclassified and noise objects, a new cluster is created.
-                # Corresponds to case "Creation" in the paper.
+                # previously unclassified and noise objects, a new cluster is
+                # created. Corresponds to case "Creation" in the paper.
 
                 for obj in component:
                     self.labels.set_label(
