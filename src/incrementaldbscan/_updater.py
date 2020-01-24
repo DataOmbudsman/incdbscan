@@ -156,15 +156,11 @@ class _Updater():
         return nx.connected_components(G)
 
     def _get_real_cluster_labels_of_objects(self, objects):
-        fake_cluster_labels = set([
-            self.incdbscan.CLUSTER_LABEL_NOISE,
-            self.incdbscan.CLUSTER_LABEL_UNCLASSIFIED
-        ])
         real_cluster_labels = set()
 
         for obj in objects:
             label = self.labels.get_label(obj)
-            if label not in fake_cluster_labels:
+            if label not in self.incdbscan.TECHNICAL_CLUSTER_LABELS:
                 real_cluster_labels.add(label)
 
         return real_cluster_labels
