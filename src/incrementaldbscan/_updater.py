@@ -2,6 +2,7 @@ from typing import Dict, Iterable
 
 import networkx as nx
 
+from src.incrementaldbscan._labels import ClusterLabel
 from src.incrementaldbscan._objects import _Object
 
 
@@ -124,10 +125,14 @@ class _Updater():
 
         return neighbors
 
-    def _get_update_seeds(self, neighbors_of_new_core_neighbors):
+    def _get_update_seeds(self, neighbors_dict):
+        """
+        During insertion, neighbors_dict holds neighbors of new core neighbors.
+        During deletion, neighbors_dict hold neighbors of ex core neighbors.
+        """
         seeds = set()
 
-        for neighbors in neighbors_of_new_core_neighbors.values():
+        for neighbors in neighbors_dict.values():
             core_neighbors = [obj for obj in neighbors
                               if obj.neighbor_count >= self.min_pts]
             seeds.update(core_neighbors)
@@ -175,5 +180,66 @@ class _Updater():
                 self.labels.set_label(neighbor, label)
 
     def deletion(self, object_id):
-        # Remove object
-        self.labels.delete_label(object_id)
+        print('\nDeleting', object_id)
+        object_to_delete = self.objects.get_object(object_id)
+        self.objects.remove_object(object_id)
+
+        neighbors = self.objects.get_neighbors(object_to_delete, self.eps)
+        self._update_neighbor_counts_after_deletion(neighbors)
+
+        ex_core_neighbors = [
+            obj for obj in neighbors if obj.neighbor_count == self.min_pts - 1
+        ]
+
+        if object_to_delete.neighbor_count >= self.min_pts:
+            ex_core_neighbors.append(object_to_delete)
+
+        neighbors_of_ex_core_neighbors = \
+            self._get_neighbors_of_objects(ex_core_neighbors)
+
+        update_seeds = self._get_update_seeds(neighbors_of_ex_core_neighbors)
+
+        # TODO what to refactor from above?
+
+        if not update_seeds:
+            print('not update_seeds')  # TODO
+            # If there are no update seeds, only border objects might change
+            # their cluster assignment, either to noise or to the cluster id of
+            # a core object in their neighborhood. Similar to, but a fixed
+            # version of case "Removal" in the paper
+
+            for ex_core in neighbors_of_ex_core_neighbors.keys():
+                label_of_ex_core = self.labels.get_label(ex_core)
+                neighbors_of_ex_core = neighbors_of_ex_core_neighbors[ex_core]
+
+                for obj in neighbors_of_ex_core:
+                    self._set_cluster_label_to_largest_in_neighborhood(
+                        obj, label_of_ex_core
+                    )
+
+            self.labels.delete_label(object_id)
+            return
+
+        # Folyt. 2&3. eset
+
+        # TODO Talán a végére ez kell? self.labels.delete_label(object_id)
+
+    def _update_neighbor_counts_after_deletion(self, neighbors):
+        for neighbor in neighbors:
+            neighbor.neighbor_count -= 1
+
+    def _set_cluster_label_to_largest_in_neighborhood(
+            self,
+            object_,
+            excluded: ClusterLabel):
+
+        labels = set()
+
+        for neighbor in self.objects.get_neighbors(object_, self.eps):
+            label_of_neighbor = self.labels.get_label(neighbor)
+            labels.add(label_of_neighbor)
+
+        labels.add(self.incdbscan.CLUSTER_LABEL_NOISE)
+        labels.remove(excluded)
+
+        self.labels.set_label(object_, max(labels))

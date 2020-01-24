@@ -26,6 +26,9 @@ class _Objects:
     def remove_object(self, object_id: ObjectId):
         del self.objects[object_id]
 
+    def get_object(self, object_id: ObjectId):
+        return self.objects[object_id]
+
     def get_all(self):
         return self.objects.values()
 
