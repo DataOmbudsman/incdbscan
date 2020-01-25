@@ -100,7 +100,7 @@ def test_border_object_can_switch_to_other_cluster(
     assert_cluster_label_of_ids([border_id], incdbscan4, cluster_1_label)
 
 
-def test_borders_around_point_losing_core_property_become_noise(
+def test_borders_around_point_losing_core_property_can_become_noise(
         incdbscan4,
         point_at_origin):
 

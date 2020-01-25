@@ -212,15 +212,15 @@ class _Updater():
                 label_of_ex_core = self.labels.get_label(ex_core)
                 neighbors_of_ex_core = neighbors_of_ex_core_neighbors[ex_core]
 
-                for obj in neighbors_of_ex_core:
-                    self._set_cluster_label_to_largest_in_neighborhood(
-                        obj, label_of_ex_core
-                    )
+                self._set_object_labels_to_largest_around_in_parallel(
+                    objects_to_set=neighbors_of_ex_core,
+                    excluded_labels=[label_of_ex_core]
+                )
 
             self.labels.delete_label(object_id)
             return
 
-        # Folyt. 2&3. eset
+        print('update seeds')
 
         # TODO Talán a végére ez kell? self.labels.delete_label(object_id)
 
@@ -228,18 +228,29 @@ class _Updater():
         for neighbor in neighbors:
             neighbor.neighbor_count -= 1
 
-    def _set_cluster_label_to_largest_in_neighborhood(
+    def _set_object_labels_to_largest_around_in_parallel(
             self,
-            object_,
-            excluded: ClusterLabel):
+            objects_to_set,
+            excluded_labels):
 
+        cluster_updates = {}
+
+        for obj in objects_to_set:
+            labels = self._get_cluster_labels_in_neighborhood(obj)
+            labels.difference_update(excluded_labels)
+            if not labels:
+                labels.add(self.incdbscan.CLUSTER_LABEL_NOISE)
+
+            cluster_updates[obj] = max(labels)
+
+        for obj, new_cluster_label in cluster_updates.items():
+            self.labels.set_label(obj, new_cluster_label)
+
+    def _get_cluster_labels_in_neighborhood(self, obj):
         labels = set()
 
-        for neighbor in self.objects.get_neighbors(object_, self.eps):
+        for neighbor in self.objects.get_neighbors(obj, self.eps):
             label_of_neighbor = self.labels.get_label(neighbor)
             labels.add(label_of_neighbor)
 
-        labels.add(self.incdbscan.CLUSTER_LABEL_NOISE)
-        labels.remove(excluded)
-
-        self.labels.set_label(object_, max(labels))
+        return labels
