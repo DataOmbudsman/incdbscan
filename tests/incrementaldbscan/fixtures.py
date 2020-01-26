@@ -25,7 +25,7 @@ def blob_in_middle():
         n_samples=10,
         centers=[[0, 0]],
         n_features=2,
-        cluster_std=0.5,
+        cluster_std=0.4,
         random_state=123
     )
     ids = np.arange(len(values))

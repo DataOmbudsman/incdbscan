@@ -3,10 +3,32 @@ import numpy as np
 from tests.incrementaldbscan.fixtures import (
     add_values_to_clustering_and_assert,
     assert_cluster_label_of_ids,
+    blob_in_middle,
     EPS,
     incdbscan4,
     point_at_origin
 )
+
+
+def test_after_removing_enough_objects_only_noise_remain(
+        incdbscan4,
+        blob_in_middle):
+
+    blob_values, blob_ids = blob_in_middle
+    incdbscan4.add_objects(blob_values, blob_ids)
+
+    blob_ids = list(blob_ids)
+    while blob_ids:
+        object_id_to_remove = blob_ids.pop(-1)
+        incdbscan4.remove_object(object_id_to_remove)
+
+        expected_label = (
+            incdbscan4.CLUSTER_LABEL_NOISE
+            if len(blob_ids) < incdbscan4.min_pts
+            else incdbscan4.CLUSTER_LABEL_FIRST_CLUSTER
+        )
+
+        assert_cluster_label_of_ids(blob_ids, incdbscan4, expected_label)
 
 
 def test_removing_only_core_makes_borders_noise(incdbscan4, point_at_origin):
@@ -104,5 +126,3 @@ def test_borders_around_point_losing_core_property_can_become_noise(
         incdbscan4,
         incdbscan4.CLUSTER_LABEL_NOISE
     )
-
-# def test_after_removing_enough_objects_only_noise_remain()
