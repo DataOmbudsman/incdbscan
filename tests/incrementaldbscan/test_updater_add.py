@@ -69,8 +69,7 @@ def test_labels_are_noise_only_until_not_enough_objects_in_cluster(
             else incdbscan4.CLUSTER_LABEL_FIRST_CLUSTER
         )
 
-        for j in range(i + 1):
-            assert incdbscan4.labels[blob_ids[j]] == expected_label
+        assert_cluster_label_of_ids(blob_ids[:i+1], incdbscan4, expected_label)
 
 
 def test_more_than_two_clusters_can_be_created(incdbscan4, blob_in_middle):
