@@ -1,38 +1,12 @@
-from typing import Iterable
-
 import numpy as np
-import pytest
 
-from src.incrementaldbscan.incrementaldbscan import IncrementalDBSCAN
-
-EPS = 1.5
-
-
-@pytest.fixture
-def incdbscan4():
-    return IncrementalDBSCAN(eps=EPS, min_pts=4)
-
-
-@pytest.fixture
-def point_at_origin():
-    value = np.array([0, 0])
-    id_ = 'origin'
-    return value, id_
-
-
-def assert_cluster_label_of_ids(object_ids: Iterable, incdbscan_fit, label):
-    for object_id in object_ids:
-        assert incdbscan_fit.labels[object_id] == label
-
-
-def add_values_to_clustering_and_assert(
-        incdbscan,
-        values: Iterable,
-        ids: Iterable,
-        expected_label):
-
-    incdbscan.add_objects(values, ids)
-    assert_cluster_label_of_ids(ids, incdbscan, expected_label)
+from tests.incrementaldbscan.fixtures import (
+    add_values_to_clustering_and_assert,
+    assert_cluster_label_of_ids,
+    EPS,
+    incdbscan4,
+    point_at_origin
+)
 
 
 def test_removing_only_core_makes_borders_noise(incdbscan4, point_at_origin):
@@ -130,3 +104,5 @@ def test_borders_around_point_losing_core_property_can_become_noise(
         incdbscan4,
         incdbscan4.CLUSTER_LABEL_NOISE
     )
+
+# def test_after_removing_enough_objects_only_noise_remain()
