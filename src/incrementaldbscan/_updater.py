@@ -2,7 +2,6 @@ from typing import Dict, Iterable
 
 import networkx as nx
 
-from src.incrementaldbscan._labels import ClusterLabel
 from src.incrementaldbscan._objects import _Object
 
 
@@ -95,6 +94,7 @@ class _Updater():
 
         # Finally all neighbors of each new core object inherits a label from
         # its new core neighbor, thereby covering border and noise objects.
+
         self._set_cluster_label_to_that_of_new_core_neighbor(
             neighbors_of_new_core_neighbors
         )
@@ -201,34 +201,35 @@ class _Updater():
 
         # TODO what to refactor from above?
 
-        if not update_seeds:
-            print('not update_seeds')  # TODO
-            # If there are no update seeds, only border objects might change
-            # their cluster assignment, either to noise or to the cluster id of
-            # a core object in their neighborhood. Similar to, but a fixed
-            # version of case "Removal" in the paper
+        if update_seeds:
+            print('update_seeds')  # TODO
+            pass
 
-            for ex_core in neighbors_of_ex_core_neighbors.keys():
-                label_of_ex_core = self.labels.get_label(ex_core)
-                neighbors_of_ex_core = neighbors_of_ex_core_neighbors[ex_core]
+        # Updating labels of border objects that were in the neighborhood
+        # of objects that lost their core property is always needed. They
+        # become either borders of other clusters or noise.
 
-                self._set_object_labels_to_largest_around_in_parallel(
-                    objects_to_set=neighbors_of_ex_core,
-                    excluded_labels=[label_of_ex_core]
-                )
-
-            self.labels.delete_label(object_id)
-            return
-
-        print('update seeds')
-
-        # TODO Talán a végére ez kell? self.labels.delete_label(object_id)
+        self._update_labels_of_border_objects_of_ex_cores(
+            neighbors_of_ex_core_neighbors)
+        self.labels.delete_label(object_id)
 
     def _update_neighbor_counts_after_deletion(self, neighbors):
         for neighbor in neighbors:
             neighbor.neighbor_count -= 1
 
-    def _set_object_labels_to_largest_around_in_parallel(
+    def _update_labels_of_border_objects_of_ex_cores(
+            self,
+            neighbors_of_ex_cores):
+
+        for ex_core, neighbors_of_ex_core in neighbors_of_ex_cores.items():
+            label_of_ex_core = self.labels.get_label(ex_core)
+
+            self._set_border_object_labels_to_largest_around_in_parallel(
+                objects_to_set=neighbors_of_ex_core,
+                excluded_labels=[label_of_ex_core]
+            )
+
+    def _set_border_object_labels_to_largest_around_in_parallel(
             self,
             objects_to_set,
             excluded_labels):
@@ -236,12 +237,13 @@ class _Updater():
         cluster_updates = {}
 
         for obj in objects_to_set:
-            labels = self._get_cluster_labels_in_neighborhood(obj)
-            labels.difference_update(excluded_labels)
-            if not labels:
-                labels.add(self.incdbscan.CLUSTER_LABEL_NOISE)
+            if obj.neighbor_count < self.min_pts:
+                labels = self._get_cluster_labels_in_neighborhood(obj)
+                labels.difference_update(excluded_labels)
+                if not labels:
+                    labels.add(self.incdbscan.CLUSTER_LABEL_NOISE)
 
-            cluster_updates[obj] = max(labels)
+                cluster_updates[obj] = max(labels)
 
         for obj, new_cluster_label in cluster_updates.items():
             self.labels.set_label(obj, new_cluster_label)
