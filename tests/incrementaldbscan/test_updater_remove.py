@@ -1,12 +1,9 @@
 import numpy as np
 
-from tests.incrementaldbscan.fixtures import (
+from tests.incrementaldbscan.conftest import EPS
+from tests.incrementaldbscan.utils import (
     add_values_to_clustering_and_assert,
-    assert_cluster_label_of_ids,
-    blob_in_middle,
-    EPS,
-    incdbscan4,
-    point_at_origin
+    assert_cluster_label_of_ids
 )
 
 
