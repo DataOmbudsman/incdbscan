@@ -77,6 +77,4 @@ class IncrementalDBSCANWarning(Warning):
     pass
 
 # TODO notebook import fails now
-# TODO pipenv
-# TODO make file?
 # TODO __init__ file setup?
