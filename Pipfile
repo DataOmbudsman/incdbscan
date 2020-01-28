@@ -6,6 +6,7 @@ verify_ssl = true
 [dev-packages]
 pylint = "*"
 flake8 = "*"
+rope = "*"
 
 [packages]
 pytest = "*"
