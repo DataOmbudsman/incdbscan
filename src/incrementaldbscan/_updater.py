@@ -2,22 +2,28 @@ from typing import Dict, Iterable
 
 import networkx as nx
 
-from src.incrementaldbscan._objects import _Object
+from src.incrementaldbscan._labels import (
+    CLUSTER_LABEL_UNCLASSIFIED,
+    CLUSTER_LABEL_NOISE,
+    CLUSTER_LABEL_FIRST_CLUSTER,
+    _Labels
+)
+from src.incrementaldbscan._objects import _Object, _Objects
 
 
 class _Updater():
-    def __init__(self, incdbscan):
-        self.incdbscan = incdbscan
-        self.eps = incdbscan.eps
-        self.min_pts = incdbscan.min_pts
-        self.labels = incdbscan._labels
-        self.objects = incdbscan._objects
+    def __init__(self, eps, min_pts):
+        self.eps = eps
+        self.min_pts = min_pts
+        self.labels = _Labels()
+        self.objects = _Objects()
+        self.next_cluster_label = CLUSTER_LABEL_FIRST_CLUSTER
 
     def insertion(self, object_to_insert: _Object):
         print('\nInserting', object_to_insert.id)  # TODO
         self.objects.add_object(object_to_insert)
         self.labels.set_label(
-            object_to_insert, self.incdbscan.CLUSTER_LABEL_UNCLASSIFIED)
+            object_to_insert, CLUSTER_LABEL_UNCLASSIFIED)
 
         neighbors = self.objects.get_neighbors(object_to_insert, self.eps)
         self._update_neighbor_counts_after_insert(object_to_insert, neighbors)
@@ -27,8 +33,8 @@ class _Updater():
 
         if not new_core_neighbors:
             print('\nnot new_core_neighbors')  # TODO
-            # If there is no new core object,
-            # only the new object has to be put in a cluster.
+            # If there is no new core object, only the new object has to be
+            # put in a cluster.
 
             if old_core_neighbors:
                 print('old_core_neighbors')
@@ -46,10 +52,9 @@ class _Updater():
                 # If the new object does not have any core neighbors,
                 # it becomes a noise. Called case "Noise" in the paper.
 
-                label_of_new_object = self.incdbscan.CLUSTER_LABEL_NOISE
+                label_of_new_object = CLUSTER_LABEL_NOISE
 
-            self.labels.set_label(
-                    object_to_insert, label_of_new_object)
+            self.labels.set_label(object_to_insert, label_of_new_object)
             return
 
         print('\nnew_core_neighbors')  # TODO
@@ -63,19 +68,18 @@ class _Updater():
                 update_seeds, neighbors_of_new_core_neighbors)
 
         for component in connected_components_in_update_seeds:
-            real_cluster_labels = \
-                self._get_real_cluster_labels_of_objects(component)
+            effective_cluster_labels = \
+                self._get_effective_cluster_labels_of_objects(component)
 
-            if not real_cluster_labels:
-                print('not real_cluster_labels')  # TODO
+            if not effective_cluster_labels:
+                print('not effective_cluster_labels')  # TODO
                 # If in a connected component of update seeds there are only
                 # previously unclassified and noise objects, a new cluster is
                 # created. Corresponds to case "Creation" in the paper.
 
                 for obj in component:
-                    self.labels.set_label(
-                        obj, self.incdbscan._next_cluster_label)
-                self.incdbscan._next_cluster_label += 1
+                    self.labels.set_label(obj, self.next_cluster_label)
+                self.next_cluster_label += 1
 
             else:
                 print('real_cluster_labels')  # TODO
@@ -84,16 +88,17 @@ class _Updater():
                 # will be merged into the most recent cluster.
                 # Corresponds to cases "Absorption" and "Merge" in the paper.
 
-                max_label = max(real_cluster_labels)
+                max_label = max(effective_cluster_labels)
 
                 for obj in component:
                     self.labels.set_label(obj, max_label)
 
-                for label in real_cluster_labels:
+                for label in effective_cluster_labels:
                     self.labels.change_labels(label, max_label)
 
         # Finally all neighbors of each new core object inherits a label from
-        # its new core neighbor, thereby covering border and noise objects.
+        # its new core neighbor, thereby affecting border and noise objects,
+        # and the object being inserted.
 
         self._set_cluster_label_to_that_of_new_core_neighbor(
             neighbors_of_new_core_neighbors
@@ -120,8 +125,7 @@ class _Updater():
         neighbors = dict()
 
         for obj in objects:
-            neighbors[obj] = \
-                self.objects.get_neighbors(obj, self.eps)
+            neighbors[obj] = self.objects.get_neighbors(obj, self.eps)
 
         return neighbors
 
@@ -151,8 +155,7 @@ class _Updater():
             if seed in stored_neighbors:
                 neighbors = stored_neighbors[seed]
             else:
-                neighbors = \
-                    self.objects.get_neighbors(seed, self.eps)
+                neighbors = self.objects.get_neighbors(seed, self.eps)
 
             for neighbor in neighbors:
                 if neighbor.neighbor_count >= self.min_pts:
@@ -160,15 +163,19 @@ class _Updater():
 
         return nx.connected_components(G)
 
-    def _get_real_cluster_labels_of_objects(self, objects):
-        real_cluster_labels = set()
+    def _get_effective_cluster_labels_of_objects(self, objects):
+        non_effective_cluster_labels = set([
+            CLUSTER_LABEL_UNCLASSIFIED,
+            CLUSTER_LABEL_NOISE
+        ])
+        effective_cluster_labels = set()
 
         for obj in objects:
             label = self.labels.get_label(obj)
-            if label not in self.incdbscan.TECHNICAL_CLUSTER_LABELS:
-                real_cluster_labels.add(label)
+            if label not in non_effective_cluster_labels:
+                effective_cluster_labels.add(label)
 
-        return real_cluster_labels
+        return effective_cluster_labels
 
     def _set_cluster_label_to_that_of_new_core_neighbor(
             self,
@@ -241,7 +248,7 @@ class _Updater():
                 labels = self._get_cluster_labels_in_neighborhood(obj)
                 labels.difference_update(excluded_labels)
                 if not labels:
-                    labels.add(self.incdbscan.CLUSTER_LABEL_NOISE)
+                    labels.add(CLUSTER_LABEL_NOISE)
 
                 cluster_updates[obj] = max(labels)
 

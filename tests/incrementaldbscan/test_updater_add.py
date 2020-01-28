@@ -6,12 +6,15 @@ from tests.incrementaldbscan.utils import (
     assert_cluster_label_of_ids
 )
 
+CLUSTER_LABEL_NOISE = -1
+CLUSTER_LABEL_FIRST_CLUSTER = 0
+
 
 def test_new_single_object_is_labeled_as_noise(incdbscan4, object_far_away):
     object_value, object_id = object_far_away
     incdbscan4.add_object(object_value, object_id)
 
-    assert incdbscan4.labels[object_id] == incdbscan4.CLUSTER_LABEL_NOISE
+    assert incdbscan4.labels[object_id] == CLUSTER_LABEL_NOISE
 
 
 def test_new_object_far_from_cluster_is_labeled_as_noise(
@@ -25,7 +28,7 @@ def test_new_object_far_from_cluster_is_labeled_as_noise(
     incdbscan4.add_objects(blob_values, blob_ids)
     incdbscan4.add_object(object_value, object_id)
 
-    assert incdbscan4.labels[object_id] == incdbscan4.CLUSTER_LABEL_NOISE
+    assert incdbscan4.labels[object_id] == CLUSTER_LABEL_NOISE
 
 
 def test_new_border_object_gets_label_from_core(incdbscan4):
@@ -43,9 +46,6 @@ def test_new_border_object_gets_label_from_core(incdbscan4):
     incdbscan4.add_objects(cluster, ids_in_cluster)
     incdbscan4.add_object(new_border_object_value, new_border_object_id)
 
-    assert incdbscan4._objects.objects[new_border_object_id].neighbor_count < \
-        incdbscan4.min_pts
-
     assert incdbscan4.labels[new_border_object_id] == \
         incdbscan4.labels[ids_in_cluster[-1]]
 
@@ -60,8 +60,8 @@ def test_labels_are_noise_only_until_not_enough_objects_in_cluster(
         incdbscan4.add_object(object_value, object_id)
 
         expected_label = (
-            incdbscan4.CLUSTER_LABEL_NOISE if i + 1 < incdbscan4.min_pts
-            else incdbscan4.CLUSTER_LABEL_FIRST_CLUSTER
+            CLUSTER_LABEL_NOISE if i + 1 < incdbscan4.min_pts
+            else CLUSTER_LABEL_FIRST_CLUSTER
         )
 
         assert_cluster_label_of_ids(blob_ids[:i+1], incdbscan4, expected_label)
@@ -70,7 +70,7 @@ def test_labels_are_noise_only_until_not_enough_objects_in_cluster(
 def test_more_than_two_clusters_can_be_created(incdbscan4, blob_in_middle):
 
     cluster_1_values, cluster_1_ids = blob_in_middle
-    cluster_1_expected_label = incdbscan4.CLUSTER_LABEL_FIRST_CLUSTER
+    cluster_1_expected_label = CLUSTER_LABEL_FIRST_CLUSTER
 
     add_values_to_clustering_and_assert(
         incdbscan4, cluster_1_values, cluster_1_ids, cluster_1_expected_label)
@@ -111,11 +111,8 @@ def test_two_clusters_can_be_born_at_the_same_time(
     incdbscan4.add_objects(cluster_1_values, cluster_1_ids)
     incdbscan4.add_objects(cluster_2_values, cluster_2_ids)
 
-    assert_cluster_label_of_ids(
-        cluster_1_ids, incdbscan4, incdbscan4.CLUSTER_LABEL_NOISE)
-
-    assert_cluster_label_of_ids(
-        cluster_2_ids, incdbscan4, incdbscan4.CLUSTER_LABEL_NOISE)
+    assert_cluster_label_of_ids(cluster_1_ids, incdbscan4, CLUSTER_LABEL_NOISE)
+    assert_cluster_label_of_ids(cluster_2_ids, incdbscan4, CLUSTER_LABEL_NOISE)
 
     new_object_value, new_object_id = point_at_origin
     incdbscan4.add_object(new_object_value, new_object_id)
@@ -125,7 +122,7 @@ def test_two_clusters_can_be_born_at_the_same_time(
         cluster_1_ids, incdbscan4, cluster_1_label_expected)
 
     cluster_2_label_expected = \
-        incdbscan4.CLUSTER_LABEL_FIRST_CLUSTER + 1 - cluster_1_label_expected
+        CLUSTER_LABEL_FIRST_CLUSTER + 1 - cluster_1_label_expected
     assert_cluster_label_of_ids(
         cluster_2_ids, incdbscan4, cluster_2_label_expected)
 
@@ -136,7 +133,7 @@ def test_two_clusters_can_be_born_at_the_same_time(
 
 
 def test_absorption_with_noise(incdbscan3, point_at_origin):
-    expected_cluster_label = incdbscan3.CLUSTER_LABEL_FIRST_CLUSTER
+    expected_cluster_label = CLUSTER_LABEL_FIRST_CLUSTER
 
     cluster_values = np.array([
         [EPS, 0],
@@ -151,7 +148,7 @@ def test_absorption_with_noise(incdbscan3, point_at_origin):
     noise_value, noise_id = np.array([0, EPS]), 'NOISE'
 
     add_values_to_clustering_and_assert(
-        incdbscan3, [noise_value], [noise_id], incdbscan3.CLUSTER_LABEL_NOISE)
+        incdbscan3, [noise_value], [noise_id], CLUSTER_LABEL_NOISE)
 
     new_object_value, new_object_id = point_at_origin
 
@@ -173,7 +170,7 @@ def test_merge_two_clusters(incdbscan3, point_at_origin):
         [EPS * 4, 0],
     ])
     cluster_1_ids = [0, 1, 2, 3]
-    cluster_1_expected_label = incdbscan3.CLUSTER_LABEL_FIRST_CLUSTER
+    cluster_1_expected_label = CLUSTER_LABEL_FIRST_CLUSTER
 
     add_values_to_clustering_and_assert(
         incdbscan3, cluster_1_values, cluster_1_ids, cluster_1_expected_label
@@ -219,7 +216,7 @@ def test_merger_and_creation_can_happen_at_the_same_time(
         [EPS, EPS * 2],
     ])
     cluster_1_ids = [0, 1, 2]
-    cluster_1_expected_label = incdbscan4.CLUSTER_LABEL_FIRST_CLUSTER
+    cluster_1_expected_label = CLUSTER_LABEL_FIRST_CLUSTER
 
     cluster_2_values = np.array([
         [EPS, -EPS],
@@ -256,7 +253,7 @@ def test_merger_and_creation_can_happen_at_the_same_time(
         incdbscan4,
         pre_cluster_values,
         pre_cluster_ids,
-        incdbscan4.CLUSTER_LABEL_NOISE
+        CLUSTER_LABEL_NOISE
     )
 
     new_object_value, new_object_id = point_at_origin

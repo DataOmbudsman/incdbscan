@@ -1,26 +1,23 @@
 import warnings
 from typing import Dict, Iterable
 
-from src.incrementaldbscan._labels import ClusterLabel, _Labels
-from src.incrementaldbscan._objects import _Object, _Objects, ObjectId
+from src.incrementaldbscan._labels import ClusterLabel
+from src.incrementaldbscan._objects import _Object, ObjectId
 from src.incrementaldbscan._updater import _Updater
-from src.dbscan._dbscanbase import _DBSCANBase
 
 
-class IncrementalDBSCAN(_DBSCANBase):
+class IncrementalDBSCAN():
     """
     Based (mostly but not completely) on "Incremental Clustering for Mining
     in a Data Warehousing Environment" by Ester et al. 1998.
     """
 
     def __init__(self, eps, min_pts):
-        super().__init__(eps, min_pts)
-        self._labels = _Labels()
-        self._objects = _Objects()
-        self._updater = _Updater(self)
-
+        self.eps = eps
+        self.min_pts = min_pts
+        self._updater = _Updater(self.eps, self.min_pts)
         self.labels: Dict[ObjectId, ClusterLabel] = \
-            self._labels.get_all_labels()
+            self._updater.labels.get_all_labels()
 
     def add_object(self, object_value, object_id: ObjectId):
         """
@@ -28,7 +25,7 @@ class IncrementalDBSCAN(_DBSCANBase):
         ID is of an unhashable type, such as int or str.
         """
 
-        if not self._labels.has_label(object_id):
+        if object_id not in self.labels:
             object_to_insert = _Object(object_value, object_id)
             self._updater.insertion(object_to_insert)
 
@@ -55,7 +52,7 @@ class IncrementalDBSCAN(_DBSCANBase):
     def remove_object(self, object_id: ObjectId):
         """Remove object, given by its ID, from clustering."""
 
-        if self._labels.has_label(object_id):
+        if object_id in self.labels:
             self._updater.deletion(object_id)
 
         else:

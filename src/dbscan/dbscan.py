@@ -1,27 +1,32 @@
 import numpy as np
 from sklearn.neighbors import NearestNeighbors
 
-from src.dbscan._dbscanbase import _DBSCANBase
 
-
-class DBSCAN(_DBSCANBase):
+class DBSCAN:
     """
     Based on "A Density-Based Algorithm for Discovering Clusters in Large
     Spatial Databases with Noise" by Ester et al. 1996.
     """
 
+    _CLUSTER_LABEL_UNCLASSIFIED = -2
+    _CLUSTER_LABEL_NOISE = -1
+    _CLUSTER_LABEL_FIRST_CLUSTER = 0
+
     def __init__(self, eps, min_pts):
-        super().__init__(eps, min_pts)
+        self.eps = eps
+        self.min_pts = min_pts
+        self.labels = None
+        self._next_cluster_label = self._CLUSTER_LABEL_FIRST_CLUSTER
 
     def _init_fit(self, X):
-        self.labels = np.repeat([DBSCAN.CLUSTER_LABEL_UNCLASSIFIED], len(X))
+        self.labels = np.repeat([self._CLUSTER_LABEL_UNCLASSIFIED], len(X))
         self._nn = NearestNeighbors(radius=self.eps).fit(X)
 
     def _is_point_unclassified(self, ix):
-        return self.labels[ix] == DBSCAN.CLUSTER_LABEL_UNCLASSIFIED
+        return self.labels[ix] == self._CLUSTER_LABEL_UNCLASSIFIED
 
     def _is_point_noise(self, ix):
-        return self.labels[ix] == DBSCAN.CLUSTER_LABEL_NOISE
+        return self.labels[ix] == self._CLUSTER_LABEL_NOISE
 
     def _assign_label(self, ix, label):
         self.labels[ix] = label
@@ -36,7 +41,7 @@ class DBSCAN(_DBSCANBase):
         seeds = self._get_neighbors(point)
 
         if len(seeds) < self.min_pts:
-            self._assign_label(ix, DBSCAN.CLUSTER_LABEL_NOISE)
+            self._assign_label(ix, self._CLUSTER_LABEL_NOISE)
             return
 
         for seed in seeds:
@@ -59,6 +64,7 @@ class DBSCAN(_DBSCANBase):
         self._next_cluster_label += 1
 
     def fit(self, X):
+        """Returns cluster labels. Indices start from 0. -1 means noise."""
         self._init_fit(X)
 
         for ix in range(len(X)):

@@ -6,6 +6,9 @@ from tests.incrementaldbscan.utils import (
     assert_cluster_label_of_ids
 )
 
+CLUSTER_LABEL_NOISE = -1
+CLUSTER_LABEL_FIRST_CLUSTER = 0
+
 
 def test_after_removing_enough_objects_only_noise_remain(
         incdbscan4,
@@ -20,9 +23,9 @@ def test_after_removing_enough_objects_only_noise_remain(
         incdbscan4.remove_object(object_id_to_remove)
 
         expected_label = (
-            incdbscan4.CLUSTER_LABEL_NOISE
+            CLUSTER_LABEL_NOISE
             if len(blob_ids) < incdbscan4.min_pts
-            else incdbscan4.CLUSTER_LABEL_FIRST_CLUSTER
+            else CLUSTER_LABEL_FIRST_CLUSTER
         )
 
         assert_cluster_label_of_ids(blob_ids, incdbscan4, expected_label)
@@ -41,12 +44,9 @@ def test_removing_only_core_makes_borders_noise(incdbscan4, point_at_origin):
 
     incdbscan4.add_objects(border_values, border_ids)
 
-    print(incdbscan4._labels._labels)
-
     incdbscan4.remove_object(core_id)
 
-    assert_cluster_label_of_ids(
-        border_ids, incdbscan4, incdbscan4.CLUSTER_LABEL_NOISE)
+    assert_cluster_label_of_ids(border_ids, incdbscan4, CLUSTER_LABEL_NOISE)
 
 
 def test_border_object_can_switch_to_other_cluster(
@@ -62,7 +62,7 @@ def test_border_object_can_switch_to_other_cluster(
         [EPS, -EPS],
     ])
     cluster_1_ids = np.array([0, 1, 2])
-    cluster_1_label = incdbscan4.CLUSTER_LABEL_FIRST_CLUSTER
+    cluster_1_label = CLUSTER_LABEL_FIRST_CLUSTER
 
     cluster_2_values = np.array([
         [-EPS, 0],
@@ -113,7 +113,7 @@ def test_borders_around_point_losing_core_property_can_become_noise(
     all_ids = all_ids_but_object_to_remove + [point_to_remove_id]
 
     add_values_to_clustering_and_assert(
-        incdbscan4, all_values, all_ids, incdbscan4.CLUSTER_LABEL_FIRST_CLUSTER
+        incdbscan4, all_values, all_ids, CLUSTER_LABEL_FIRST_CLUSTER
     )
 
     incdbscan4.remove_object(point_to_remove_id)
@@ -121,5 +121,5 @@ def test_borders_around_point_losing_core_property_can_become_noise(
     assert_cluster_label_of_ids(
         all_ids_but_object_to_remove,
         incdbscan4,
-        incdbscan4.CLUSTER_LABEL_NOISE
+        CLUSTER_LABEL_NOISE
     )

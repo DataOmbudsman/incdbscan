@@ -4,6 +4,10 @@ from src.incrementaldbscan._objects import ObjectId
 
 ClusterLabel = int
 
+CLUSTER_LABEL_UNCLASSIFIED: ClusterLabel = -2
+CLUSTER_LABEL_NOISE: ClusterLabel = -1
+CLUSTER_LABEL_FIRST_CLUSTER: ClusterLabel = 0
+
 
 class _Labels:
     def __init__(self):
