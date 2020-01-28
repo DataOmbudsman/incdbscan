@@ -194,19 +194,14 @@ class _Updater():
         neighbors = self.objects.get_neighbors(object_to_delete, self.eps)
         self._update_neighbor_counts_after_deletion(neighbors)
 
-        ex_core_neighbors = [
-            obj for obj in neighbors if obj.neighbor_count == self.min_pts - 1
-        ]
+        ex_cores = self._get_objects_that_lost_core_property(
+            neighbors,
+            object_to_delete
+        )
 
-        if object_to_delete.neighbor_count >= self.min_pts:
-            ex_core_neighbors.append(object_to_delete)
+        neighbors_of_ex_cores = self._get_neighbors_of_objects(ex_cores)
 
-        neighbors_of_ex_core_neighbors = \
-            self._get_neighbors_of_objects(ex_core_neighbors)
-
-        update_seeds = self._get_update_seeds(neighbors_of_ex_core_neighbors)
-
-        # TODO what to refactor from above?
+        update_seeds = self._get_update_seeds(neighbors_of_ex_cores)
 
         if update_seeds:
             print('update_seeds')  # TODO
@@ -217,8 +212,24 @@ class _Updater():
         # become either borders of other clusters or noise.
 
         self._update_labels_of_border_objects_of_ex_cores(
-            neighbors_of_ex_core_neighbors)
+            neighbors_of_ex_cores)
         self.labels.delete_label(object_id)
+
+    def _get_objects_that_lost_core_property(
+            self,
+            neighbors,
+            object_to_delete):
+
+        ex_core_neighbors = [
+            obj for obj in neighbors
+            if obj.neighbor_count == self.min_pts - 1
+        ]
+
+        # The result has to contain the deleted object if it was core
+        if object_to_delete.neighbor_count >= self.min_pts:
+            ex_core_neighbors.append(object_to_delete)
+
+        return ex_core_neighbors
 
     def _update_neighbor_counts_after_deletion(self, neighbors):
         for neighbor in neighbors:
