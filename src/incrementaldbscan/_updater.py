@@ -1,5 +1,3 @@
-from typing import Dict, Iterable
-
 import networkx as nx
 
 from src.incrementaldbscan._labels import (
@@ -64,7 +62,7 @@ class _Updater():
         update_seeds = self._get_update_seeds(neighbors_of_new_core_neighbors)
 
         connected_components_in_update_seeds = \
-            self._get_connected_components_in_update_seeds(update_seeds)
+            self._get_connected_components_in_objects(update_seeds)
 
         for component in connected_components_in_update_seeds:
             effective_cluster_labels = \
@@ -142,15 +140,15 @@ class _Updater():
 
         return seeds
 
-    def _get_connected_components_in_update_seeds(self, update_seeds):
+    def _get_connected_components_in_objects(self, objects):
         G = nx.Graph()
 
-        for seed in update_seeds:
-            neighbors = self.objects.get_neighbors(seed, self.eps)
+        for obj in objects:
+            neighbors = self.objects.get_neighbors(obj, self.eps)
 
             for neighbor in neighbors:
-                if neighbor.neighbor_count >= self.min_pts:
-                    G.add_edge(seed, neighbor)
+                if neighbor in objects:
+                    G.add_edge(obj, neighbor)
 
         return nx.connected_components(G)
 
