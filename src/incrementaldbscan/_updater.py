@@ -64,8 +64,7 @@ class _Updater():
         update_seeds = self._get_update_seeds(neighbors_of_new_core_neighbors)
 
         connected_components_in_update_seeds = \
-            self._get_connected_components_in_update_seeds(
-                update_seeds, neighbors_of_new_core_neighbors)
+            self._get_connected_components_in_update_seeds(update_seeds)
 
         for component in connected_components_in_update_seeds:
             effective_cluster_labels = \
@@ -143,19 +142,11 @@ class _Updater():
 
         return seeds
 
-    def _get_connected_components_in_update_seeds(
-            self,
-            update_seeds: Iterable,
-            stored_neighbors: Dict):
-
+    def _get_connected_components_in_update_seeds(self, update_seeds):
         G = nx.Graph()
 
         for seed in update_seeds:
-
-            if seed in stored_neighbors:
-                neighbors = stored_neighbors[seed]
-            else:
-                neighbors = self.objects.get_neighbors(seed, self.eps)
+            neighbors = self.objects.get_neighbors(seed, self.eps)
 
             for neighbor in neighbors:
                 if neighbor.neighbor_count >= self.min_pts:
