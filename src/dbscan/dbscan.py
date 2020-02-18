@@ -3,16 +3,36 @@ from sklearn.neighbors import NearestNeighbors
 
 
 class DBSCAN:
-    """
-    Based on "A Density-Based Algorithm for Discovering Clusters in Large
-    Spatial Databases with Noise" by Ester et al. 1996.
+    """A density-based clustering algorithm that handles outliers.
+
+    Parameters
+    ----------
+    eps : float, default=0.5
+        The radius of neighborhood calculation. An object is the neighbor of
+        another if the distance between them is no more than eps.
+
+    min_pts : int, default=5
+        The minimum number of neighbors that an object needs to have to be a
+        core object of a cluster.
+
+    Attributes
+    ----------
+    labels : array
+        Cluster label for each object. -1 means noise.
+
+    References
+    ----------
+    Ester et al. 1996. "A Density-Based Algorithm for Discovering Clusters
+    in Large Spatial Databases with Noise". In: Proceedings of the Second
+    International Conference on Knowledge Discovery and Data Mining (KDD-96).
+
     """
 
     _CLUSTER_LABEL_UNCLASSIFIED = -2
     _CLUSTER_LABEL_NOISE = -1
     _CLUSTER_LABEL_FIRST_CLUSTER = 0
 
-    def __init__(self, eps, min_pts):
+    def __init__(self, eps=0.5, min_pts=5):
         self.eps = eps
         self.min_pts = min_pts
         self.labels = None
@@ -64,7 +84,19 @@ class DBSCAN:
         self._next_cluster_label += 1
 
     def fit(self, X):
-        """Returns cluster labels. Indices start from 0. -1 means noise."""
+        """Cluster objects.
+
+        Parameters
+        ----------
+        X : array
+            Array of objects to cluster.
+
+        Returns
+        -------
+        self
+
+        """
+
         self._init_fit(X)
 
         for ix in range(len(X)):
