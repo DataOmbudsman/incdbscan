@@ -10,11 +10,11 @@ from src.incrementaldbscan._objects import _Object, _Objects
 
 
 class _Updater():
-    def __init__(self, eps, min_pts):
+    def __init__(self, eps, min_pts, cache_size):
         self.eps = eps
         self.min_pts = min_pts
         self.labels = _Labels()
-        self.objects = _Objects()
+        self.objects = _Objects(cache_size)
         self.next_cluster_label = CLUSTER_LABEL_FIRST_CLUSTER
 
     def insertion(self, object_to_insert: _Object):
@@ -62,7 +62,7 @@ class _Updater():
         update_seeds = self._get_update_seeds(neighbors_of_new_core_neighbors)
 
         connected_components_in_update_seeds = \
-            self._get_connected_components_in_objects(update_seeds)
+            self._get_connected_components(update_seeds)
 
         for component in connected_components_in_update_seeds:
             effective_cluster_labels = \
@@ -140,7 +140,10 @@ class _Updater():
 
         return seeds
 
-    def _get_connected_components_in_objects(self, objects):
+    def _get_connected_components(self, objects):
+        if len(objects) == 1:
+            return [objects]
+
         G = nx.Graph()
 
         for obj in objects:
@@ -193,8 +196,22 @@ class _Updater():
         update_seeds = self._get_update_seeds(neighbors_of_ex_cores)
 
         if update_seeds:
-            print('update_seeds')  # TODO
-            pass
+            print('\nupdate_seeds')  # TODO
+
+            # def n_components():
+            #     return len(self._get_connected_components(update_seeds))
+
+            # def n_components_by_expansion():
+            #     return len(
+            #         self._get_connected_components_by_expansion(update_seeds))
+
+            # if n_components() > 1 and n_components_by_expansion() > 1:
+            #     pass
+            #     # Splitting logic
+
+            # else:
+            #     pass
+            #     # TODO test for reduction? probably not needed but wont hurt
 
         # Updating labels of border objects that were in the neighborhood
         # of objects that lost their core property is always needed. They
@@ -263,3 +280,6 @@ class _Updater():
             labels.add(label_of_neighbor)
 
         return labels
+
+    def _get_connected_components_by_expansion(self, objects):
+        pass

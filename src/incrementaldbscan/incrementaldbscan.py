@@ -12,10 +12,12 @@ class IncrementalDBSCAN():
     in a Data Warehousing Environment" by Ester et al. 1998.
     """
 
-    def __init__(self, eps, min_pts):
+    def __init__(self, eps=0.5, min_pts=5, cache_size=256):
         self.eps = eps
         self.min_pts = min_pts
-        self._updater = _Updater(self.eps, self.min_pts)
+        self.cache_size = cache_size
+
+        self._updater = _Updater(self.eps, self.min_pts, self.cache_size)
         self.labels: Dict[ObjectId, ClusterLabel] = \
             self._updater.labels.get_all_labels()
 

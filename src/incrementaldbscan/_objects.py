@@ -17,9 +17,10 @@ class _Object:
 
 
 class _Objects:
-    def __init__(self, distance=euclidean_distance):
+    def __init__(self, cache_size, distance=euclidean_distance):
         self.objects: Dict[ObjectId, _Object] = dict()
         self._distance = distance
+        self.get_neighbors = lru_cache(maxsize=cache_size)(self.get_neighbors)
 
     def get_object(self, object_id: ObjectId):
         return self.objects[object_id]
@@ -27,12 +28,7 @@ class _Objects:
     def get_all(self):
         return self.objects.values()
 
-    @lru_cache(maxsize=256)
-    def get_neighbors(
-            self,
-            query_object,
-            radius):
-
+    def get_neighbors(self, query_object, radius):
         return [
             object_ for object_ in self.get_all()
             if self._distance(query_object.value, object_.value) <= radius
