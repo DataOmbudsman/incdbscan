@@ -7,9 +7,46 @@ from src.incrementaldbscan._updater import _Updater
 
 
 class IncrementalDBSCAN():
-    """
-    Based (mostly but not completely) on "Incremental Clustering for Mining
-    in a Data Warehousing Environment" by Ester et al. 1998.
+    """An incremental density-based clustering algorithm that handles outliers.
+
+    After an initial clustering of objects, the clustering can at any time be
+    updated by increments of any size. An increment can be either an addition
+    of objects to the clustering or the removal objects from the clustering.
+
+    After each update the result of the clustering is the same as if the
+    updated object set (i.e., the initial object set modified by the
+    increments) was clustered by DBSCAN. However, this result is reached by
+    using information from the previous state of clustering, and without the
+    need of applying DBSCAN to the updated object set. Therefore, it is more
+    efficient.
+
+    Parameters
+    ----------
+    eps : float, default=0.5
+        The radius of neighborhood calculation. An object is the neighbor of
+        another if the distance between them is no more than eps.
+
+    min_pts : int, default=5
+        The minimum number of neighbors that an object needs to have to be a
+        core object of a cluster.
+
+    cache_size : int, default=256
+        Size of cache for caching neighbor retrieval within an update. The
+        larger the value, the faster the calculation is, at the expense of
+        memory need.
+
+    Attributes
+    ----------
+    labels : dict
+        Cluster label for each object, stored as a dictionary mapping
+        object IDs to cluster labels. Label -1 means noise.
+
+    References
+    ----------
+    Ester et al. 1998. Incremental Clustering for Mining in a Data Warehousing
+    Environment. In: Proceedings of the 24rd International Conference on Very
+    Large Data Bases (VLDB 1998).
+
     """
 
     def __init__(self, eps=0.5, min_pts=5, cache_size=256):
@@ -22,9 +59,17 @@ class IncrementalDBSCAN():
             self._updater.labels.get_all_labels()
 
     def add_object(self, object_value, object_id: ObjectId):
-        """
-        Add an object (given by its value), along with its ID, to clustering.
-        ID is of an unhashable type, such as int or str.
+        """Add object to clustering.
+
+        Parameters
+        ----------
+        object_value : array
+            A numpy array representing the data object to be added to the
+            clustering.
+
+        object_id : str or int
+            The identifier of the data object to be added to the clustering.
+
         """
 
         if object_id not in self.labels:
@@ -43,16 +88,32 @@ class IncrementalDBSCAN():
             self,
             object_values: Iterable,
             object_ids: Iterable[ObjectId]):
-        """
-        Add objects (given by their values), along with their IDs, to
-        clustering. ID is of an unhashable type, such as int or str.
-        """
+        """Add objects to clustering.
 
+        Parameters
+        ----------
+        object_values : array
+            An array of numpy arrays, representing the data objects to be added
+            to the clustering.
+
+        object_ids : iterable of int or of str
+            The identifiers of the data objects to be added to the clustering.
+            E.g., list of strings, or numpy array of integers.
+
+        """
         for object_value, object_id in zip(object_values, object_ids):
             self.add_object(object_value, object_id)
 
     def remove_object(self, object_id: ObjectId):
-        """Remove object, given by its ID, from clustering."""
+        """Remove object from clustering.
+
+        Parameters
+        ----------
+        object_id : str or int
+            The identifier of the data object to be removed from the
+            clustering.
+
+        """
 
         if object_id in self.labels:
             self._updater.deletion(object_id)
@@ -66,8 +127,15 @@ class IncrementalDBSCAN():
             )
 
     def remove_objects(self, object_ids: Iterable):
-        """Remove objects, given by their IDs, from clustering."""
+        """Remove objects from clustering.
 
+        Parameters
+        ----------
+        object_ids : iterable of int or of str
+            The identifiers of the data objects to be removed from the
+            clustering. E.g., list of strings, or numpy array of integers.
+
+        """
         for object_id in object_ids:
             self.remove_object(object_id)
 
@@ -77,3 +145,6 @@ class IncrementalDBSCANWarning(Warning):
 
 # TODO notebook import fails now
 # TODO __init__ file setup?
+# TODO package restructure: no src
+# TODO only euclidean?
+# TODO validate purpose of cache 
