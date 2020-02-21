@@ -197,21 +197,17 @@ class _Updater():
 
         if update_seeds:
             print('\nupdate_seeds')  # TODO
+            n_components = len(
+                    self._get_connected_components_by_expansion(update_seeds)
+            )
 
-            # def n_components():
-            #     return len(self._get_connected_components(update_seeds))
+            if n_components > 1:
+                pass
+                # Splitting logic
 
-            # def n_components_by_expansion():
-            #     return len(
-            #         self._get_connected_components_by_expansion(update_seeds))
-
-            # if n_components() > 1 and n_components_by_expansion() > 1:
-            #     pass
-            #     # Splitting logic
-
-            # else:
-            #     pass
-            #     # TODO test for reduction? probably not needed but wont hurt
+            else:
+                pass
+                # TODO test for reduction? probably not needed but wont hurt
 
         # Updating labels of border objects that were in the neighborhood
         # of objects that lost their core property is always needed. They
@@ -282,4 +278,4 @@ class _Updater():
         return labels
 
     def _get_connected_components_by_expansion(self, objects):
-        pass
+        return list(['dummy'])

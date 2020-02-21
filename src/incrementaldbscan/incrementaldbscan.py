@@ -143,8 +143,8 @@ class IncrementalDBSCAN():
 class IncrementalDBSCANWarning(Warning):
     pass
 
-# TODO notebook import fails now
-# TODO __init__ file setup?
+# TODO notebook: example
 # TODO package restructure: no src
-# TODO only euclidean?
-# TODO validate purpose of cache 
+# TODO __init__ file setup
+# TODO 0.1.0 comes with all kinds of metrics, no index
+# TODO validate purpose of cache

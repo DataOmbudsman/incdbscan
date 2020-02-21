@@ -97,7 +97,7 @@ def test_borders_around_point_losing_core_property_can_become_noise(
         incdbscan4,
         point_at_origin):
 
-    object_to_remove_value, point_to_remove_id = point_at_origin
+    point_to_remove_value, point_to_remove_id = point_at_origin
 
     core_value = np.array([0, EPS])
     core_id = 1
@@ -108,7 +108,7 @@ def test_borders_around_point_losing_core_property_can_become_noise(
     ])
     border_ids = [2, 3]
 
-    all_values = np.vstack([object_to_remove_value, core_value, border_values])
+    all_values = np.vstack([point_to_remove_value, core_value, border_values])
     all_ids_but_object_to_remove = border_ids + [core_id]
     all_ids = all_ids_but_object_to_remove + [point_to_remove_id]
 
@@ -123,3 +123,63 @@ def test_borders_around_point_losing_core_property_can_become_noise(
         incdbscan4,
         CLUSTER_LABEL_NOISE
     )
+
+
+def test_core_property_of_singleton_update_seed_is_kept_after_removal(
+        incdbscan3,
+        point_at_origin):
+
+    point_to_remove_value, point_to_remove_id = point_at_origin
+
+    core_values = np.array([
+        [EPS, 0],
+        [2 * EPS, 0],
+        [2 * EPS, 0],
+    ])
+    core_ids = [1, 2, 3]
+
+    lonely_value = np.array([-EPS, 0])
+    lonely_id = 4
+
+    all_values = np.vstack([point_to_remove_value, core_values, lonely_value])
+    all_ids = [point_to_remove_id] + core_ids + [lonely_id]
+
+    add_values_to_clustering_and_assert(
+        incdbscan3, all_values, all_ids, CLUSTER_LABEL_FIRST_CLUSTER
+    )
+
+    incdbscan3.remove_object(point_to_remove_id)
+
+    assert_cluster_label_of_ids(
+        core_ids, incdbscan3, CLUSTER_LABEL_FIRST_CLUSTER)
+    assert_cluster_label_of_ids([lonely_id], incdbscan3, CLUSTER_LABEL_NOISE)
+
+
+def test_core_property_of_single_component_update_seeds_is_kept_after_removal(
+        incdbscan3,
+        point_at_origin):
+
+    point_to_remove_value, point_to_remove_id = point_at_origin
+
+    core_values = np.array([
+        [EPS, 0],
+        [EPS, 0],
+        [2 * EPS, 0],
+    ])
+    core_ids = [1, 2, 3]
+
+    lonely_value = np.array([-EPS, 0])
+    lonely_id = 4
+
+    all_values = np.vstack([point_to_remove_value, core_values, lonely_value])
+    all_ids = [point_to_remove_id] + core_ids + [lonely_id]
+
+    add_values_to_clustering_and_assert(
+        incdbscan3, all_values, all_ids, CLUSTER_LABEL_FIRST_CLUSTER
+    )
+
+    incdbscan3.remove_object(point_to_remove_id)
+
+    assert_cluster_label_of_ids(
+        core_ids, incdbscan3, CLUSTER_LABEL_FIRST_CLUSTER)
+    assert_cluster_label_of_ids([lonely_id], incdbscan3, CLUSTER_LABEL_NOISE)
