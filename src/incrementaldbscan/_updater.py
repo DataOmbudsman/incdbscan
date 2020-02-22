@@ -3,7 +3,6 @@ import networkx as nx
 from src.incrementaldbscan._labels import (
     CLUSTER_LABEL_UNCLASSIFIED,
     CLUSTER_LABEL_NOISE,
-    CLUSTER_LABEL_FIRST_CLUSTER,
     _Labels
 )
 from src.incrementaldbscan._objects import _Object, _Objects
@@ -15,7 +14,6 @@ class _Updater():
         self.min_pts = min_pts
         self.labels = _Labels()
         self.objects = _Objects(cache_size)
-        self.next_cluster_label = CLUSTER_LABEL_FIRST_CLUSTER
 
     def insertion(self, object_to_insert: _Object):
         print('\nInserting', object_to_insert.id)  # TODO
@@ -74,9 +72,8 @@ class _Updater():
                 # previously unclassified and noise objects, a new cluster is
                 # created. Corresponds to case "Creation" in the paper.
 
-                for obj in component:
-                    self.labels.set_label(obj, self.next_cluster_label)
-                self.next_cluster_label += 1
+                next_cluster_label = self.labels.get_next_cluster_label()
+                self.labels.set_labels(component, next_cluster_label)
 
             else:
                 print('real_cluster_labels')  # TODO
@@ -86,9 +83,7 @@ class _Updater():
                 # Corresponds to cases "Absorption" and "Merge" in the paper.
 
                 max_label = max(effective_cluster_labels)
-
-                for obj in component:
-                    self.labels.set_label(obj, max_label)
+                self.labels.set_labels(component, max_label)
 
                 for label in effective_cluster_labels:
                     self.labels.change_labels(label, max_label)
@@ -175,8 +170,7 @@ class _Updater():
 
         for new_core, neighbors in neighbors_of_new_core_neighbors.items():
             label = self.labels.get_label(new_core)
-            for neighbor in neighbors:
-                self.labels.set_label(neighbor, label)
+            self.labels.set_labels(neighbors, label)
 
     def deletion(self, object_id):
         print('\nDeleting', object_id)

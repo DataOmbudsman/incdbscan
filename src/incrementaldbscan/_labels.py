@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Set
 
 from src.incrementaldbscan._objects import ObjectId
 
@@ -13,14 +13,18 @@ class _Labels:
     def __init__(self):
         self._labels: Dict[ObjectId, ClusterLabel] = dict()
 
-    def set_label(self, object_, label):
-        self._labels[object_.id] = label
+    def set_label(self, obj, label):
+        self._labels[obj.id] = label
+
+    def set_labels(self, objects, label):
+        for obj in objects:
+            self.set_label(obj, label)
 
     def has_label(self, object_id):
         return object_id in self._labels
 
-    def get_label(self, object_):
-        return self._labels[object_.id]
+    def get_label(self, obj):
+        return self._labels[obj.id]
 
     def get_all_labels(self):
         return self._labels
@@ -32,3 +36,8 @@ class _Labels:
         for object_id, cluster_label in self._labels.items():
             if cluster_label == change_from:
                 self._labels[object_id] = change_to
+
+    def get_next_cluster_label(self):
+        if not self._labels:
+            return CLUSTER_LABEL_FIRST_CLUSTER
+        return max(self._labels.values()) + 1
