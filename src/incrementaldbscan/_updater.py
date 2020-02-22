@@ -55,7 +55,7 @@ class _Updater():
 
         print('\nnew_core_neighbors')  # TODO
         neighbors_of_new_core_neighbors = \
-            self._get_neighbors_of_objects(new_core_neighbors)
+            self.objects.get_neighbors_of_objects(new_core_neighbors, self.eps)
 
         update_seeds = self._get_update_seeds(neighbors_of_new_core_neighbors)
 
@@ -112,14 +112,6 @@ class _Updater():
                 old_cores.add(obj)
 
         return new_cores, old_cores
-
-    def _get_neighbors_of_objects(self, objects):
-        neighbors = dict()
-
-        for obj in objects:
-            neighbors[obj] = self.objects.get_neighbors(obj, self.eps)
-
-        return neighbors
 
     def _get_update_seeds(self, neighbors_dict):
         """
@@ -185,7 +177,8 @@ class _Updater():
             object_to_delete
         )
 
-        neighbors_of_ex_cores = self._get_neighbors_of_objects(ex_cores)
+        neighbors_of_ex_cores = \
+            self.objects.get_neighbors_of_objects(ex_cores, self.eps)
 
         update_seeds = self._get_update_seeds(neighbors_of_ex_cores)
 

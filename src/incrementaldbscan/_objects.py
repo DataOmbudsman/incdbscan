@@ -1,6 +1,6 @@
 import numpy as np
 from functools import lru_cache
-from typing import Dict, Union
+from typing import Dict, List, Union
 
 ObjectId = Union[int, str]
 
@@ -25,14 +25,21 @@ class _Objects:
     def get_object(self, object_id: ObjectId):
         return self.objects[object_id]
 
-    def get_all(self):
-        return self.objects.values()
-
     def get_neighbors(self, query_object, radius):
         return [
-            object_ for object_ in self.get_all()
+            object_ for object_ in self.objects.values()
             if self._distance(query_object.value, object_.value) <= radius
         ]
+
+    def get_neighbors_of_objects(
+            self, query_objects, radius) -> Dict[ObjectId, List[ObjectId]]:
+
+        neighbors = dict()
+
+        for obj in query_objects:
+            neighbors[obj] = self.get_neighbors(obj, radius)
+
+        return neighbors
 
     def add_object(self, object_to_add: _Object):
         self.objects[object_to_add.id] = object_to_add
