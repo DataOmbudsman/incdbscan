@@ -1,9 +1,10 @@
 import warnings
 from typing import Dict, Iterable
 
-from src.incrementaldbscan._labels import ClusterLabel
-from src.incrementaldbscan._objects import _Object, ObjectId
-from src.incrementaldbscan._updater import _Updater
+from src.incrementaldbscan._deleter import _Deleter
+from src.incrementaldbscan._inserter import _Inserter
+from src.incrementaldbscan._labels import ClusterLabel, _Labels
+from src.incrementaldbscan._objects import _Object, ObjectId, _Objects
 
 
 class IncrementalDBSCAN():
@@ -54,9 +55,17 @@ class IncrementalDBSCAN():
         self.min_pts = min_pts
         self.cache_size = cache_size
 
-        self._updater = _Updater(self.eps, self.min_pts, self.cache_size)
-        self.labels: Dict[ObjectId, ClusterLabel] = \
-            self._updater.labels.get_all_labels()
+        self._labels = _Labels()
+        self._objects = _Objects(self.cache_size)
+
+        self._inserter = _Inserter(
+            self.eps, self.min_pts, self._labels, self._objects)
+        self._deleter = _Deleter(
+            self.eps, self.min_pts, self._labels, self._objects)
+
+    @property
+    def labels(self) -> Dict[ObjectId, ClusterLabel]:
+        return self._labels.get_all_labels()
 
     def add_object(self, object_value, object_id: ObjectId):
         """Add object to clustering.
@@ -74,7 +83,7 @@ class IncrementalDBSCAN():
 
         if object_id not in self.labels:
             object_to_insert = _Object(object_value, object_id)
-            self._updater.insertion(object_to_insert)
+            self._inserter.insert(object_to_insert)
 
         else:
             warnings.warn(
@@ -116,7 +125,7 @@ class IncrementalDBSCAN():
         """
 
         if object_id in self.labels:
-            self._updater.deletion(object_id)
+            self._deleter.delete(object_id)
 
         else:
             warnings.warn(
