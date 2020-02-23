@@ -30,9 +30,9 @@ class _Deleter():
 
         if update_seeds:
             print('\nupdate_seeds')  # TODO
-            n_components = len(
-                    self._get_connected_components_by_expansion(update_seeds)
-            )
+            n_components = \
+                len(self._get_connected_components_through_expansion(
+                    update_seeds))
 
             if n_components > 1:
                 pass
@@ -113,5 +113,32 @@ class _Deleter():
 
         return labels
 
-    def _get_connected_components_by_expansion(self, objects):
-        return list(['dummy'])
+    def _get_connected_components_through_expansion(self, objects):
+        if len(objects) == 1:
+            return [objects]
+
+        G = nx.Graph()
+        nodes_to_visit = list()
+
+        def _add_neighbors_of_object_to_graph(obj):
+            edges = set(G.edges())
+            nodes = set(G.nodes())
+
+            neighbors = self.objects.get_neighbors(obj, self.eps)
+            for neighbor in neighbors:
+                if neighbor != obj:
+                    if (obj, neighbor) not in edges:
+                        G.add_edge(obj, neighbor)
+                    if neighbor not in nodes:
+                        nodes_to_visit.append(neighbor)
+
+        for obj in objects:
+            _add_neighbors_of_object_to_graph(obj)
+
+        while nodes_to_visit and len(list(nx.connected_components(G))) != 1:
+            # print('IND print', nodes_to_visit)
+            obj = nodes_to_visit.pop(0)
+            _add_neighbors_of_object_to_graph(obj)
+            # print('END print\n', nodes_to_visit)
+
+        return list(nx.connected_components(G))
