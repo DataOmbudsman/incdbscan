@@ -49,6 +49,31 @@ def test_removing_only_core_makes_borders_noise(incdbscan4, point_at_origin):
     assert_cluster_label_of_ids(border_ids, incdbscan4, CLUSTER_LABEL_NOISE)
 
 
+def test_objects_losing_core_property_can_keep_cluster_id(
+        incdbscan3,
+        point_at_origin):
+
+    point_to_remove_value, point_to_remove_id = point_at_origin
+
+    core_values = np.array([
+        [EPS, 0],
+        [0, EPS],
+        [EPS, EPS],
+    ])
+    core_ids = [0, 1, 2]
+
+    all_values = np.vstack([point_to_remove_value, core_values])
+    all_ids = [point_to_remove_id] + core_ids
+
+    add_values_to_clustering_and_assert(
+        incdbscan3, all_values, all_ids, CLUSTER_LABEL_FIRST_CLUSTER
+    )
+
+    incdbscan3.remove_object(point_to_remove_id)
+    assert_cluster_label_of_ids(
+        core_ids, incdbscan3, CLUSTER_LABEL_FIRST_CLUSTER)
+
+
 def test_border_object_can_switch_to_other_cluster(
         incdbscan4,
         point_at_origin):

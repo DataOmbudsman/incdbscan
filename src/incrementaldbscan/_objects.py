@@ -15,6 +15,9 @@ class _Object:
         self.id = object_id
         self.neighbor_count = 1
 
+    def __repr__(self):
+        return f'<ID: {self.id}, count: {self.neighbor_count}>'
+
 
 class _Objects:
     def __init__(self, cache_size, distance=euclidean_distance):

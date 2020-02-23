@@ -1,3 +1,5 @@
+import networkx as nx
+
 from src.incrementaldbscan._labels import CLUSTER_LABEL_NOISE
 
 
@@ -40,7 +42,7 @@ class _Deleter():
         # of objects that lost their core property is always needed. They
         # become either borders of other clusters or noise.
 
-        self._update_labels_of_border_objects_of_ex_cores(
+        self._update_labels_of_border_objects_around_ex_cores(
             neighbors_of_ex_cores)
         self.labels.delete_label(object_id)
 
@@ -74,29 +76,25 @@ class _Deleter():
 
         return seeds
 
-    def _update_labels_of_border_objects_of_ex_cores(
+    def _update_labels_of_border_objects_around_ex_cores(
             self,
             neighbors_of_ex_cores):
 
-        for ex_core, neighbors_of_ex_core in neighbors_of_ex_cores.items():
-            label_of_ex_core = self.labels.get_label(ex_core)
-
+        for neighbors_of_ex_core in neighbors_of_ex_cores.values():
             self._set_border_object_labels_to_largest_around_in_parallel(
                 objects_to_set=neighbors_of_ex_core,
-                excluded_labels=[label_of_ex_core]
             )
 
     def _set_border_object_labels_to_largest_around_in_parallel(
             self,
             objects_to_set,
-            excluded_labels):
+            ):
 
         cluster_updates = {}
 
         for obj in objects_to_set:
             if obj.neighbor_count < self.min_pts:
                 labels = self._get_cluster_labels_in_neighborhood(obj)
-                labels.difference_update(excluded_labels)
                 if not labels:
                     labels.add(CLUSTER_LABEL_NOISE)
 
@@ -109,8 +107,9 @@ class _Deleter():
         labels = set()
 
         for neighbor in self.objects.get_neighbors(obj, self.eps):
-            label_of_neighbor = self.labels.get_label(neighbor)
-            labels.add(label_of_neighbor)
+            if neighbor.neighbor_count >= self.min_pts:
+                label_of_neighbor = self.labels.get_label(neighbor)
+                labels.add(label_of_neighbor)
 
         return labels
 
