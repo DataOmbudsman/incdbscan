@@ -20,32 +20,32 @@ TODO: Notebook examples.
 TODO
 
 # Additions to Ester et al. 1998
-The work by Ester et al. 1998 lays the groundwork for the incremental version of DBSCAN. However, two edge cases are not covered in the paper. In this section, these holes will be identified, and solutions are proposed to fill them.  
+The work by Ester et al. 1998 lays the groundwork for the incremental version of DBSCAN. However, two edge cases are not covered in the paper. In this section, these holes will be identified, and solutions are proposed to fill them.
 
 Notations used:
 - _N<sub>Eps</sub>(p)_: the set of all objects that are in the _Eps_-neighborhood of _p_.
-- _UpdSeed<sub>Ins</sub>_, the set of update seeds after insertion, is defined in _Definition 7_ as the set of core objects in the _Eps_-neighborhood of those objects that gain their core object property as a result of the insertion.  
-- _UpdSeed<sub>Del</sub>_, the set of update seeds after deletion, is defined in _Definition 7_ as the set of core objects in the _Eps_-neighborhood of those objects that lose their core object property as a result of the deletion.   
+- _UpdSeed<sub>Ins</sub>_, the set of update seeds after insertion, is defined in _Definition 7_ as the set of core objects in the _Eps_-neighborhood of those objects that gain their core object property as a result of the insertion.
+- _UpdSeed<sub>Del</sub>_, the set of update seeds after deletion, is defined in _Definition 7_ as the set of core objects in the _Eps_-neighborhood of those objects that lose their core object property as a result of the deletion.
 
 ## Absorption when _UpdSeed<sub>Ins</sub>_ is empty
-Let's suppose that cluster _C_ is already established, and a new object _p_ is inserted in the _Eps_-neighborhood of a core object _c_ of cluster _C_. Additionally, suppose that there are not enough objects in _N<sub>Eps</sub>(p)_ for _p_ to become a core object and that no other objects become core objects due to the insertion.  
+Let's suppose that cluster _C_ is already established, and a new object _p_ is inserted in the _Eps_-neighborhood of a core object _c_ of cluster _C_. Additionally, suppose that there are not enough objects in _N<sub>Eps</sub>(p)_ for _p_ to become a core object and that no other objects become core objects due to the insertion.
 
 Now, how should _p_ be handled?
 
-Since there are no new core objects after the insertion, _UpdSeed<sub>Ins</sub>_ is empty. According to _Section 4.2_, _"if _UpdSeed<sub>Ins</sub>_ is empty [...] then _p_ is a noise object."_ But we also know that _p_ is in _N<sub>Eps</sub>(c)_, and according to _Definition 4_ this means that it should be assigned to cluster _C_. There is clearly a contradiction here.  
+Since there are no new core objects after the insertion, _UpdSeed<sub>Ins</sub>_ is empty. According to _Section 4.2_, _"if _UpdSeed<sub>Ins</sub>_ is empty [...] then _p_ is a noise object."_ But we also know that _p_ is in _N<sub>Eps</sub>(c)_, and according to _Definition 4_ this means that it should be assigned to cluster _C_. There is clearly a contradiction here.
 
-**Solution**: In this implementation, even if _UpdSeed<sub>Ins</sub>_ is empty, _p_ is assigned to cluster _C_ if _c_ is a core object of cluster _C_ and _p_ is in _N<sub>Eps</sub>(c)_.  
+**Solution**: In this implementation, even if _UpdSeed<sub>Ins</sub>_ is empty, _p_ is assigned to cluster _C_ if _c_ is a core object of cluster _C_ and _p_ is in _N<sub>Eps</sub>(c)_.
 
 ## Simultaneous creations, absorptions and merges
-In _Section 4.2_, cases of creation, absorption and merge are presented. These are indeed essential building blocks of IncrementalDBSCAN. However, the paper fails to mention that these events can happen simultaneously.  
+In _Section 4.2_, cases of creation, absorption and merge are presented. These are indeed essential building blocks of IncrementalDBSCAN. However, the paper fails to mention that these events can happen simultaneously.
 
-Let's see an example. Suppose we have a 1 dimensional data set with 6 objects (_a_, _b_, _c_, _x_, _y_, _z_) as illustrated in the following block. The coordinates of the objects are as noted below their names.  
+Let's see an example. Suppose we have a 1 dimensional data set with 6 objects (_a_, _b_, _c_, _x_, _y_, _z_) as illustrated in the following block. The coordinates of the objects are as noted below their names.
 <pre>
 - - - c - b - a - - - - - - - x - y - z - - -
      -4  -3  -2               2   3   4      
 </pre>
 
-If we apply IncrementalDBSCAN to the data set with _Eps_=2 and _MinPts_=4, no clusters are created since none of the objects have an _Eps_-neighborhood that contain at least 4 objects. That is, all objects are noise objects.   
+If we apply IncrementalDBSCAN to the data set with _Eps_=2 and _MinPts_=4, no clusters are created since none of the objects have an _Eps_-neighborhood that contain at least 4 objects. That is, all objects are noise objects.
 
 We now add point _p_ to position 0.
 <pre>
@@ -63,7 +63,7 @@ Analogous examples can be constructed for absorptions and merges. E.g., a creati
 
 ## Extended definition of _UpdSeed<sub>Del</sub>_
 
-The point of defining _UpdSeed<sub>Del</sub>_ is the first step towards finding all objects in the whole object set that eventually might be affected by the deletion. _UpdSeed<sub>Del</sub>_ contains the _"seed objects for the update"_.
+The point of defining _UpdSeed<sub>Del</sub>_ is the first step towards finding all objects in the whole object set that eventually might be affected by a deletion. _UpdSeed<sub>Del</sub>_ contains the _"seed objects for the update"_.
 
 Let's take the following object set _D_ of 7 one dimensional objects (_a_, _b_, _c_, _p_, _x_, _y_, _z_). The coordinates of the objects are as noted below their names.
 <pre>

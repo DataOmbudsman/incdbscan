@@ -87,8 +87,7 @@ class _Deleter():
 
     def _set_border_object_labels_to_largest_around_in_parallel(
             self,
-            objects_to_set,
-            ):
+            objects_to_set):
 
         cluster_updates = {}
 
