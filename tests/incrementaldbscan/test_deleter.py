@@ -2,8 +2,9 @@ import numpy as np
 
 from tests.incrementaldbscan.conftest import EPS
 from tests.incrementaldbscan.utils import (
-    add_values_to_clustering_and_assert,
-    assert_cluster_label_of_ids
+    add_objects_to_clustering_and_assert,
+    assert_cluster_label_of_ids,
+    assert_split_creates_new_labels
 )
 
 CLUSTER_LABEL_NOISE = -1
@@ -65,7 +66,7 @@ def test_objects_losing_core_property_can_keep_cluster_id(
     all_values = np.vstack([point_to_remove_value, core_values])
     all_ids = [point_to_remove_id] + core_ids
 
-    add_values_to_clustering_and_assert(
+    add_objects_to_clustering_and_assert(
         incdbscan3, all_values, all_ids, CLUSTER_LABEL_FIRST_CLUSTER
     )
 
@@ -97,14 +98,14 @@ def test_border_object_can_switch_to_other_cluster(
     cluster_2_ids = np.array([3, 4, 5])
     cluster_2_label = cluster_1_label + 1
 
-    add_values_to_clustering_and_assert(
+    add_objects_to_clustering_and_assert(
         incdbscan4,
         cluster_1_values,
         cluster_1_ids,
         cluster_1_label
     )
 
-    add_values_to_clustering_and_assert(
+    add_objects_to_clustering_and_assert(
         incdbscan4,
         cluster_2_values,
         cluster_2_ids,
@@ -137,7 +138,7 @@ def test_borders_around_point_losing_core_property_can_become_noise(
     all_ids_but_object_to_remove = border_ids + [core_id]
     all_ids = all_ids_but_object_to_remove + [point_to_remove_id]
 
-    add_values_to_clustering_and_assert(
+    add_objects_to_clustering_and_assert(
         incdbscan4, all_values, all_ids, CLUSTER_LABEL_FIRST_CLUSTER
     )
 
@@ -169,7 +170,7 @@ def test_core_property_of_singleton_update_seed_is_kept_after_removal(
     all_values = np.vstack([point_to_remove_value, core_values, lonely_value])
     all_ids = [point_to_remove_id] + core_ids + [lonely_id]
 
-    add_values_to_clustering_and_assert(
+    add_objects_to_clustering_and_assert(
         incdbscan3, all_values, all_ids, CLUSTER_LABEL_FIRST_CLUSTER
     )
 
@@ -199,7 +200,7 @@ def test_cluster_id_of_single_component_update_seeds_is_kept_after_removal(
     all_values = np.vstack([point_to_remove_value, core_values, lonely_value])
     all_ids = [point_to_remove_id] + core_ids + [lonely_id]
 
-    add_values_to_clustering_and_assert(
+    add_objects_to_clustering_and_assert(
         incdbscan3, all_values, all_ids, CLUSTER_LABEL_FIRST_CLUSTER
     )
 
@@ -227,10 +228,44 @@ def test_cluster_id_of_single_component_objects_is_kept_after_removal(
     all_values = np.vstack([point_to_remove_value, core_values])
     all_ids = [point_to_remove_id] + core_ids
 
-    add_values_to_clustering_and_assert(
+    add_objects_to_clustering_and_assert(
         incdbscan3, all_values, all_ids, CLUSTER_LABEL_FIRST_CLUSTER
     )
 
     incdbscan3.remove_object(point_to_remove_id)
     assert_cluster_label_of_ids(
         core_ids, incdbscan3, CLUSTER_LABEL_FIRST_CLUSTER)
+
+
+def test_simple_split_into_two_parts(incdbscan3, point_at_origin):
+    point_to_remove_value, point_to_remove_id = point_at_origin
+
+    values_left = np.array([
+        [-EPS, 0],
+        [-EPS * 2, 0],
+        [-EPS * 3, 0],
+    ])
+    ids_left = [0, 1, 2]
+
+    values_right = np.array([
+        [EPS, 0],
+        [EPS * 2, 0],
+        [EPS * 3, 0],
+    ])
+    ids_right = [3, 4, 5]
+
+    all_values = np.vstack([point_to_remove_value, values_left, values_right])
+    all_ids = [point_to_remove_id] + ids_left + ids_right
+
+    add_objects_to_clustering_and_assert(
+        incdbscan3, all_values, all_ids, CLUSTER_LABEL_FIRST_CLUSTER
+    )
+
+    incdbscan3.remove_object(point_to_remove_id)
+
+    assert_split_creates_new_labels(
+        incdbscan3, [ids_left, ids_right], CLUSTER_LABEL_FIRST_CLUSTER)
+
+# TODO test for different cluster components
+# de csak azutan hogy a splitting logic
+# implementalva van

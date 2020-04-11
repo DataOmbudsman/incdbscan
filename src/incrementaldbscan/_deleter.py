@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 import networkx as nx
 
 from src.incrementaldbscan._labels import CLUSTER_LABEL_NOISE
@@ -29,14 +31,22 @@ class _Deleter():
         update_seeds = self._get_update_seeds(neighbors_of_ex_cores)
 
         if update_seeds:
-            print('\nupdate_seeds')  # TODO
-            n_components = \
-                len(self._get_connected_components_through_expansion(
-                    update_seeds))
+            print('\nupdate_seeds', update_seeds)  # TODO
 
-            if n_components > 1:
-                pass
-                # Splitting logic
+            # Only for update seeds belonging to the same cluster do we
+            # have to consider if split is needed.
+
+            update_seeds_by_cluster = \
+                self._group_objects_by_cluster(update_seeds)
+
+            for seeds in update_seeds_by_cluster.values():
+                components = self._find_components_to_split_away(seeds)
+                # print(list(components)) #TODO
+
+                for component in components:
+                    pass
+                    self.labels.set_labels(
+                        component, self.labels.get_next_cluster_label())
 
         # Updating labels of border objects that were in the neighborhood
         # of objects that lost their core property is always needed. They
@@ -112,32 +122,66 @@ class _Deleter():
 
         return labels
 
-    def _get_connected_components_through_expansion(self, objects):
-        if len(objects) == 1:
-            return [objects]
+    def _find_components_to_split_away(self, seed_objects):
+        if len(seed_objects) == 1:
+            return list()
+
+        if self._objects_are_neighbors_of_each_other(seed_objects):
+            return list()
 
         G = nx.Graph()
         nodes_to_visit = list()
 
-        def _add_neighbors_of_object_to_graph(obj):
-            edges = set(G.edges())
-            nodes = set(G.nodes())
+        print("HEREr")
+
+        def _add_neighbors_of_object_to_graph(obj, seed_id):
+            edges = set(G.edges)
+            nodes = set(G.nodes)
 
             neighbors = self.objects.get_neighbors(obj, self.eps)
+
             for neighbor in neighbors:
                 if neighbor != obj:
                     if (obj, neighbor) not in edges:
                         G.add_edge(obj, neighbor)
                     if neighbor not in nodes:
-                        nodes_to_visit.append(neighbor)
+                        nodes_to_visit.append((neighbor, seed_id))
 
-        for obj in objects:
-            _add_neighbors_of_object_to_graph(obj)
+        def _nodes_to_visit_are_from_different_seeds():
+            seed_ids = set([seed_id for (node, seed_id) in nodes_to_visit])
+            return len(seed_ids) > 1
 
-        while nodes_to_visit and len(list(nx.connected_components(G))) != 1:
-            # print('IND print', nodes_to_visit)
-            obj = nodes_to_visit.pop(0)
-            _add_neighbors_of_object_to_graph(obj)
-            # print('END print\n', nodes_to_visit)
+        for seed in seed_objects:
+            _add_neighbors_of_object_to_graph(seed, seed.id)
 
-        return list(nx.connected_components(G))
+        print('0 print', nodes_to_visit); print()
+        while _nodes_to_visit_are_from_different_seeds():
+            obj, seed_ix = nodes_to_visit.pop(0)
+            _add_neighbors_of_object_to_graph(obj, seed_ix)
+            print('END print', nodes_to_visit)
+
+        connected_components = nx.connected_components(G)
+        remaining_seed_id = nodes_to_visit[0][1]
+
+        for component in connected_components:
+            if all([remaining_seed_id != obj.id for obj in component]):
+                yield component
+
+    def _objects_are_neighbors_of_each_other(self, objects):
+        for obj1 in objects:
+            neighbors = self.objects.get_neighbors(obj1, self.eps)
+            for obj2 in objects:
+                if obj2 not in neighbors:
+                    return False
+        return True
+
+    def _group_objects_by_cluster(self, objects):
+        objects_with_cluster_labels = [
+            (obj, self.labels.get_label(obj)) for obj in objects
+        ]
+        grouped_objects = defaultdict(list)
+
+        for obj, label in objects_with_cluster_labels:
+            grouped_objects[label].append(obj)
+
+        return grouped_objects
