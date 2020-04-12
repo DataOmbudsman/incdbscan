@@ -11,8 +11,8 @@ class IncrementalDBSCAN:
     """An incremental density-based clustering algorithm that handles outliers.
 
     After an initial clustering of objects, the clustering can at any time be
-    updated by increments of any size. An increment can be either an addition
-    of objects to the clustering or the removal objects from the clustering.
+    updated by increments of any size. An increment can be either addition or
+    or deletion of objects.
 
     After each update the result of the clustering is the same as if the
     updated object set (i.e., the initial object set modified by the
@@ -113,14 +113,14 @@ class IncrementalDBSCAN:
         for object_value, object_id in zip(object_values, object_ids):
             self.add_object(object_value, object_id)
 
-    def remove_object(self, object_id: ObjectId):
-        """Remove object from clustering.
+    def delete_object(self, object_id: ObjectId):
+        """Delete object from object set, then update clustering.
 
         Parameters
         ----------
         object_id : str or int
-            The identifier of the data object to be removed from the
-            clustering.
+            The identifier of the data object to be deleted from the object
+            set.
 
         """
 
@@ -130,23 +130,23 @@ class IncrementalDBSCAN:
         else:
             warnings.warn(
                 IncrementalDBSCANWarning(
-                    f'Object with ID {object_id} was not removed '
+                    f'Object with ID {object_id} was not deleted '
                     f'because there is no object with this ID.'
                 )
             )
 
-    def remove_objects(self, object_ids: Iterable):
-        """Remove objects from clustering.
+    def delete_objects(self, object_ids: Iterable):
+        """Delete objects from object set, then update clustering.
 
         Parameters
         ----------
         object_ids : iterable of int or of str
-            The identifiers of the data objects to be removed from the
-            clustering. E.g., list of strings, or numpy array of integers.
+            The identifiers of the data objects to be deleted from the object
+            set. E.g., list of strings, or numpy array of integers.
 
         """
         for object_id in object_ids:
-            self.remove_object(object_id)
+            self.delete_object(object_id)
 
 
 class IncrementalDBSCANWarning(Warning):

@@ -81,7 +81,7 @@ Let's take the following object set _D_ of 7 one dimensional objects (_a_, _b_, 
 
 Suppose we apply IncrementalDBSCAN to the objects with _MinPts_ = 3 and _Eps_ = 2. As a result, all objects belong to a single cluster.
 
-Now suppose we remove _p_. Following _Definition 7_ in the paper, _UpdSeed<sub>Del</sub>_ would be empty, since there is no object that is core in _D_ but not in _D_ \ {_p_}. Thus, according to the definition, there are no seed objects for the update.
+Now suppose we delete _p_. Following _Definition 7_ in the paper, _UpdSeed<sub>Del</sub>_ would be empty, since there is no object that is core in _D_ but not in _D_ \ {_p_}. Thus, according to the definition, there are no seed objects for the update.
 
 This is in conflict with the results of the deletion, in which there are now two clusters of objects, as can be seen below. Thus, there was indeed a need for cluster membership update.
 <pre>
@@ -97,7 +97,7 @@ According to _Section 4.3_ of the paper, when during the deletion of an object _
 
 However, consider there are two core objects in _D_, _p_ and _q_, not in the neighborhood of each other. They are of different clusters, _C1_ and _C2_, respectively. And suppose there is an object _b_ that is not core and is in both _N<sub>Eps</sub>(p)_ and _N<sub>Eps</sub>(q)_ (but is not a neighbor of any other object). In such cases _b_ is either in cluster _C1_ or _C2_. In this example assume it is in _C1_.
 
-We now remove _p_ from the _D_. _UpdSeed<sub>Del</sub>_ is empty because there are no core objects in the neighborhood of objects that lost their core property. _b_ is then removed from _C1_ (no object to keep it there) but does not become noise. Instead, because it is in _N<sub>Eps</sub>(q)_ it should be assigned to _C2_, which goes against the description in the paper.
+We now delete _p_ from _D_. _UpdSeed<sub>Del</sub>_ is empty because there are no core objects in the neighborhood of objects that lost their core property. _b_ is then no longer in _C1_ (as there is no object to keep it there) but does not become noise. Instead, because it is in _N<sub>Eps</sub>(q)_ it should be assigned to _C2_, which goes against the description in the paper.
 
 **Solution**: in this implementation whenever an object loses its cluster membership it is checked first if it should be reassigned to another cluster. Only if it is not in the neighborhood of any other core objects it becomes noise.
 

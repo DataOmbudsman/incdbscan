@@ -36,7 +36,7 @@ def test_warning_raised_if_known_id_is_passed_to_add(incdbscan, inputs):
         incdbscan.add_object(object_values[0], object_ids[0])
 
 
-def test_warning_raised_if_unknown_id_is_passed_to_remove(incdbscan, inputs):
+def test_warning_raised_if_unknown_id_is_passed_to_delete(incdbscan, inputs):
     object_values, object_ids = inputs
     incdbscan.add_objects(object_values, object_ids)
 
@@ -44,10 +44,10 @@ def test_warning_raised_if_unknown_id_is_passed_to_remove(incdbscan, inputs):
 
     with pytest.warns(IncrementalDBSCANWarning):
         one_known_one_unknown = [object_ids[0], unknown_index]
-        incdbscan.remove_objects(one_known_one_unknown)
+        incdbscan.delete_objects(one_known_one_unknown)
 
 
-def test_no_warning_raised_if_known_index_is_passed_to_remove(
+def test_no_warning_raised_if_known_index_is_passed_to_delete(
         incdbscan,
         inputs):
 
@@ -55,7 +55,7 @@ def test_no_warning_raised_if_known_index_is_passed_to_remove(
     incdbscan.add_objects(object_values, object_ids)
 
     with pytest.warns(None) as record:
-        incdbscan.remove_objects(object_ids[1:5])
+        incdbscan.delete_objects(object_ids[1:5])
 
     number_of_warnings = len(record)
     assert number_of_warnings == 0
@@ -77,11 +77,11 @@ def test_labels_are_not_accessible_for_not_added_objects(incdbscan, inputs):
     assert unknown_id not in incdbscan.labels
 
 
-def test_labels_are_not_accessible_for_removed_objects(incdbscan, inputs):
+def test_labels_are_not_accessible_for_deleted_objects(incdbscan, inputs):
     object_values, object_ids = inputs
     incdbscan.add_objects(object_values, object_ids)
 
     first_object_id = object_ids[0]
-    incdbscan.remove_object(first_object_id)
+    incdbscan.delete_object(first_object_id)
 
     assert first_object_id not in incdbscan.labels
