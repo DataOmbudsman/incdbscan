@@ -1,6 +1,9 @@
 from typing import Iterable
 from src.incrementaldbscan._objects import ObjectId
 
+CLUSTER_LABEL_NOISE = -1
+CLUSTER_LABEL_FIRST_CLUSTER = 0
+
 
 def assert_cluster_label_of_ids(
         object_ids: Iterable[ObjectId],
@@ -39,3 +42,4 @@ def assert_split_creates_new_labels(
 
     assert previous_common_label in all_labels
     assert len(all_labels) == len(components)
+    assert CLUSTER_LABEL_NOISE not in all_labels

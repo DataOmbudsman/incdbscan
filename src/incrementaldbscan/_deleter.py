@@ -44,7 +44,6 @@ class _Deleter():
                 # print(list(components)) #TODO
 
                 for component in components:
-                    pass
                     self.labels.set_labels(
                         component, self.labels.get_next_cluster_label())
 

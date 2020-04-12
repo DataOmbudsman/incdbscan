@@ -152,8 +152,19 @@ class IncrementalDBSCAN():
 class IncrementalDBSCANWarning(Warning):
     pass
 
-# TODO notebook: example
+
+# TODO readme 5. hiba
+# TODO functional test
 # TODO package restructure: no src
 # TODO __init__ file setup
-# TODO 0.1.0 comes with all kinds of metrics, no index
+# TODO notebook: example
+# TODO license
+# TODO gif example
+# TODO readme: intro
+# TODO readme: usage
+# TODO remove prints
+# TODO metrics
 # TODO validate purpose of cache
+# TODO indexing
+# TODO pip
+# TODO readme: installation

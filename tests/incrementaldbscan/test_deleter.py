@@ -4,11 +4,10 @@ from tests.incrementaldbscan.conftest import EPS
 from tests.incrementaldbscan.utils import (
     add_objects_to_clustering_and_assert,
     assert_cluster_label_of_ids,
-    assert_split_creates_new_labels
+    assert_split_creates_new_labels,
+    CLUSTER_LABEL_NOISE,
+    CLUSTER_LABEL_FIRST_CLUSTER
 )
-
-CLUSTER_LABEL_NOISE = -1
-CLUSTER_LABEL_FIRST_CLUSTER = 0
 
 
 def test_after_removing_enough_objects_only_noise_remain(
@@ -237,7 +236,7 @@ def test_cluster_id_of_single_component_objects_is_kept_after_removal(
         core_ids, incdbscan3, CLUSTER_LABEL_FIRST_CLUSTER)
 
 
-def test_simple_split_into_two_parts(incdbscan3, point_at_origin):
+def test_simple_two_way_split(incdbscan3, point_at_origin):
     point_to_remove_value, point_to_remove_id = point_at_origin
 
     values_left = np.array([
@@ -265,6 +264,99 @@ def test_simple_split_into_two_parts(incdbscan3, point_at_origin):
 
     assert_split_creates_new_labels(
         incdbscan3, [ids_left, ids_right], CLUSTER_LABEL_FIRST_CLUSTER)
+
+
+def test_simple_two_way_split_with_noise(incdbscan3, point_at_origin):
+    point_to_remove_value, point_to_remove_id = point_at_origin
+
+    values_left = np.array([
+        [-EPS, 0],
+        [-EPS * 2, 0],
+        [-EPS * 3, 0],
+    ])
+    ids_left = [0, 1, 2]
+
+    values_right_top = np.array([
+        [0, EPS],
+        [0, EPS * 2],
+        [0, EPS * 3],
+    ])
+    ids_right_top = [3, 4, 5]
+
+    values_right_bottom = np.array([
+        [0, -EPS],
+        [0, -EPS * 2],
+    ])
+    ids_right_bottom = [6, 7]
+
+    all_values = np.vstack([
+        point_to_remove_value,
+        values_left,
+        values_right_top,
+        values_right_bottom
+    ])
+    all_ids = \
+        [point_to_remove_id] + ids_left + ids_right_top + ids_right_bottom
+
+    add_objects_to_clustering_and_assert(
+        incdbscan3, all_values, all_ids, CLUSTER_LABEL_FIRST_CLUSTER
+    )
+
+    incdbscan3.remove_object(point_to_remove_id)
+
+    assert_split_creates_new_labels(
+        incdbscan3,
+        [ids_left, ids_right_top],
+        CLUSTER_LABEL_FIRST_CLUSTER)
+
+    assert_cluster_label_of_ids(
+        ids_right_bottom, incdbscan3, CLUSTER_LABEL_NOISE)
+
+
+def test_three_way_split(incdbscan3, point_at_origin):
+    point_to_remove_value, point_to_remove_id = point_at_origin
+
+    values_left = np.array([
+        [-EPS, 0],
+        [-EPS * 2, 0],
+        [-EPS * 3, 0],
+    ])
+    ids_left = [0, 1, 2]
+
+    values_right_top = np.array([
+        [0, EPS],
+        [0, EPS * 2],
+        [0, EPS * 3],
+    ])
+    ids_right_top = [3, 4, 5]
+
+    values_right_bottom = np.array([
+        [0, -EPS],
+        [0, -EPS * 2],
+        [0, -EPS * 3],
+    ])
+    ids_right_bottom = [6, 7, 8]
+
+    all_values = np.vstack([
+        point_to_remove_value,
+        values_left,
+        values_right_top,
+        values_right_bottom
+    ])
+    all_ids = \
+        [point_to_remove_id] + ids_left + ids_right_top + ids_right_bottom
+
+    add_objects_to_clustering_and_assert(
+        incdbscan3, all_values, all_ids, CLUSTER_LABEL_FIRST_CLUSTER
+    )
+
+    incdbscan3.remove_object(point_to_remove_id)
+
+    assert_split_creates_new_labels(
+        incdbscan3,
+        [ids_left, ids_right_top, ids_right_bottom],
+        CLUSTER_LABEL_FIRST_CLUSTER)
+
 
 # TODO test for different cluster components
 # de csak azutan hogy a splitting logic

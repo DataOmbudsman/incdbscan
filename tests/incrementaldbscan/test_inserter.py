@@ -3,11 +3,10 @@ import numpy as np
 from tests.incrementaldbscan.conftest import EPS
 from tests.incrementaldbscan.utils import (
     add_objects_to_clustering_and_assert,
-    assert_cluster_label_of_ids
+    assert_cluster_label_of_ids,
+    CLUSTER_LABEL_NOISE,
+    CLUSTER_LABEL_FIRST_CLUSTER
 )
-
-CLUSTER_LABEL_NOISE = -1
-CLUSTER_LABEL_FIRST_CLUSTER = 0
 
 
 def test_new_single_object_is_labeled_as_noise(incdbscan4, object_far_away):
