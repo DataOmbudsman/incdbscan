@@ -48,6 +48,6 @@ class _Objects:
         self.objects[object_to_add.id] = object_to_add
         self.get_neighbors.cache_clear()
 
-    def remove_object(self, object_id: ObjectId):
+    def delete_object(self, object_id: ObjectId):
         del self.objects[object_id]
         self.get_neighbors.cache_clear()

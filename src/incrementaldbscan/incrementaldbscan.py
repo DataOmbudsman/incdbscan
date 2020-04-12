@@ -7,7 +7,7 @@ from src.incrementaldbscan._labels import ClusterLabel, _Labels
 from src.incrementaldbscan._objects import _Object, ObjectId, _Objects
 
 
-class IncrementalDBSCAN():
+class IncrementalDBSCAN:
     """An incremental density-based clustering algorithm that handles outliers.
 
     After an initial clustering of objects, the clustering can at any time be

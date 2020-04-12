@@ -7,7 +7,7 @@ from src.incrementaldbscan._labels import (
 from src.incrementaldbscan._objects import _Object
 
 
-class _Inserter():
+class _Inserter:
     def __init__(self, eps, min_pts, labels, objects):
         self.eps = eps
         self.min_pts = min_pts

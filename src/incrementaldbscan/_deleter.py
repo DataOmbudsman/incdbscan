@@ -5,7 +5,7 @@ import networkx as nx
 from src.incrementaldbscan._labels import CLUSTER_LABEL_NOISE
 
 
-class _Deleter():
+class _Deleter:
     def __init__(self, eps, min_pts, labels, objects):
         self.eps = eps
         self.min_pts = min_pts
@@ -15,7 +15,7 @@ class _Deleter():
     def delete(self, object_id):
         print('\nDeleting', object_id)
         object_to_delete = self.objects.get_object(object_id)
-        self.objects.remove_object(object_id)
+        self.objects.delete_object(object_id)
 
         neighbors = self.objects.get_neighbors(object_to_delete, self.eps)
         self._update_neighbor_counts_after_deletion(neighbors)
