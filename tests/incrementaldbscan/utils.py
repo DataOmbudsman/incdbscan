@@ -14,7 +14,7 @@ def assert_cluster_label_of_ids(
         assert incdbscan_fit.labels[object_id] == label
 
 
-def add_objects_to_clustering_and_assert(
+def add_objects_to_clustering_and_assert_membership(
         incdbscan,
         values: Iterable,
         ids_to_add: Iterable[ObjectId],

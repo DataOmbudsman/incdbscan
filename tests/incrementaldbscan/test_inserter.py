@@ -2,7 +2,7 @@ import numpy as np
 
 from tests.incrementaldbscan.conftest import EPS
 from tests.incrementaldbscan.utils import (
-    add_objects_to_clustering_and_assert,
+    add_objects_to_clustering_and_assert_membership,
     assert_cluster_label_of_ids,
     CLUSTER_LABEL_NOISE,
     CLUSTER_LABEL_FIRST_CLUSTER
@@ -71,21 +71,21 @@ def test_more_than_two_clusters_can_be_created(incdbscan4, blob_in_middle):
     cluster_1_values, cluster_1_ids = blob_in_middle
     cluster_1_expected_label = CLUSTER_LABEL_FIRST_CLUSTER
 
-    add_objects_to_clustering_and_assert(
+    add_objects_to_clustering_and_assert_membership(
         incdbscan4, cluster_1_values, cluster_1_ids, cluster_1_expected_label)
 
     cluster_2_values, cluster_2_ids = \
         cluster_1_values + 10, cluster_1_ids + 10
     cluster_2_expected_label = cluster_1_expected_label + 1
 
-    add_objects_to_clustering_and_assert(
+    add_objects_to_clustering_and_assert_membership(
         incdbscan4, cluster_2_values, cluster_2_ids, cluster_2_expected_label)
 
     cluster_3_values, cluster_3_ids = \
         cluster_2_values + 10, cluster_2_ids + 10
     cluster_3_expected_label = cluster_2_expected_label + 1
 
-    add_objects_to_clustering_and_assert(
+    add_objects_to_clustering_and_assert_membership(
         incdbscan4, cluster_3_values, cluster_3_ids, cluster_3_expected_label)
 
 
@@ -141,17 +141,17 @@ def test_absorption_with_noise(incdbscan3, point_at_origin):
     ])
     cluster_ids = [0, 1, 2]
 
-    add_objects_to_clustering_and_assert(
+    add_objects_to_clustering_and_assert_membership(
         incdbscan3, cluster_values, cluster_ids, expected_cluster_label)
 
     noise_value, noise_id = np.array([0, EPS]), 'NOISE'
 
-    add_objects_to_clustering_and_assert(
+    add_objects_to_clustering_and_assert_membership(
         incdbscan3, [noise_value], [noise_id], CLUSTER_LABEL_NOISE)
 
     new_object_value, new_object_id = point_at_origin
 
-    add_objects_to_clustering_and_assert(
+    add_objects_to_clustering_and_assert_membership(
         incdbscan3,
         [new_object_value],
         [new_object_id],
@@ -171,7 +171,7 @@ def test_merge_two_clusters(incdbscan3, point_at_origin):
     cluster_1_ids = [0, 1, 2, 3]
     cluster_1_expected_label = CLUSTER_LABEL_FIRST_CLUSTER
 
-    add_objects_to_clustering_and_assert(
+    add_objects_to_clustering_and_assert_membership(
         incdbscan3, cluster_1_values, cluster_1_ids, cluster_1_expected_label
     )
 
@@ -184,7 +184,7 @@ def test_merge_two_clusters(incdbscan3, point_at_origin):
     cluster_2_ids = [4, 5, 6, 7]
     cluster_2_expected_label = cluster_1_expected_label + 1
 
-    add_objects_to_clustering_and_assert(
+    add_objects_to_clustering_and_assert_membership(
         incdbscan3, cluster_2_values, cluster_2_ids, cluster_2_expected_label
     )
 
@@ -192,7 +192,7 @@ def test_merge_two_clusters(incdbscan3, point_at_origin):
     merged_cluster_expected_label = \
         max([cluster_1_expected_label, cluster_2_expected_label])
 
-    add_objects_to_clustering_and_assert(
+    add_objects_to_clustering_and_assert_membership(
         incdbscan3,
         [new_object_value],
         [new_object_id],
@@ -248,7 +248,7 @@ def test_merger_and_creation_can_happen_at_the_same_time(
     pre_cluster_ids = [6, 7, 8]
     cluster_3_expected_label = cluster_2_expected_label + 1
 
-    add_objects_to_clustering_and_assert(
+    add_objects_to_clustering_and_assert_membership(
         incdbscan4,
         pre_cluster_values,
         pre_cluster_ids,

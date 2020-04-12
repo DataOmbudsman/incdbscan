@@ -42,3 +42,14 @@ def point_at_origin():
     value = np.array([0, 0])
     id_ = 'NEW'
     return value, id_
+
+
+@pytest.fixture
+def three_points_to_the_left():
+    values = np.array([
+        [-EPS, 0],
+        [-EPS * 2, 0],
+        [-EPS * 3, 0],
+    ])
+    ids = ['left0', 'left1', 'left2']
+    return values, ids
