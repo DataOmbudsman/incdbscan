@@ -5,6 +5,7 @@ from tests.incrementaldbscan.utils import (
     add_objects_to_clustering_and_assert_membership,
     assert_cluster_label_of_ids,
     assert_split_creates_new_labels,
+    reflect_horizontally,
     CLUSTER_LABEL_NOISE,
     CLUSTER_LABEL_FIRST_CLUSTER
 )
@@ -88,11 +89,7 @@ def test_border_object_can_switch_to_other_cluster(
     cluster_1_ids = np.array([0, 1, 2])
     cluster_1_label = CLUSTER_LABEL_FIRST_CLUSTER
 
-    cluster_2_values = np.array([
-        [-EPS, 0],
-        [-EPS, EPS],
-        [-EPS, -EPS],
-    ])
+    cluster_2_values = reflect_horizontally(cluster_1_values)
     cluster_2_ids = np.array([3, 4, 5])
     cluster_2_label = cluster_1_label + 1
 
@@ -236,11 +233,7 @@ def test_simple_two_way_split(
     point_to_delete_value, point_to_delete_id = point_at_origin
     values_left, ids_left = three_points_to_the_left
 
-    values_right = np.array([
-        [EPS, 0],
-        [EPS * 2, 0],
-        [EPS * 3, 0],
-    ])
+    values_right = reflect_horizontally(values_left)
     ids_right = [3, 4, 5]
 
     all_values = np.vstack([point_to_delete_value, values_left, values_right])
@@ -258,23 +251,16 @@ def test_simple_two_way_split(
 def test_simple_two_way_split_with_noise(
         incdbscan3,
         point_at_origin,
-        three_points_to_the_left):
+        three_points_to_the_left,
+        three_points_on_the_top,
+        three_points_at_the_bottom):
 
     point_to_delete_value, point_to_delete_id = point_at_origin
     values_left, ids_left = three_points_to_the_left
+    values_top, ids_top = three_points_on_the_top
 
-    values_top = np.array([
-        [0, EPS],
-        [0, EPS * 2],
-        [0, EPS * 3],
-    ])
-    ids_top = [3, 4, 5]
-
-    values_bottom = np.array([
-        [0, -EPS],
-        [0, -EPS * 2],
-    ])
-    ids_bottom = [6, 7]
+    values_bottom, ids_bottom = three_points_at_the_bottom
+    values_bottom, ids_bottom = values_bottom[:-1], ids_bottom[:-1]
 
     all_values = np.vstack([
         point_to_delete_value,
@@ -299,33 +285,22 @@ def test_simple_two_way_split_with_noise(
 def test_three_way_split(
         incdbscan3,
         point_at_origin,
-        three_points_to_the_left):
+        three_points_to_the_left,
+        three_points_on_the_top,
+        three_points_at_the_bottom):
 
     point_to_delete_value, point_to_delete_id = point_at_origin
     values_left, ids_left = three_points_to_the_left
-
-    values_right_top = np.array([
-        [0, EPS],
-        [0, EPS * 2],
-        [0, EPS * 3],
-    ])
-    ids_right_top = [3, 4, 5]
-
-    values_right_bottom = np.array([
-        [0, -EPS],
-        [0, -EPS * 2],
-        [0, -EPS * 3],
-    ])
-    ids_right_bottom = [6, 7, 8]
+    values_top, ids_top = three_points_on_the_top
+    values_bottom, ids_bottom = three_points_at_the_bottom
 
     all_values = np.vstack([
         point_to_delete_value,
         values_left,
-        values_right_top,
-        values_right_bottom
+        values_top,
+        values_bottom
     ])
-    all_ids = \
-        [point_to_delete_id] + ids_left + ids_right_top + ids_right_bottom
+    all_ids = [point_to_delete_id] + ids_left + ids_top + ids_bottom
 
     add_objects_to_clustering_and_assert_membership(
         incdbscan3, all_values, all_ids, CLUSTER_LABEL_FIRST_CLUSTER)
@@ -334,7 +309,7 @@ def test_three_way_split(
 
     assert_split_creates_new_labels(
         incdbscan3,
-        [ids_left, ids_right_top, ids_right_bottom],
+        [ids_left, ids_top, ids_bottom],
         CLUSTER_LABEL_FIRST_CLUSTER
     )
 

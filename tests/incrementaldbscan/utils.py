@@ -1,4 +1,7 @@
 from typing import Iterable
+
+import numpy as np
+
 from src.incrementaldbscan._objects import ObjectId
 
 CLUSTER_LABEL_NOISE = -1
@@ -43,3 +46,9 @@ def assert_split_creates_new_labels(
     assert previous_common_label in all_labels
     assert len(all_labels) == len(components)
     assert CLUSTER_LABEL_NOISE not in all_labels
+
+
+def reflect_horizontally(points):
+    new_points = np.copy(points)
+    new_points[:, 0] = np.negative(new_points[:, 0])
+    return new_points

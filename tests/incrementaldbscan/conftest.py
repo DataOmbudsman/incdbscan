@@ -53,3 +53,25 @@ def three_points_to_the_left():
     ])
     ids = ['left0', 'left1', 'left2']
     return values, ids
+
+
+@pytest.fixture
+def three_points_on_the_top():
+    values = np.array([
+        [0, EPS],
+        [0, EPS * 2],
+        [0, EPS * 3],
+    ])
+    ids = ['top0', 'top1', 'top2']
+    return values, ids
+
+
+@pytest.fixture
+def three_points_at_the_bottom():
+    values = np.array([
+        [0, -EPS],
+        [0, -EPS * 2],
+        [0, -EPS * 3],
+    ])
+    ids = ['bottom0', 'bottom1', 'bottom2']
+    return values, ids
