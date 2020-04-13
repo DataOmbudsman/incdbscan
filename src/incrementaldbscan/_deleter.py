@@ -39,8 +39,8 @@ class _Deleter:
                 self._group_objects_by_cluster(update_seeds)
 
             for seeds in update_seeds_by_cluster.values():
-                components = self._find_components_to_split_away(seeds)
-                # print(list(components)) #TODO
+                components = self._find_components_to_split_away(
+                    seeds, non_core_neighbors_of_ex_cores)
 
                 for component in components:
                     self.labels.set_labels(
@@ -50,7 +50,7 @@ class _Deleter:
         # of objects that lost their core property is always needed. They
         # become either borders of other clusters or noise.
 
-        self._set_border_object_labels_to_largest_around_in_parallel(
+        self._set_each_border_object_labels_to_largest_around(
             non_core_neighbors_of_ex_cores)
         self.labels.delete_label(object_id)
 
@@ -70,10 +70,13 @@ class _Deleter:
 
         # The result has to contain the deleted object if it was core
 
-        if object_to_delete.neighbor_count >= self.min_pts:
+        if self._is_core(object_to_delete):
             ex_core_neighbors.append(object_to_delete)
 
         return ex_core_neighbors
+
+    def _is_core(self, obj):
+        return obj.neighbor_count >= self.min_pts
 
     def _separate_neighbors_by_core_property(self, neighbors_of_ex_cores):
         core_objects = set()
@@ -81,14 +84,14 @@ class _Deleter:
 
         for neighbors in neighbors_of_ex_cores.values():
             for neighbor in neighbors:
-                if neighbor.neighbor_count >= self.min_pts:
+                if self._is_core(neighbor):
                     core_objects.add(neighbor)
                 else:
                     non_core_objects.add(neighbor)
 
         return core_objects, non_core_objects
 
-    def _set_border_object_labels_to_largest_around_in_parallel(
+    def _set_each_border_object_labels_to_largest_around(
             self,
             objects_to_set):
 
@@ -108,47 +111,52 @@ class _Deleter:
         labels = set()
 
         for neighbor in self.objects.get_neighbors(obj, self.eps):
-            if neighbor.neighbor_count >= self.min_pts:
+            if self._is_core(neighbor):
                 label_of_neighbor = self.labels.get_label(neighbor)
                 labels.add(label_of_neighbor)
 
         return labels
 
-    def _find_components_to_split_away(self, seed_objects):
+    def _find_components_to_split_away(
+            self,
+            seed_objects,
+            objects_to_exclude_from_components):
+
+        # Traverse the objects in a BFS manner to find those components of
+        # objects that need to be split away. Starting from the seed objects,
+        # expand the graph by adding neighboring objects, but objects whose
+        # update is not taken care of in this step are excluded. Traversal
+        # terminates when all of the next nodes to be added are linked to the
+        # same seed objects -- this means that the components (that all can be
+        # linked to other seed objects) are traversed completely and they can
+        # be split away.
+
         if len(seed_objects) == 1:
             return list()
 
         if self._objects_are_neighbors_of_each_other(seed_objects):
             return list()
 
-        G = nx.Graph()
-        nodes_to_visit = list()
-
-        def _add_neighbors_of_object_to_graph(obj, seed_id):
-            edges = set(G.edges)
+        def _expand_graph(obj, seed_id):
             nodes = set(G.nodes)
-
             neighbors = self.objects.get_neighbors(obj, self.eps)
 
             for neighbor in neighbors:
-                if neighbor != obj:
-                    if (obj, neighbor) not in edges:
-                        G.add_edge(obj, neighbor)
-                    if neighbor not in nodes:
-                        nodes_to_visit.append((neighbor, seed_id))
+                if neighbor not in objects_to_exclude_from_components:
+                    G.add_edge(obj, neighbor)
+                if neighbor not in nodes and self._is_core(neighbor):
+                    nodes_to_visit.append((neighbor, seed_id))
 
         def _nodes_to_visit_are_from_different_seeds():
             seed_ids = set([seed_id for (node, seed_id) in nodes_to_visit])
             return len(seed_ids) > 1
 
-        for seed in seed_objects:
-            nodes_to_visit.append((seed, seed.id))
+        G = nx.Graph()
+        nodes_to_visit = [(seed, seed.id) for seed in seed_objects]
 
-        print('0 print', nodes_to_visit); print()
         while _nodes_to_visit_are_from_different_seeds():
             obj, seed_ix = nodes_to_visit.pop(0)
-            _add_neighbors_of_object_to_graph(obj, seed_ix)
-            print('END print', nodes_to_visit)
+            _expand_graph(obj, seed_ix)
 
         connected_components = nx.connected_components(G)
         remaining_seed_id = nodes_to_visit[0][1]

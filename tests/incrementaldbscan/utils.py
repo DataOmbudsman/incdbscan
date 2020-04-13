@@ -27,24 +27,24 @@ def add_objects_to_clustering_and_assert_membership(
     assert_cluster_label_of_ids(ids_to_add, incdbscan, expected_label)
 
 
-def assert_split_creates_new_labels(
+def assert_split_creates_new_labels_for_new_clusters(
         incdbscan_fit,
-        components: Iterable[Iterable[ObjectId]],
+        clusters: Iterable[Iterable[ObjectId]],
         previous_common_label):
 
     all_labels = set()
 
-    for component in components:
-        labels_within_component = set()
+    for objects in clusters:
+        labels_within_cluster = set()
 
-        for object_id in component:
-            labels_within_component.add(incdbscan_fit.labels[object_id])
+        for object_id in objects:
+            labels_within_cluster.add(incdbscan_fit.labels[object_id])
 
-        assert len(labels_within_component) == 1
-        all_labels.update(labels_within_component)
+        assert len(labels_within_cluster) == 1
+        all_labels.update(labels_within_cluster)
 
     assert previous_common_label in all_labels
-    assert len(all_labels) == len(components)
+    assert len(all_labels) == len(clusters)
     assert CLUSTER_LABEL_NOISE not in all_labels
 
 

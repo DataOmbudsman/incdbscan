@@ -4,7 +4,7 @@ from tests.incrementaldbscan.conftest import EPS
 from tests.incrementaldbscan.utils import (
     add_objects_to_clustering_and_assert_membership,
     assert_cluster_label_of_ids,
-    assert_split_creates_new_labels,
+    assert_split_creates_new_labels_for_new_clusters,
     reflect_horizontally,
     CLUSTER_LABEL_NOISE,
     CLUSTER_LABEL_FIRST_CLUSTER
@@ -244,7 +244,7 @@ def test_simple_two_way_split(
 
     incdbscan3.delete_object(point_to_delete_id)
 
-    assert_split_creates_new_labels(
+    assert_split_creates_new_labels_for_new_clusters(
         incdbscan3, [ids_left, ids_right], CLUSTER_LABEL_FIRST_CLUSTER)
 
 
@@ -275,7 +275,7 @@ def test_simple_two_way_split_with_noise(
 
     incdbscan3.delete_object(point_to_delete_id)
 
-    assert_split_creates_new_labels(
+    assert_split_creates_new_labels_for_new_clusters(
         incdbscan3, [ids_left, ids_top], CLUSTER_LABEL_FIRST_CLUSTER)
 
     assert_cluster_label_of_ids(
@@ -307,7 +307,7 @@ def test_three_way_split(
 
     incdbscan3.delete_object(point_to_delete_id)
 
-    assert_split_creates_new_labels(
+    assert_split_creates_new_labels_for_new_clusters(
         incdbscan3,
         [ids_left, ids_top, ids_bottom],
         CLUSTER_LABEL_FIRST_CLUSTER
@@ -339,9 +339,78 @@ def test_simultaneous_split_and_non_split(
 
     incdbscan3.delete_object(point_to_delete_id)
 
-    assert_split_creates_new_labels(
+    assert_split_creates_new_labels_for_new_clusters(
         incdbscan3, [ids_left, ids_right], CLUSTER_LABEL_FIRST_CLUSTER)
 
-# TODO test for different cluster components
-# de csak azutan hogy a splitting logic
-# implementalva van
+
+def test_two_way_split_with_non_dense_bridge(incdbscan4, point_at_origin):
+    point_to_delete_value, point_to_delete_id = point_at_origin
+
+    bridge_point_value = point_to_delete_value
+    bridge_point_id = 1
+
+    values_left = np.array([
+        [0, -EPS],
+        [0, -EPS * 2],
+        [0, -EPS * 2],
+        [0, -EPS * 3],
+        [0, -EPS * 3],
+    ])
+    ids_left = [2, 3, 4, 5, 6]
+
+    values_right = np.array([
+        [0, EPS],
+        [0, EPS * 2],
+        [0, EPS * 2],
+        [0, EPS * 3],
+        [0, EPS * 3],
+    ])
+    ids_right = [7, 8, 9, 10, 11]
+
+    all_values = np.vstack([
+        point_to_delete_value, bridge_point_value, values_left, values_right
+    ])
+    all_ids = [point_to_delete_id] + [bridge_point_id] + ids_left + ids_right
+
+    add_objects_to_clustering_and_assert_membership(
+        incdbscan4, all_values, all_ids, CLUSTER_LABEL_FIRST_CLUSTER)
+
+    incdbscan4.delete_object(point_to_delete_id)
+
+    assert_split_creates_new_labels_for_new_clusters(
+        incdbscan4, [ids_left, ids_right], CLUSTER_LABEL_FIRST_CLUSTER)
+
+
+def test_simultaneous_splits_within_two_clusters(incdbscan4, point_at_origin):
+    point_to_delete_value, point_to_delete_id = point_at_origin
+
+    values_left = np.array([
+        [-EPS, EPS * 2],
+        [-EPS, EPS * 2],
+        [-EPS, EPS],
+        [-EPS, 0],
+        [-EPS, -EPS],
+        [-EPS, -EPS * 2],
+        [-EPS, -EPS * 2],
+    ])
+    ids_left = [1, 2, 3, 4, 5, 6, 7]
+
+    values_right = reflect_horizontally(values_left)
+    ids_right = [8, 9, 10, 11, 12, 13, 14]
+
+    incdbscan4.add_object(point_to_delete_value, point_to_delete_id)
+
+    add_objects_to_clustering_and_assert_membership(
+        incdbscan4, values_left, ids_left, CLUSTER_LABEL_FIRST_CLUSTER)
+
+    cluster_label_2 = CLUSTER_LABEL_FIRST_CLUSTER + 1
+    add_objects_to_clustering_and_assert_membership(
+        incdbscan4, values_right, ids_right, cluster_label_2)
+
+    incdbscan4.delete_object(point_to_delete_id)
+
+    expected_clusters = \
+        [ids_left[:3], ids_left[-3:], ids_right[:3], ids_right[-3:]]
+
+    assert_split_creates_new_labels_for_new_clusters(
+        incdbscan4, expected_clusters, CLUSTER_LABEL_FIRST_CLUSTER)

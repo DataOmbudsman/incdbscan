@@ -153,8 +153,9 @@ class IncrementalDBSCANWarning(Warning):
     pass
 
 
+# TODO "insert" api change
 # TODO readme 5. hiba
-# TODO functional test
+# TODO functional tests
 # TODO package restructure: no src
 # TODO __init__ file setup
 # TODO notebook: example
