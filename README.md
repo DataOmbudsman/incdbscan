@@ -95,11 +95,11 @@ This is in conflict with the results of the deletion, in which there are now two
 
 According to _Section 4.3_ of the paper, when during the deletion of an object _p_ if *"_UpdSeed<sub>Del</sub>_ is empty [...] then p is deleted from D and eventually other objects in _N<sub>Eps</sub>(p)_ change from a former cluster C to noise".*
 
-However, consider there are two core objects in _D_, _p_ and _q_, not in the neighborhood of each other. They are of different clusters, _C1_ and _C2_, respectively. And suppose there is an object _b_ that is not core and is in both _N<sub>Eps</sub>(p)_ and _N<sub>Eps</sub>(q)_ (but is not a neighbor of any other object). In such cases _b_ is either in cluster _C1_ or _C2_. In this example assume it is in _C1_.
+However, consider there are two core objects in _D_, _p_ and _q_, not in the _Eps_-neighborhood of each other. They are of different clusters, _C1_ and _C2_, respectively. And suppose there is an object _b_ that is not core and is in both _N<sub>Eps</sub>(p)_ and _N<sub>Eps</sub>(q)_ (but not in _N<sub>Eps</sub>(r)_ for of any other object _r_). In such cases _b_ is either in cluster _C1_ or _C2_. In this example assume it is in _C1_.
 
-We now delete _p_ from _D_. _UpdSeed<sub>Del</sub>_ is empty because there are no core objects in the neighborhood of objects that lost their core property. _b_ is then no longer in _C1_ (as there is no object to keep it there) but does not become noise. Instead, because it is in _N<sub>Eps</sub>(q)_ it should be assigned to _C2_, which goes against the description in the paper.
+We now delete _p_ from _D_. _UpdSeed<sub>Del</sub>_ is empty because there are no core objects in the _Eps_-neighborhood of objects that lost their core property. _b_ is then no longer in _C1_ (as there is no object to keep it there) but does not become noise. Instead, because it is in _N<sub>Eps</sub>(q)_ it should be assigned to _C2_, which goes against the description in the paper.
 
-**Solution**: in this implementation whenever an object loses its cluster membership it is checked first if it should be reassigned to another cluster. Only if it is not in the neighborhood of any other core objects it becomes noise.
+**Solution**: in this implementation whenever an object loses its cluster membership it is checked first if it should be reassigned to another cluster. Only if it is not in the _Eps_-neighborhood of any other core objects it becomes noise.
 
 # References
 Ester, Martin; Kriegel, Hans-Peter; Sander, Jörg; Xu, Xiaowei (1996). _A density-based algorithm for discovering clusters in large spatial databases with noise._ In: Proceedings of the Second International Conference on Knowledge Discovery and Data Mining (KDD-96). [ACM Digital Library][acm1]. [PDF][pdf1].
