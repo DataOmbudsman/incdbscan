@@ -21,14 +21,13 @@ class _Deleter:
         self._update_neighbor_counts_after_deletion(neighbors)
 
         ex_cores = self._get_objects_that_lost_core_property(
-            neighbors,
-            object_to_delete
-        )
+            neighbors, object_to_delete)
 
         neighbors_of_ex_cores = \
             self.objects.get_neighbors_of_objects(ex_cores, self.eps)
 
-        update_seeds = self._get_update_seeds(neighbors_of_ex_cores)
+        update_seeds, non_core_neighbors_of_ex_cores = \
+            self._separate_neighbors_by_core_property(neighbors_of_ex_cores)
 
         if update_seeds:
             print('\nupdate_seeds', update_seeds)  # TODO
@@ -51,8 +50,8 @@ class _Deleter:
         # of objects that lost their core property is always needed. They
         # become either borders of other clusters or noise.
 
-        self._update_labels_of_border_objects_around_ex_cores(
-            neighbors_of_ex_cores)
+        self._set_border_object_labels_to_largest_around_in_parallel(
+            non_core_neighbors_of_ex_cores)
         self.labels.delete_label(object_id)
 
     def _update_neighbor_counts_after_deletion(self, neighbors):
@@ -70,29 +69,24 @@ class _Deleter:
         ]
 
         # The result has to contain the deleted object if it was core
+
         if object_to_delete.neighbor_count >= self.min_pts:
             ex_core_neighbors.append(object_to_delete)
 
         return ex_core_neighbors
 
-    def _get_update_seeds(self, neighbors_of_ex_cores):
-        seeds = set()
+    def _separate_neighbors_by_core_property(self, neighbors_of_ex_cores):
+        core_objects = set()
+        non_core_objects = set()
 
         for neighbors in neighbors_of_ex_cores.values():
-            core_neighbors = [obj for obj in neighbors
-                              if obj.neighbor_count >= self.min_pts]
-            seeds.update(core_neighbors)
+            for neighbor in neighbors:
+                if neighbor.neighbor_count >= self.min_pts:
+                    core_objects.add(neighbor)
+                else:
+                    non_core_objects.add(neighbor)
 
-        return seeds
-
-    def _update_labels_of_border_objects_around_ex_cores(
-            self,
-            neighbors_of_ex_cores):
-
-        for neighbors_of_ex_core in neighbors_of_ex_cores.values():
-            self._set_border_object_labels_to_largest_around_in_parallel(
-                objects_to_set=neighbors_of_ex_core,
-            )
+        return core_objects, non_core_objects
 
     def _set_border_object_labels_to_largest_around_in_parallel(
             self,
@@ -101,12 +95,11 @@ class _Deleter:
         cluster_updates = {}
 
         for obj in objects_to_set:
-            if obj.neighbor_count < self.min_pts:
-                labels = self._get_cluster_labels_in_neighborhood(obj)
-                if not labels:
-                    labels.add(CLUSTER_LABEL_NOISE)
+            labels = self._get_cluster_labels_in_neighborhood(obj)
+            if not labels:
+                labels.add(CLUSTER_LABEL_NOISE)
 
-                cluster_updates[obj] = max(labels)
+            cluster_updates[obj] = max(labels)
 
         for obj, new_cluster_label in cluster_updates.items():
             self.labels.set_label(obj, new_cluster_label)
@@ -130,7 +123,6 @@ class _Deleter:
 
         G = nx.Graph()
         nodes_to_visit = list()
-
 
         def _add_neighbors_of_object_to_graph(obj, seed_id):
             edges = set(G.edges)
