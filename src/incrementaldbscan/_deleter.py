@@ -131,7 +131,6 @@ class _Deleter:
         G = nx.Graph()
         nodes_to_visit = list()
 
-        print("HEREr")
 
         def _add_neighbors_of_object_to_graph(obj, seed_id):
             edges = set(G.edges)
@@ -151,7 +150,7 @@ class _Deleter:
             return len(seed_ids) > 1
 
         for seed in seed_objects:
-            _add_neighbors_of_object_to_graph(seed, seed.id)
+            nodes_to_visit.append((seed, seed.id))
 
         print('0 print', nodes_to_visit); print()
         while _nodes_to_visit_are_from_different_seeds():
