@@ -91,31 +91,16 @@ class _Deleter:
 
         return core_objects, non_core_objects
 
-    def _set_each_border_object_labels_to_largest_around(
-            self,
-            objects_to_set):
+    def _group_objects_by_cluster(self, objects):
+        objects_with_cluster_labels = [
+            (obj, self.labels.get_label(obj)) for obj in objects
+        ]
+        grouped_objects = defaultdict(list)
 
-        cluster_updates = {}
+        for obj, label in objects_with_cluster_labels:
+            grouped_objects[label].append(obj)
 
-        for obj in objects_to_set:
-            labels = self._get_cluster_labels_in_neighborhood(obj)
-            if not labels:
-                labels.add(CLUSTER_LABEL_NOISE)
-
-            cluster_updates[obj] = max(labels)
-
-        for obj, new_cluster_label in cluster_updates.items():
-            self.labels.set_label(obj, new_cluster_label)
-
-    def _get_cluster_labels_in_neighborhood(self, obj):
-        labels = set()
-
-        for neighbor in self.objects.get_neighbors(obj, self.eps):
-            if self._is_core(neighbor):
-                label_of_neighbor = self.labels.get_label(neighbor)
-                labels.add(label_of_neighbor)
-
-        return labels
+        return grouped_objects
 
     def _find_components_to_split_away(
             self,
@@ -173,13 +158,28 @@ class _Deleter:
                     return False
         return True
 
-    def _group_objects_by_cluster(self, objects):
-        objects_with_cluster_labels = [
-            (obj, self.labels.get_label(obj)) for obj in objects
-        ]
-        grouped_objects = defaultdict(list)
+    def _set_each_border_object_labels_to_largest_around(
+            self,
+            objects_to_set):
 
-        for obj, label in objects_with_cluster_labels:
-            grouped_objects[label].append(obj)
+        cluster_updates = {}
 
-        return grouped_objects
+        for obj in objects_to_set:
+            labels = self._get_cluster_labels_in_neighborhood(obj)
+            if not labels:
+                labels.add(CLUSTER_LABEL_NOISE)
+
+            cluster_updates[obj] = max(labels)
+
+        for obj, new_cluster_label in cluster_updates.items():
+            self.labels.set_label(obj, new_cluster_label)
+
+    def _get_cluster_labels_in_neighborhood(self, obj):
+        labels = set()
+
+        for neighbor in self.objects.get_neighbors(obj, self.eps):
+            if self._is_core(neighbor):
+                label_of_neighbor = self.labels.get_label(neighbor)
+                labels.add(label_of_neighbor)
+
+        return labels
