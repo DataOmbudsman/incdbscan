@@ -159,7 +159,6 @@ class IncrementalDBSCANWarning(Warning):
 # TODO package restructure: no src
 # TODO __init__ file setup
 # TODO notebook: example
-# TODO license
 # TODO gif example
 # TODO readme: intro
 # TODO readme: usage
