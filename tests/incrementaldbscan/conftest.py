@@ -45,7 +45,7 @@ def point_at_origin():
 
 
 @pytest.fixture
-def three_points_to_the_left():
+def three_points_on_the_left():
     values = np.array([
         [-EPS, 0],
         [-EPS * 2, 0],
@@ -74,4 +74,19 @@ def three_points_at_the_bottom():
         [0, -EPS * 3],
     ])
     ids = ['bottom0', 'bottom1', 'bottom2']
+    return values, ids
+
+
+@pytest.fixture
+def hourglass_on_the_right():
+    values = np.array([
+        [EPS, EPS * 2],
+        [EPS, EPS * 2],
+        [EPS, EPS],
+        [EPS, 0],
+        [EPS, -EPS],
+        [EPS, -EPS * 2],
+        [EPS, -EPS * 2],
+    ])
+    ids = [100, 200, 300, 400, 500, 600, 700]
     return values, ids

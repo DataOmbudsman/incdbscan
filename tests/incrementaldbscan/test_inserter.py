@@ -4,8 +4,9 @@ from tests.incrementaldbscan.conftest import EPS
 from tests.incrementaldbscan.utils import (
     add_objects_to_clustering_and_assert_membership,
     assert_cluster_label_of_ids,
+    CLUSTER_LABEL_FIRST_CLUSTER,
     CLUSTER_LABEL_NOISE,
-    CLUSTER_LABEL_FIRST_CLUSTER
+    reflect_horizontally
 )
 
 
@@ -67,7 +68,6 @@ def test_labels_are_noise_only_until_not_enough_objects_in_cluster(
 
 
 def test_more_than_two_clusters_can_be_created(incdbscan4, blob_in_middle):
-
     cluster_1_values, cluster_1_ids = blob_in_middle
     cluster_1_expected_label = CLUSTER_LABEL_FIRST_CLUSTER
 
@@ -100,11 +100,7 @@ def test_two_clusters_can_be_born_at_the_same_time(
     ])
     cluster_1_ids = np.array([0, 1, 2])
 
-    cluster_2_values = np.array([
-        [-EPS * 1, 0],
-        [-EPS * 2, 0],
-        [-EPS * 2, 0],
-    ])
+    cluster_2_values = reflect_horizontally(cluster_1_values)
     cluster_2_ids = np.array([3, 4, 5])
 
     incdbscan4.add_objects(cluster_1_values, cluster_1_ids)
@@ -125,10 +121,8 @@ def test_two_clusters_can_be_born_at_the_same_time(
     assert_cluster_label_of_ids(
         cluster_2_ids, incdbscan4, cluster_2_label_expected)
 
-    assert incdbscan4.labels[new_object_id] in set((
-        cluster_1_label_expected,
-        cluster_2_label_expected
-    ))
+    assert incdbscan4.labels[new_object_id] in \
+        {cluster_1_label_expected, cluster_2_label_expected}
 
 
 def test_absorption_with_noise(incdbscan3, point_at_origin):
@@ -172,21 +166,14 @@ def test_merge_two_clusters(incdbscan3, point_at_origin):
     cluster_1_expected_label = CLUSTER_LABEL_FIRST_CLUSTER
 
     add_objects_to_clustering_and_assert_membership(
-        incdbscan3, cluster_1_values, cluster_1_ids, cluster_1_expected_label
-    )
+        incdbscan3, cluster_1_values, cluster_1_ids, cluster_1_expected_label)
 
-    cluster_2_values = np.array([
-        [-EPS, 0],
-        [-EPS * 2, 0],
-        [-EPS * 3, 0],
-        [-EPS * 4, 0],
-    ])
+    cluster_2_values = reflect_horizontally(cluster_1_values)
     cluster_2_ids = [4, 5, 6, 7]
     cluster_2_expected_label = cluster_1_expected_label + 1
 
     add_objects_to_clustering_and_assert_membership(
-        incdbscan3, cluster_2_values, cluster_2_ids, cluster_2_expected_label
-    )
+        incdbscan3, cluster_2_values, cluster_2_ids, cluster_2_expected_label)
 
     new_object_value, new_object_id = point_at_origin
     merged_cluster_expected_label = \
@@ -207,25 +194,21 @@ def test_merge_two_clusters(incdbscan3, point_at_origin):
 
 def test_merger_and_creation_can_happen_at_the_same_time(
         incdbscan4,
-        point_at_origin):
+        point_at_origin,
+        hourglass_on_the_right):
 
-    cluster_1_values = np.array([
-        [EPS, EPS],
-        [EPS, EPS * 2],
-        [EPS, EPS * 2],
-    ])
-    cluster_1_ids = [0, 1, 2]
+    hourglass_values, hourglass_ids = hourglass_on_the_right
+
+    cluster_1_values = hourglass_values[:3]
+    cluster_1_ids = hourglass_ids[:3]
     cluster_1_expected_label = CLUSTER_LABEL_FIRST_CLUSTER
 
-    cluster_2_values = np.array([
-        [EPS, -EPS],
-        [EPS, -EPS * 2],
-        [EPS, -EPS * 2],
-    ])
-    cluster_2_ids = [3, 4, 5]
+    cluster_2_values = hourglass_values[-3:]
+    cluster_2_ids = hourglass_ids[-3:]
     cluster_2_expected_label = cluster_1_expected_label + 1
 
-    bridge_point_value, bridge_point_id = np.array([EPS, 0]), 'bridge'
+    bridge_point_value, bridge_point_id = \
+        hourglass_values[3], hourglass_ids[3]
 
     incdbscan4.add_objects(cluster_1_values, cluster_1_ids)
     incdbscan4.add_object(bridge_point_value, bridge_point_id)
@@ -266,5 +249,5 @@ def test_merger_and_creation_can_happen_at_the_same_time(
         [bridge_point_id], incdbscan4, merged_cluster_expected_label)
     assert_cluster_label_of_ids(
         pre_cluster_ids, incdbscan4, cluster_3_expected_label)
-    assert incdbscan4.labels[new_object_id]\
+    assert incdbscan4.labels[new_object_id] \
         in {merged_cluster_expected_label, cluster_3_expected_label}

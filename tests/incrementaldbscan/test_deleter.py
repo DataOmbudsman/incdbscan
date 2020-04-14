@@ -5,9 +5,9 @@ from tests.incrementaldbscan.utils import (
     add_objects_to_clustering_and_assert_membership,
     assert_cluster_label_of_ids,
     assert_split_creates_new_labels_for_new_clusters,
-    reflect_horizontally,
+    CLUSTER_LABEL_FIRST_CLUSTER,
     CLUSTER_LABEL_NOISE,
-    CLUSTER_LABEL_FIRST_CLUSTER
+    reflect_horizontally
 )
 
 
@@ -228,10 +228,10 @@ def test_cluster_id_of_single_component_objects_is_kept_after_deletion(
 def test_simple_two_way_split(
         incdbscan3,
         point_at_origin,
-        three_points_to_the_left):
+        three_points_on_the_left):
 
     point_to_delete_value, point_to_delete_id = point_at_origin
-    values_left, ids_left = three_points_to_the_left
+    values_left, ids_left = three_points_on_the_left
 
     values_right = reflect_horizontally(values_left)
     ids_right = [3, 4, 5]
@@ -251,12 +251,12 @@ def test_simple_two_way_split(
 def test_simple_two_way_split_with_noise(
         incdbscan3,
         point_at_origin,
-        three_points_to_the_left,
+        three_points_on_the_left,
         three_points_on_the_top,
         three_points_at_the_bottom):
 
     point_to_delete_value, point_to_delete_id = point_at_origin
-    values_left, ids_left = three_points_to_the_left
+    values_left, ids_left = three_points_on_the_left
     values_top, ids_top = three_points_on_the_top
 
     values_bottom, ids_bottom = three_points_at_the_bottom
@@ -285,12 +285,12 @@ def test_simple_two_way_split_with_noise(
 def test_three_way_split(
         incdbscan3,
         point_at_origin,
-        three_points_to_the_left,
+        three_points_on_the_left,
         three_points_on_the_top,
         three_points_at_the_bottom):
 
     point_to_delete_value, point_to_delete_id = point_at_origin
-    values_left, ids_left = three_points_to_the_left
+    values_left, ids_left = three_points_on_the_left
     values_top, ids_top = three_points_on_the_top
     values_bottom, ids_bottom = three_points_at_the_bottom
 
@@ -317,10 +317,10 @@ def test_three_way_split(
 def test_simultaneous_split_and_non_split(
         incdbscan3,
         point_at_origin,
-        three_points_to_the_left):
+        three_points_on_the_left):
 
     point_to_delete_value, point_to_delete_id = point_at_origin
-    values_left, ids_left = three_points_to_the_left
+    values_left, ids_left = three_points_on_the_left
 
     values_right = np.array([
         [0, EPS],
@@ -380,23 +380,20 @@ def test_two_way_split_with_non_dense_bridge(incdbscan4, point_at_origin):
     assert_split_creates_new_labels_for_new_clusters(
         incdbscan4, [ids_left, ids_right], CLUSTER_LABEL_FIRST_CLUSTER)
 
+    assert incdbscan4.labels[bridge_point_id] in \
+        {CLUSTER_LABEL_FIRST_CLUSTER, CLUSTER_LABEL_FIRST_CLUSTER + 1}
 
-def test_simultaneous_splits_within_two_clusters(incdbscan4, point_at_origin):
+
+def test_simultaneous_splits_within_two_clusters(
+        incdbscan4,
+        point_at_origin,
+        hourglass_on_the_right):
+
     point_to_delete_value, point_to_delete_id = point_at_origin
+    values_right, ids_right = hourglass_on_the_right
 
-    values_left = np.array([
-        [-EPS, EPS * 2],
-        [-EPS, EPS * 2],
-        [-EPS, EPS],
-        [-EPS, 0],
-        [-EPS, -EPS],
-        [-EPS, -EPS * 2],
-        [-EPS, -EPS * 2],
-    ])
-    ids_left = [1, 2, 3, 4, 5, 6, 7]
-
-    values_right = reflect_horizontally(values_left)
-    ids_right = [8, 9, 10, 11, 12, 13, 14]
+    values_left = reflect_horizontally(values_right)
+    ids_left = [-x for x in ids_right]
 
     incdbscan4.add_object(point_to_delete_value, point_to_delete_id)
 
@@ -414,3 +411,12 @@ def test_simultaneous_splits_within_two_clusters(incdbscan4, point_at_origin):
 
     assert_split_creates_new_labels_for_new_clusters(
         incdbscan4, expected_clusters, CLUSTER_LABEL_FIRST_CLUSTER)
+
+    expected_cluster_labels_left = \
+        {incdbscan4.labels[ids_left[2]], incdbscan4.labels[ids_left[4]]}
+
+    expected_cluster_labels_right = \
+        {incdbscan4.labels[ids_right[2]], incdbscan4.labels[ids_right[4]]}
+
+    assert incdbscan4.labels[ids_left[3]] in expected_cluster_labels_left
+    assert incdbscan4.labels[ids_right[3]] in expected_cluster_labels_right
