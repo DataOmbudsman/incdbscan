@@ -197,57 +197,137 @@ def test_merger_and_creation_can_happen_at_the_same_time(
         point_at_origin,
         hourglass_on_the_right):
 
+    # Add objects to the right
     hourglass_values, hourglass_ids = hourglass_on_the_right
 
-    cluster_1_values = hourglass_values[:3]
-    cluster_1_ids = hourglass_ids[:3]
-    cluster_1_expected_label = CLUSTER_LABEL_FIRST_CLUSTER
+    top_right_values = hourglass_values[:3]
+    top_right_ids = hourglass_ids[:3]
+    top_right_expected_label = CLUSTER_LABEL_FIRST_CLUSTER
 
-    cluster_2_values = hourglass_values[-3:]
-    cluster_2_ids = hourglass_ids[-3:]
-    cluster_2_expected_label = cluster_1_expected_label + 1
+    bottom_right_values = hourglass_values[-3:]
+    bottom_right_ids = hourglass_ids[-3:]
+    bottom_right_expected_label = top_right_expected_label + 1
 
     bridge_point_value, bridge_point_id = \
         hourglass_values[3], hourglass_ids[3]
 
-    incdbscan4.add_objects(cluster_1_values, cluster_1_ids)
+    incdbscan4.add_objects(top_right_values, top_right_ids)
     incdbscan4.add_object(bridge_point_value, bridge_point_id)
-    incdbscan4.add_objects(cluster_2_values, cluster_2_ids)
+    incdbscan4.add_objects(bottom_right_values, bottom_right_ids)
 
     assert_cluster_label_of_ids(
-        cluster_1_ids, incdbscan4, cluster_1_expected_label)
+        top_right_ids, incdbscan4, top_right_expected_label)
     assert_cluster_label_of_ids(
-        cluster_2_ids, incdbscan4, cluster_2_expected_label)
-    assert incdbscan4.labels[bridge_point_id]\
-        in {cluster_2_expected_label, cluster_2_expected_label}
+        bottom_right_ids, incdbscan4, bottom_right_expected_label)
+    assert incdbscan4.labels[bridge_point_id] in \
+        {bottom_right_expected_label, bottom_right_expected_label}
 
     merged_cluster_expected_label = incdbscan4.labels[bridge_point_id]
 
-    pre_cluster_values = np.array([
+    # Add objects to the left
+    left_pre_cluster_values = np.array([
         [-EPS, 0],
         [-EPS * 2, 0],
         [-EPS * 2, 0],
     ])
-    pre_cluster_ids = [6, 7, 8]
-    cluster_3_expected_label = cluster_2_expected_label + 1
+    left_pre_cluster_ids = [6, 7, 8]
+    left_cluster_expected_label = bottom_right_expected_label + 1
 
     add_objects_to_clustering_and_assert_membership(
         incdbscan4,
-        pre_cluster_values,
-        pre_cluster_ids,
+        left_pre_cluster_values,
+        left_pre_cluster_ids,
         CLUSTER_LABEL_NOISE
     )
 
+    # Add object to the center
     new_object_value, new_object_id = point_at_origin
     incdbscan4.add_object(new_object_value, new_object_id)
 
     assert_cluster_label_of_ids(
-        cluster_1_ids, incdbscan4, merged_cluster_expected_label)
+        top_right_ids, incdbscan4, merged_cluster_expected_label)
     assert_cluster_label_of_ids(
-        cluster_2_ids, incdbscan4, merged_cluster_expected_label)
+        bottom_right_ids, incdbscan4, merged_cluster_expected_label)
     assert_cluster_label_of_ids(
         [bridge_point_id], incdbscan4, merged_cluster_expected_label)
     assert_cluster_label_of_ids(
-        pre_cluster_ids, incdbscan4, cluster_3_expected_label)
-    assert incdbscan4.labels[new_object_id] \
-        in {merged_cluster_expected_label, cluster_3_expected_label}
+        left_pre_cluster_ids, incdbscan4, left_cluster_expected_label)
+    assert incdbscan4.labels[new_object_id] in \
+        {merged_cluster_expected_label, left_cluster_expected_label}
+
+
+def test_two_mergers_can_happen_at_the_same_time(
+        incdbscan4,
+        point_at_origin,
+        hourglass_on_the_right):
+
+    # Add objects to the right
+    hourglass_right_values, hourglass_right_ids = hourglass_on_the_right
+
+    top_right_values = hourglass_right_values[:3]
+    top_right_ids = hourglass_right_ids[:3]
+    top_right_expected_label = CLUSTER_LABEL_FIRST_CLUSTER
+
+    bottom_right_values = hourglass_right_values[-3:]
+    bottom_right_ids = hourglass_right_ids[-3:]
+    bottom_right_expected_label = top_right_expected_label + 1
+
+    bridge_point_right_value, bridge_point_right_id = \
+        hourglass_right_values[3], hourglass_right_ids[3]
+
+    incdbscan4.add_objects(top_right_values, top_right_ids)
+    incdbscan4.add_object(bridge_point_right_value, bridge_point_right_id)
+    incdbscan4.add_objects(bottom_right_values, bottom_right_ids)
+
+    assert_cluster_label_of_ids(
+        top_right_ids, incdbscan4, top_right_expected_label)
+    assert_cluster_label_of_ids(
+        bottom_right_ids, incdbscan4, bottom_right_expected_label)
+    assert incdbscan4.labels[bridge_point_right_id] in \
+        {bottom_right_expected_label, bottom_right_expected_label}
+
+    # Add objects to the left
+    hourglass_left_values = reflect_horizontally(hourglass_right_values)
+    hourglass_left_ids = [-i for i in hourglass_right_ids]
+
+    top_left_values = hourglass_left_values[:3]
+    top_left_ids = hourglass_left_ids[:3]
+    top_left_expected_label = bottom_right_expected_label + 1
+
+    bottom_left_values = hourglass_left_values[-3:]
+    bottom_left_ids = hourglass_left_ids[-3:]
+    bottom_left_expected_label = top_left_expected_label + 1
+
+    bridge_point_left_value, bridge_point_left_id = \
+        hourglass_left_values[3], hourglass_left_ids[3]
+
+    incdbscan4.add_objects(top_left_values, top_left_ids)
+    incdbscan4.add_object(bridge_point_left_value, bridge_point_left_id)
+    incdbscan4.add_objects(bottom_left_values, bottom_left_ids)
+
+    assert_cluster_label_of_ids(
+        top_left_ids, incdbscan4, top_left_expected_label)
+    assert_cluster_label_of_ids(
+        bottom_left_ids, incdbscan4, bottom_left_expected_label)
+    assert incdbscan4.labels[bridge_point_left_id] in \
+        {top_left_expected_label, bottom_left_expected_label}
+
+    # Add object to the center
+    new_object_value, new_object_id = point_at_origin
+    incdbscan4.add_object(new_object_value, new_object_id)
+
+    assert_cluster_label_of_ids(
+        top_right_ids + bottom_right_ids,
+        incdbscan4,
+        bottom_right_expected_label
+    )
+    assert_cluster_label_of_ids(
+        top_left_ids + bottom_left_ids,
+        incdbscan4,
+        bottom_left_expected_label
+    )
+
+    assert incdbscan4.labels[bridge_point_right_id] in \
+        {bottom_left_expected_label, bottom_right_expected_label}
+    assert incdbscan4.labels[bridge_point_left_id] in \
+        {top_left_expected_label, bottom_left_expected_label}
