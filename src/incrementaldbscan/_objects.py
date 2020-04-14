@@ -1,6 +1,7 @@
-import numpy as np
 from functools import lru_cache
 from typing import Dict, List, Union
+
+import numpy as np
 
 ObjectId = Union[int, str]
 

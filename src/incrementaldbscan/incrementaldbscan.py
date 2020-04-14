@@ -153,6 +153,7 @@ class IncrementalDBSCANWarning(Warning):
     pass
 
 
+# TODO ID type only int?
 # TODO "insert" api change
 # TODO readme 5. hiba
 # TODO functional tests
