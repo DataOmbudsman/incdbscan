@@ -10,7 +10,7 @@ TODO: Animation.
 
 - [Installation](#installation)
 - [Usage](#usage)
-- [Notes on complexity](#notes-on-complexity)
+- [Performance](#Performance)
 - [Notes on the IncrementalDBSCAN paper](#notes-on-the-incrementaldbscan-paper)
 
 # Installation
@@ -23,7 +23,7 @@ TODO: API example.
 
 TODO: Notebook examples.
 
-# Notes on complexity
+# Performance
 
 TODO
 
@@ -100,6 +100,27 @@ However, consider there are two core objects in _D_, _p_ and _q_, not in the _Ep
 We now delete _p_ from _D_. _UpdSeed<sub>Del</sub>_ is empty because there are no core objects in the _Eps_-neighborhood of objects that lost their core property. _b_ is then no longer in _C1_ (as there is no object to keep it there) but does not become noise. Instead, because it is in _N<sub>Eps</sub>(q)_ it should be assigned to _C2_, which goes against the description in the paper.
 
 **Solution**: in this implementation whenever an object loses its cluster membership it is checked first if it should be reassigned to another cluster. Only if it is not in the _Eps_-neighborhood of any other core objects it becomes noise.
+
+## Simultaneous splits
+
+When the paper, in _Section 4.3_ (_"potential Split"_), describes the splitting logic that happens after an object _p_ is deleted, it says this is when _UpdSeed<sub>Del</sub>_ is not empty and the objects in it "_belonged to exactly one cluster [...] before the deletion of p_".
+
+Take the following two dimensional object set _D_ as example. There are several objects, most of them marked with a star, and 3 of them with a letter: _p_, _b_, and _q_. With the left and bottom axes one can see the coordinates of the objects.
+
+<pre>
+ 1   *  *  *     q     *   *   *
+
+ 0               b
+
+-1   *  *  *     p     *   *   *
+    -2    -1     0     1       2
+</pre>
+
+When we cluster these objects according to DBSCAN with _MinPts_ = 4 and _Eps_ = 1, two clusters emerge. The first cluster consists of the objects on the _y_=-1 line, while the second one with objects on the line _y_=1. Object _b_, since there are less than _MinPts_ objects in _N<sub>Eps</sub>(b)_, is not a core object itself, but it belongs to either one of the clusters as a border object.
+
+What happens when we delete _b_ from _D_? As a result, both _q_ and _p_ lose their core property. According to the definition of _UpdSeed<sub>Del</sub>_, the core objects in the neighborhood of _p_ and _q_, that is, the objects marked with stars next to them, will be in _UpdSeed<sub>Del</sub>_. These objects belonged to two clusters, not "_exactly one cluster [...] before the deletion of p_", as the paper states. The paper misses a point here.
+
+**Solution**: In this case, this implementation follows the logic of DBSCAN and reaches the conclusion of what would happen if DBSCAN was applied to _D_ after the deletion of _p_. That is, four clusters are formed, two at the top and two at the bottom. So two splits need happen at the same time: both the bottom and the top cluster breaks down into two smaller clusters.
 
 # References
 Ester, Martin; Kriegel, Hans-Peter; Sander, Jörg; Xu, Xiaowei (1996). _A density-based algorithm for discovering clusters in large spatial databases with noise._ In: Proceedings of the Second International Conference on Knowledge Discovery and Data Mining (KDD-96). [ACM Digital Library][acm1]. [PDF][pdf1].

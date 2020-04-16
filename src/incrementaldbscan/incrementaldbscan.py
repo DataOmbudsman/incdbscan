@@ -153,19 +153,34 @@ class IncrementalDBSCANWarning(Warning):
     pass
 
 
+# TODO metrics in arguments
+# TODO make API more sklearn-like.
+    # Step 1: 1 insert method, 1 delete method
+    # Step 2: no ID argument, use hash instead -> predict
+    # Step 3: 1 update method -> partial_fit
+    # Step 4: fit as initial fitting
+
 # TODO ID type only int?
 # TODO "insert" api change
-# TODO readme 5. hiba
+
+# ALGO related
 # TODO functional tests
-# TODO package restructure: no src
-# TODO __init__ file setup
-# TODO notebook: example
-# TODO gif example
-# TODO readme: intro
-# TODO readme: usage
 # TODO remove prints
-# TODO metrics
+
+# UX related
+# TODO readme: intro
+# TODO readme: API usage
+# TODO gif example
+# TODO notebook: example
+
+# Performance related
 # TODO validate purpose of cache
-# TODO indexing
+# TODO indexing: use KDTree for initial tree building
+# TODO indexing: cKDTree
+# TODO readme: performance
+
+# Packaging related
+# TODO __init__ file setup
+# TODO package restructure: no src
 # TODO pip
 # TODO readme: installation
