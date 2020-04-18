@@ -113,28 +113,6 @@ class IncrementalDBSCAN:
         for object_value, object_id in zip(object_values, object_ids):
             self.add_object(object_value, object_id)
 
-    def delete_object(self, object_id: ObjectId):
-        """Delete object from object set, then update clustering.
-
-        Parameters
-        ----------
-        object_id : str or int
-            The identifier of the data object to be deleted from the object
-            set.
-
-        """
-
-        if object_id in self.labels:
-            self._deleter.delete(object_id)
-
-        else:
-            warnings.warn(
-                IncrementalDBSCANWarning(
-                    f'Object with ID {object_id} was not deleted '
-                    f'because there is no object with this ID.'
-                )
-            )
-
     def delete_objects(self, object_ids: Iterable):
         """Delete objects from object set, then update clustering.
 
@@ -146,7 +124,17 @@ class IncrementalDBSCAN:
 
         """
         for object_id in object_ids:
-            self.delete_object(object_id)
+
+            if object_id in self.labels:
+                self._deleter.delete(object_id)
+
+            else:
+                warnings.warn(
+                    IncrementalDBSCANWarning(
+                        f'Object with ID {object_id} was not deleted '
+                        f'because there is no object with this ID.'
+                    )
+                )
 
 
 class IncrementalDBSCANWarning(Warning):
@@ -156,12 +144,13 @@ class IncrementalDBSCANWarning(Warning):
 # TODO metrics in arguments
 # TODO make API more sklearn-like.
     # Step 1: 1 insert method, 1 delete method
-    # Step 2: no ID argument, use hash instead -> predict
-    # Step 3: 1 update method -> partial_fit
-    # Step 4: fit as initial fitting
+    # Step 2: no ID argument, use hash instead
+    # Step 3: create predict
+    # Step 4: 1 update method -> partial_fit
+    # Step 5: fit as initial fitting
 
 # TODO ID type only int?
-# TODO "insert" api change
+# TODO "insert" api doc change
 
 # ALGO related
 # TODO functional tests

@@ -21,7 +21,7 @@ def test_after_deleting_enough_objects_only_noise_remain(
     blob_ids = list(blob_ids)
     while blob_ids:
         object_id_to_delete = blob_ids.pop(-1)
-        incdbscan4.delete_object(object_id_to_delete)
+        incdbscan4.delete_objects([object_id_to_delete])
 
         expected_label = (
             CLUSTER_LABEL_NOISE
@@ -45,7 +45,7 @@ def test_deleting_cores_only_makes_borders_noise(incdbscan4, point_at_origin):
 
     incdbscan4.add_objects(border_values, border_ids)
 
-    incdbscan4.delete_object(core_id)
+    incdbscan4.delete_objects([core_id])
 
     assert_cluster_label_of_ids(border_ids, incdbscan4, CLUSTER_LABEL_NOISE)
 
@@ -69,7 +69,7 @@ def test_objects_losing_core_property_can_keep_cluster_id(
     add_objects_to_clustering_and_assert_membership(
         incdbscan3, all_values, all_ids, CLUSTER_LABEL_FIRST_CLUSTER)
 
-    incdbscan3.delete_object(point_to_delete_id)
+    incdbscan3.delete_objects([point_to_delete_id])
     assert_cluster_label_of_ids(
         core_ids, incdbscan3, CLUSTER_LABEL_FIRST_CLUSTER)
 
@@ -109,7 +109,7 @@ def test_border_object_can_switch_to_other_cluster(
 
     assert_cluster_label_of_ids([border_id], incdbscan4, cluster_2_label)
 
-    incdbscan4.delete_object(cluster_2_ids[0])
+    incdbscan4.delete_objects([cluster_2_ids[0]])
 
     assert_cluster_label_of_ids([border_id], incdbscan4, cluster_1_label)
 
@@ -136,7 +136,7 @@ def test_borders_around_point_losing_core_property_can_become_noise(
     add_objects_to_clustering_and_assert_membership(
         incdbscan4, all_values, all_ids, CLUSTER_LABEL_FIRST_CLUSTER)
 
-    incdbscan4.delete_object(point_to_delete_id)
+    incdbscan4.delete_objects([point_to_delete_id])
 
     assert_cluster_label_of_ids(
         all_ids_but_object_to_delete, incdbscan4, CLUSTER_LABEL_NOISE)
@@ -164,7 +164,7 @@ def test_core_property_of_singleton_update_seed_is_kept_after_deletion(
     add_objects_to_clustering_and_assert_membership(
         incdbscan3, all_values, all_ids, CLUSTER_LABEL_FIRST_CLUSTER)
 
-    incdbscan3.delete_object(point_to_delete_id)
+    incdbscan3.delete_objects([point_to_delete_id])
 
     assert_cluster_label_of_ids(
         core_ids, incdbscan3, CLUSTER_LABEL_FIRST_CLUSTER)
@@ -193,7 +193,7 @@ def test_cluster_id_of_single_component_update_seeds_is_kept_after_deletion(
     add_objects_to_clustering_and_assert_membership(
         incdbscan3, all_values, all_ids, CLUSTER_LABEL_FIRST_CLUSTER)
 
-    incdbscan3.delete_object(point_to_delete_id)
+    incdbscan3.delete_objects([point_to_delete_id])
 
     assert_cluster_label_of_ids(
         core_ids, incdbscan3, CLUSTER_LABEL_FIRST_CLUSTER)
@@ -220,7 +220,7 @@ def test_cluster_id_of_single_component_objects_is_kept_after_deletion(
     add_objects_to_clustering_and_assert_membership(
         incdbscan3, all_values, all_ids, CLUSTER_LABEL_FIRST_CLUSTER)
 
-    incdbscan3.delete_object(point_to_delete_id)
+    incdbscan3.delete_objects([point_to_delete_id])
     assert_cluster_label_of_ids(
         core_ids, incdbscan3, CLUSTER_LABEL_FIRST_CLUSTER)
 
@@ -242,7 +242,7 @@ def test_simple_two_way_split(
     add_objects_to_clustering_and_assert_membership(
         incdbscan3, all_values, all_ids, CLUSTER_LABEL_FIRST_CLUSTER)
 
-    incdbscan3.delete_object(point_to_delete_id)
+    incdbscan3.delete_objects([point_to_delete_id])
 
     assert_split_creates_new_labels_for_new_clusters(
         incdbscan3, [ids_left, ids_right], CLUSTER_LABEL_FIRST_CLUSTER)
@@ -273,7 +273,7 @@ def test_simple_two_way_split_with_noise(
     add_objects_to_clustering_and_assert_membership(
         incdbscan3, all_values, all_ids, CLUSTER_LABEL_FIRST_CLUSTER)
 
-    incdbscan3.delete_object(point_to_delete_id)
+    incdbscan3.delete_objects([point_to_delete_id])
 
     assert_split_creates_new_labels_for_new_clusters(
         incdbscan3, [ids_left, ids_top], CLUSTER_LABEL_FIRST_CLUSTER)
@@ -305,7 +305,7 @@ def test_three_way_split(
     add_objects_to_clustering_and_assert_membership(
         incdbscan3, all_values, all_ids, CLUSTER_LABEL_FIRST_CLUSTER)
 
-    incdbscan3.delete_object(point_to_delete_id)
+    incdbscan3.delete_objects([point_to_delete_id])
 
     assert_split_creates_new_labels_for_new_clusters(
         incdbscan3,
@@ -337,7 +337,7 @@ def test_simultaneous_split_and_non_split(
     add_objects_to_clustering_and_assert_membership(
         incdbscan3, all_values, all_ids, CLUSTER_LABEL_FIRST_CLUSTER)
 
-    incdbscan3.delete_object(point_to_delete_id)
+    incdbscan3.delete_objects([point_to_delete_id])
 
     assert_split_creates_new_labels_for_new_clusters(
         incdbscan3, [ids_left, ids_right], CLUSTER_LABEL_FIRST_CLUSTER)
@@ -375,7 +375,7 @@ def test_two_way_split_with_non_dense_bridge(incdbscan4, point_at_origin):
     add_objects_to_clustering_and_assert_membership(
         incdbscan4, all_values, all_ids, CLUSTER_LABEL_FIRST_CLUSTER)
 
-    incdbscan4.delete_object(point_to_delete_id)
+    incdbscan4.delete_objects([point_to_delete_id])
 
     assert_split_creates_new_labels_for_new_clusters(
         incdbscan4, [ids_left, ids_right], CLUSTER_LABEL_FIRST_CLUSTER)
@@ -404,7 +404,7 @@ def test_simultaneous_splits_within_two_clusters(
     add_objects_to_clustering_and_assert_membership(
         incdbscan4, values_right, ids_right, cluster_label_2)
 
-    incdbscan4.delete_object(point_to_delete_id)
+    incdbscan4.delete_objects([point_to_delete_id])
 
     expected_clusters = \
         [ids_left[:3], ids_left[-3:], ids_right[:3], ids_right[-3:]]

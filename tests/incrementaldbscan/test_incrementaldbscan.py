@@ -82,6 +82,6 @@ def test_labels_are_not_accessible_for_deleted_objects(incdbscan, inputs):
     incdbscan.add_objects(object_values, object_ids)
 
     first_object_id = object_ids[0]
-    incdbscan.delete_object(first_object_id)
+    incdbscan.delete_objects([first_object_id])
 
     assert first_object_id not in incdbscan.labels
