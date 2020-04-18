@@ -125,15 +125,12 @@ class IncrementalDBSCAN:
 class IncrementalDBSCANWarning(Warning):
     pass
 
-# TODO cleanup test fixtures incrementaldbscan.py
-
 # TODO metrics in arguments
 # TODO make API more sklearn-like.
-    # Step 1: 1 insert method, 1 delete method
-    # Step 2: no ID argument, use hash instead
-    # Step 3: create predict
-    # Step 4: 1 update method -> partial_fit
-    # Step 5: fit as initial fitting
+    # Step 1: no ID argument, use hash instead
+    # Step 2: create predict
+    # Step 3: 1 update method -> partial_fit
+    # Step 4: fit as initial fitting
 
 # TODO ID type only int?
 # TODO "insert" api doc change
