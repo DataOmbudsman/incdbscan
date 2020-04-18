@@ -17,14 +17,14 @@ def assert_cluster_label_of_ids(
         assert incdbscan_fit.labels[object_id] == label
 
 
-def add_objects_to_clustering_and_assert_membership(
+def insert_objects_then_assert_membership(
         incdbscan,
         values: Iterable,
-        ids_to_add: Iterable[ObjectId],
+        ids_to_insert: Iterable[ObjectId],
         expected_label):
 
-    incdbscan.add_objects(values, ids_to_add)
-    assert_cluster_label_of_ids(ids_to_add, incdbscan, expected_label)
+    incdbscan.insert_objects(values, ids_to_insert)
+    assert_cluster_label_of_ids(ids_to_insert, incdbscan, expected_label)
 
 
 def assert_split_creates_new_labels_for_new_clusters(

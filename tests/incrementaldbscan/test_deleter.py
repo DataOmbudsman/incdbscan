@@ -2,11 +2,11 @@ import numpy as np
 
 from tests.incrementaldbscan.conftest import EPS
 from tests.incrementaldbscan.utils import (
-    add_objects_to_clustering_and_assert_membership,
     assert_cluster_label_of_ids,
     assert_split_creates_new_labels_for_new_clusters,
     CLUSTER_LABEL_FIRST_CLUSTER,
     CLUSTER_LABEL_NOISE,
+    insert_objects_then_assert_membership,
     reflect_horizontally
 )
 
@@ -16,7 +16,7 @@ def test_after_deleting_enough_objects_only_noise_remain(
         blob_in_middle):
 
     blob_values, blob_ids = blob_in_middle
-    incdbscan4.add_objects(blob_values, blob_ids)
+    incdbscan4.insert_objects(blob_values, blob_ids)
 
     blob_ids = list(blob_ids)
     while blob_ids:
@@ -34,7 +34,7 @@ def test_after_deleting_enough_objects_only_noise_remain(
 
 def test_deleting_cores_only_makes_borders_noise(incdbscan4, point_at_origin):
     core_value, core_id = point_at_origin
-    incdbscan4.add_objects(core_value, [core_id])
+    incdbscan4.insert_objects(core_value, [core_id])
 
     border_values = np.array([
         [EPS, 0],
@@ -43,7 +43,7 @@ def test_deleting_cores_only_makes_borders_noise(incdbscan4, point_at_origin):
     ])
     border_ids = np.array([0, 1, 2])
 
-    incdbscan4.add_objects(border_values, border_ids)
+    incdbscan4.insert_objects(border_values, border_ids)
 
     incdbscan4.delete_objects([core_id])
 
@@ -66,7 +66,7 @@ def test_objects_losing_core_property_can_keep_cluster_id(
     all_values = np.vstack([point_to_delete_value, core_values])
     all_ids = [point_to_delete_id] + core_ids
 
-    add_objects_to_clustering_and_assert_membership(
+    insert_objects_then_assert_membership(
         incdbscan3, all_values, all_ids, CLUSTER_LABEL_FIRST_CLUSTER)
 
     incdbscan3.delete_objects([point_to_delete_id])
@@ -79,7 +79,7 @@ def test_border_object_can_switch_to_other_cluster(
         point_at_origin):
 
     border_value, border_id = point_at_origin
-    incdbscan4.add_objects(border_value, [border_id])
+    incdbscan4.insert_objects(border_value, [border_id])
 
     cluster_1_values = np.array([
         [EPS, 0],
@@ -93,14 +93,14 @@ def test_border_object_can_switch_to_other_cluster(
     cluster_2_ids = np.array([3, 4, 5])
     cluster_2_label = cluster_1_label + 1
 
-    add_objects_to_clustering_and_assert_membership(
+    insert_objects_then_assert_membership(
         incdbscan4,
         cluster_1_values,
         cluster_1_ids,
         cluster_1_label
     )
 
-    add_objects_to_clustering_and_assert_membership(
+    insert_objects_then_assert_membership(
         incdbscan4,
         cluster_2_values,
         cluster_2_ids,
@@ -133,7 +133,7 @@ def test_borders_around_point_losing_core_property_can_become_noise(
     all_ids_but_object_to_delete = border_ids + [core_id]
     all_ids = all_ids_but_object_to_delete + [point_to_delete_id]
 
-    add_objects_to_clustering_and_assert_membership(
+    insert_objects_then_assert_membership(
         incdbscan4, all_values, all_ids, CLUSTER_LABEL_FIRST_CLUSTER)
 
     incdbscan4.delete_objects([point_to_delete_id])
@@ -161,7 +161,7 @@ def test_core_property_of_singleton_update_seed_is_kept_after_deletion(
     all_values = np.vstack([point_to_delete_value, core_values, lonely_value])
     all_ids = [point_to_delete_id] + core_ids + [lonely_id]
 
-    add_objects_to_clustering_and_assert_membership(
+    insert_objects_then_assert_membership(
         incdbscan3, all_values, all_ids, CLUSTER_LABEL_FIRST_CLUSTER)
 
     incdbscan3.delete_objects([point_to_delete_id])
@@ -190,7 +190,7 @@ def test_cluster_id_of_single_component_update_seeds_is_kept_after_deletion(
     all_values = np.vstack([point_to_delete_value, core_values, lonely_value])
     all_ids = [point_to_delete_id] + core_ids + [lonely_id]
 
-    add_objects_to_clustering_and_assert_membership(
+    insert_objects_then_assert_membership(
         incdbscan3, all_values, all_ids, CLUSTER_LABEL_FIRST_CLUSTER)
 
     incdbscan3.delete_objects([point_to_delete_id])
@@ -217,7 +217,7 @@ def test_cluster_id_of_single_component_objects_is_kept_after_deletion(
     all_values = np.vstack([point_to_delete_value, core_values])
     all_ids = [point_to_delete_id] + core_ids
 
-    add_objects_to_clustering_and_assert_membership(
+    insert_objects_then_assert_membership(
         incdbscan3, all_values, all_ids, CLUSTER_LABEL_FIRST_CLUSTER)
 
     incdbscan3.delete_objects([point_to_delete_id])
@@ -239,7 +239,7 @@ def test_simple_two_way_split(
     all_values = np.vstack([point_to_delete_value, values_left, values_right])
     all_ids = [point_to_delete_id] + ids_left + ids_right
 
-    add_objects_to_clustering_and_assert_membership(
+    insert_objects_then_assert_membership(
         incdbscan3, all_values, all_ids, CLUSTER_LABEL_FIRST_CLUSTER)
 
     incdbscan3.delete_objects([point_to_delete_id])
@@ -270,7 +270,7 @@ def test_simple_two_way_split_with_noise(
     ])
     all_ids = [point_to_delete_id] + ids_left + ids_top + ids_bottom
 
-    add_objects_to_clustering_and_assert_membership(
+    insert_objects_then_assert_membership(
         incdbscan3, all_values, all_ids, CLUSTER_LABEL_FIRST_CLUSTER)
 
     incdbscan3.delete_objects([point_to_delete_id])
@@ -302,7 +302,7 @@ def test_three_way_split(
     ])
     all_ids = [point_to_delete_id] + ids_left + ids_top + ids_bottom
 
-    add_objects_to_clustering_and_assert_membership(
+    insert_objects_then_assert_membership(
         incdbscan3, all_values, all_ids, CLUSTER_LABEL_FIRST_CLUSTER)
 
     incdbscan3.delete_objects([point_to_delete_id])
@@ -334,7 +334,7 @@ def test_simultaneous_split_and_non_split(
     all_values = np.vstack([point_to_delete_value, values_left, values_right])
     all_ids = [point_to_delete_id] + ids_left + ids_right
 
-    add_objects_to_clustering_and_assert_membership(
+    insert_objects_then_assert_membership(
         incdbscan3, all_values, all_ids, CLUSTER_LABEL_FIRST_CLUSTER)
 
     incdbscan3.delete_objects([point_to_delete_id])
@@ -372,7 +372,7 @@ def test_two_way_split_with_non_dense_bridge(incdbscan4, point_at_origin):
     ])
     all_ids = [point_to_delete_id] + [bridge_point_id] + ids_left + ids_right
 
-    add_objects_to_clustering_and_assert_membership(
+    insert_objects_then_assert_membership(
         incdbscan4, all_values, all_ids, CLUSTER_LABEL_FIRST_CLUSTER)
 
     incdbscan4.delete_objects([point_to_delete_id])
@@ -395,13 +395,13 @@ def test_simultaneous_splits_within_two_clusters(
     values_left = reflect_horizontally(values_right)
     ids_left = [-x for x in ids_right]
 
-    incdbscan4.add_objects(point_to_delete_value, [point_to_delete_id])
+    incdbscan4.insert_objects(point_to_delete_value, [point_to_delete_id])
 
-    add_objects_to_clustering_and_assert_membership(
+    insert_objects_then_assert_membership(
         incdbscan4, values_left, ids_left, CLUSTER_LABEL_FIRST_CLUSTER)
 
     cluster_label_2 = CLUSTER_LABEL_FIRST_CLUSTER + 1
-    add_objects_to_clustering_and_assert_membership(
+    insert_objects_then_assert_membership(
         incdbscan4, values_right, ids_right, cluster_label_2)
 
     incdbscan4.delete_objects([point_to_delete_id])

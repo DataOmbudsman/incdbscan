@@ -16,7 +16,7 @@ class _Inserter:
 
     def insert(self, object_to_insert: _Object):
         print('\nInserting', object_to_insert.id)  # TODO
-        self.objects.add_object(object_to_insert)
+        self.objects.insert_object(object_to_insert)
         self.labels.set_label(
             object_to_insert, CLUSTER_LABEL_UNCLASSIFIED)
 

@@ -11,7 +11,7 @@ class IncrementalDBSCAN:
     """An incremental density-based clustering algorithm that handles outliers.
 
     After an initial clustering of objects, the clustering can at any time be
-    updated by increments of any size. An increment can be either addition or
+    updated by increments of any size. An increment can be either insertion or
     or deletion of objects.
 
     After each update the result of the clustering is the same as if the
@@ -67,7 +67,7 @@ class IncrementalDBSCAN:
     def labels(self) -> Dict[ObjectId, ClusterLabel]:
         return self._labels.get_all_labels()
 
-    def add_objects(
+    def insert_objects(
             self,
             object_values: Iterable,
             object_ids: Iterable[ObjectId]):
@@ -93,7 +93,7 @@ class IncrementalDBSCAN:
             else:
                 warnings.warn(
                     IncrementalDBSCANWarning(
-                        f'Object with ID {object_id} was not added '
+                        f'Object with ID {object_id} was not inserted '
                         'because it already exists in the clustering.'
                     )
                 )
@@ -127,13 +127,10 @@ class IncrementalDBSCANWarning(Warning):
 
 # TODO metrics in arguments
 # TODO make API more sklearn-like.
-    # Step 1: no ID argument, use hash instead
+    # Step 1: no ID argument, use hash instead ... (ID type only int?)
     # Step 2: create predict
     # Step 3: 1 update method -> partial_fit
     # Step 4: fit as initial fitting
-
-# TODO ID type only int?
-# TODO "insert" api doc change
 
 # ALGO related
 # TODO functional tests

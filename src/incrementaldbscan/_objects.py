@@ -45,8 +45,8 @@ class _Objects:
 
         return neighbors
 
-    def add_object(self, object_to_add: _Object):
-        self.objects[object_to_add.id] = object_to_add
+    def insert_object(self, object_to_insert: _Object):
+        self.objects[object_to_insert.id] = object_to_insert
         self.get_neighbors.cache_clear()
 
     def delete_object(self, object_id: ObjectId):
