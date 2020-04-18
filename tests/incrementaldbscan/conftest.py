@@ -32,14 +32,14 @@ def blob_in_middle():
 
 @pytest.fixture
 def object_far_away():
-    value = np.array([10, 10])
+    value = np.array([[10, 10]])
     id_ = 'FARAWAY'
     return value, id_
 
 
 @pytest.fixture
 def point_at_origin():
-    value = np.array([0, 0])
+    value = np.array([[0, 0]])
     id_ = 'NEW'
     return value, id_
 

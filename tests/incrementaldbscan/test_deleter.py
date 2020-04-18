@@ -34,7 +34,7 @@ def test_after_deleting_enough_objects_only_noise_remain(
 
 def test_deleting_cores_only_makes_borders_noise(incdbscan4, point_at_origin):
     core_value, core_id = point_at_origin
-    incdbscan4.add_object(core_value, core_id)
+    incdbscan4.add_objects(core_value, [core_id])
 
     border_values = np.array([
         [EPS, 0],
@@ -79,7 +79,7 @@ def test_border_object_can_switch_to_other_cluster(
         point_at_origin):
 
     border_value, border_id = point_at_origin
-    incdbscan4.add_object(border_value, border_id)
+    incdbscan4.add_objects(border_value, [border_id])
 
     cluster_1_values = np.array([
         [EPS, 0],
@@ -395,7 +395,7 @@ def test_simultaneous_splits_within_two_clusters(
     values_left = reflect_horizontally(values_right)
     ids_left = [-x for x in ids_right]
 
-    incdbscan4.add_object(point_to_delete_value, point_to_delete_id)
+    incdbscan4.add_objects(point_to_delete_value, [point_to_delete_id])
 
     add_objects_to_clustering_and_assert_membership(
         incdbscan4, values_left, ids_left, CLUSTER_LABEL_FIRST_CLUSTER)

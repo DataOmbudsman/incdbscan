@@ -33,7 +33,7 @@ def test_warning_raised_if_known_id_is_passed_to_add(incdbscan, inputs):
     incdbscan.add_objects(object_values, object_ids)
 
     with pytest.warns(IncrementalDBSCANWarning):
-        incdbscan.add_object(object_values[0], object_ids[0])
+        incdbscan.add_objects([object_values[0]], [object_ids[0]])
 
 
 def test_warning_raised_if_unknown_id_is_passed_to_delete(incdbscan, inputs):

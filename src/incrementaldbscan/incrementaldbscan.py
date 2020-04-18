@@ -67,51 +67,36 @@ class IncrementalDBSCAN:
     def labels(self) -> Dict[ObjectId, ClusterLabel]:
         return self._labels.get_all_labels()
 
-    def add_object(self, object_value, object_id: ObjectId):
-        """Add object to clustering.
-
-        Parameters
-        ----------
-        object_value : array
-            A numpy array representing the data object to be added to the
-            clustering.
-
-        object_id : str or int
-            The identifier of the data object to be added to the clustering.
-
-        """
-
-        if object_id not in self.labels:
-            object_to_insert = _Object(object_value, object_id)
-            self._inserter.insert(object_to_insert)
-
-        else:
-            warnings.warn(
-                IncrementalDBSCANWarning(
-                    f'Object with ID {object_id} was not added '
-                    'because it already exists in the clustering.'
-                )
-            )
-
     def add_objects(
             self,
             object_values: Iterable,
             object_ids: Iterable[ObjectId]):
-        """Add objects to clustering.
+        """Insert objects into the object set, then update clustering.
 
         Parameters
         ----------
         object_values : array
-            An array of numpy arrays, representing the data objects to be added
-            to the clustering.
+            An array of numpy arrays, representing the data objects to be
+            inserted into the object set.
 
         object_ids : iterable of int or of str
-            The identifiers of the data objects to be added to the clustering.
-            E.g., list of strings, or numpy array of integers.
+            The identifiers of the data objects to be inserted into the object
+            set. E.g., list of strings, or numpy array of integers.
 
         """
         for object_value, object_id in zip(object_values, object_ids):
-            self.add_object(object_value, object_id)
+
+            if object_id not in self.labels:
+                object_to_insert = _Object(object_value, object_id)
+                self._inserter.insert(object_to_insert)
+
+            else:
+                warnings.warn(
+                    IncrementalDBSCANWarning(
+                        f'Object with ID {object_id} was not added '
+                        'because it already exists in the clustering.'
+                    )
+                )
 
     def delete_objects(self, object_ids: Iterable):
         """Delete objects from object set, then update clustering.
@@ -140,6 +125,7 @@ class IncrementalDBSCAN:
 class IncrementalDBSCANWarning(Warning):
     pass
 
+# TODO cleanup test fixtures incrementaldbscan.py
 
 # TODO metrics in arguments
 # TODO make API more sklearn-like.
