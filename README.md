@@ -55,7 +55,7 @@ Let's see an example. Suppose we have a 1 dimensional data set with 6 objects (_
 
 If we apply IncrementalDBSCAN to the data set with _Eps_=2 and _MinPts_=4, no clusters are created since none of the objects have an _Eps_-neighborhood that contain at least 4 objects. That is, all objects are noise objects.
 
-We now add point _p_ to position 0.
+We now insert object _p_ at position 0.
 <pre>
 - - - c - b - a - - - p - - - x - y - z - - -
      -4  -3  -2       0       2   3   4      
