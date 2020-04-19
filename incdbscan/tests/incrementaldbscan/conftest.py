@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 from sklearn.datasets import make_blobs
 
-from incdbscan.incrementaldbscan.incrementaldbscan import IncrementalDBSCAN
+from incdbscan import IncrementalDBSCAN
 
 EPS = 1.5
 

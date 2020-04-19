@@ -2,7 +2,7 @@ from collections import defaultdict
 
 import networkx as nx
 
-from incdbscan.incrementaldbscan._labels import CLUSTER_LABEL_NOISE
+from ._labels import CLUSTER_LABEL_NOISE
 
 
 class _Deleter:

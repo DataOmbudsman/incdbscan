@@ -1,6 +1,6 @@
 from typing import Dict
 
-from incdbscan.incrementaldbscan._objects import ObjectId
+from ._objects import ObjectId
 
 ClusterLabel = int
 
