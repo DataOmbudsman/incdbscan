@@ -1,2 +1,2 @@
 test:
-	python -m pytest tests/*
+	python -m pytest incdbscan/tests/*

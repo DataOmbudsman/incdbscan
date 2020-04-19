@@ -1,6 +1,8 @@
 import pytest
 
-from src.incrementaldbscan.incrementaldbscan import IncrementalDBSCANWarning
+from incdbscan.incrementaldbscan.incrementaldbscan import (
+    IncrementalDBSCANWarning
+)
 
 
 def test_no_warning_raised_if_unknown_id_is_passed_to_insert(

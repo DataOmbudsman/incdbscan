@@ -7,9 +7,9 @@ verify_ssl = true
 pylint = "*"
 flake8 = "*"
 rope = "*"
+pytest = "*"
 
 [packages]
-pytest = "*"
 numpy = "*"
 sklearn = "*"
 networkx = "*"

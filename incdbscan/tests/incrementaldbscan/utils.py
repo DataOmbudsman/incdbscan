@@ -2,7 +2,7 @@ from typing import Iterable
 
 import numpy as np
 
-from src.incrementaldbscan._objects import ObjectId
+from incdbscan.incrementaldbscan._objects import ObjectId
 
 CLUSTER_LABEL_NOISE = -1
 CLUSTER_LABEL_FIRST_CLUSTER = 0

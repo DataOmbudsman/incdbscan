@@ -1,7 +1,7 @@
 import numpy as np
 
-from tests.incrementaldbscan.conftest import EPS
-from tests.incrementaldbscan.utils import (
+from incdbscan.tests.incrementaldbscan.conftest import EPS
+from incdbscan.tests.incrementaldbscan.utils import (
     assert_cluster_label_of_ids,
     assert_split_creates_new_labels_for_new_clusters,
     CLUSTER_LABEL_FIRST_CLUSTER,

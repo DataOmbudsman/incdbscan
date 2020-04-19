@@ -1,10 +1,10 @@
 import networkx as nx
 
-from src.incrementaldbscan._labels import (
+from incdbscan.incrementaldbscan._labels import (
     CLUSTER_LABEL_UNCLASSIFIED,
     CLUSTER_LABEL_NOISE,
 )
-from src.incrementaldbscan._objects import _Object
+from incdbscan.incrementaldbscan._objects import _Object
 
 
 class _Inserter:

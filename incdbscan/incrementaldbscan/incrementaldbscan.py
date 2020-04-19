@@ -1,10 +1,10 @@
 import warnings
 from typing import Dict, Iterable
 
-from src.incrementaldbscan._deleter import _Deleter
-from src.incrementaldbscan._inserter import _Inserter
-from src.incrementaldbscan._labels import ClusterLabel, _Labels
-from src.incrementaldbscan._objects import _Object, ObjectId, _Objects
+from incdbscan.incrementaldbscan._deleter import _Deleter
+from incdbscan.incrementaldbscan._inserter import _Inserter
+from incdbscan.incrementaldbscan._labels import ClusterLabel, _Labels
+from incdbscan.incrementaldbscan._objects import _Object, ObjectId, _Objects
 
 
 class IncrementalDBSCAN:
@@ -150,6 +150,5 @@ class IncrementalDBSCANWarning(Warning):
 
 # Packaging related
 # TODO __init__ file setup
-# TODO package restructure: no src
-# TODO pip
+# TODO pip upload
 # TODO readme: installation

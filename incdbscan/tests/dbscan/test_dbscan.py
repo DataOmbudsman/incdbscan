@@ -1,8 +1,8 @@
 import pytest
 from sklearn.datasets import make_circles
 
-from src.dbscan.dbscan import DBSCAN
-from tests.dbscan.utils import are_lists_isomorphic
+from incdbscan.dbscan.dbscan import DBSCAN
+from incdbscan.tests.dbscan.utils import are_lists_isomorphic
 
 
 @pytest.fixture
