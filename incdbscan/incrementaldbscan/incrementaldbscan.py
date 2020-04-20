@@ -8,18 +8,19 @@ from ._objects import _Object, ObjectId, _Objects
 
 
 class IncrementalDBSCAN:
-    """An incremental density-based clustering algorithm that handles outliers.
+    """The incremental version of DBSCAN, a density-based clustering algorithm
+    that handles outliers.
 
-    After an initial clustering of objects, the clustering can at any time be
-    updated by increments of any size. An increment can be either insertion or
-    or deletion of objects.
+    Starting from an initial clustering of objects, the object set can at any
+    time be updated by increments of any size. An increment can be either the
+    insertion or the deletion of objects.
 
-    After each update the result of the clustering is the same as if the
+    After each update, the result of the clustering is the same as if the
     updated object set (i.e., the initial object set modified by the
     increments) was clustered by DBSCAN. However, this result is reached by
     using information from the previous state of clustering, and without the
-    need of applying DBSCAN to the updated object set. Therefore, it is more
-    efficient.
+    need of applying DBSCAN to the whole updated object set. Therefore, it is
+    more efficient.
 
     Parameters
     ----------
