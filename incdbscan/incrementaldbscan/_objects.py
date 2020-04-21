@@ -11,7 +11,7 @@ def euclidean_distance(x, y):
 
 
 class _Object:
-    def __init__(self, object_value, object_id):
+    def __init__(self, object_value):
         self.value = object_value
         self.id = object_id
         self.neighbor_count = 1

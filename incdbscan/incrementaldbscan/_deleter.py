@@ -6,22 +6,22 @@ from ._labels import CLUSTER_LABEL_NOISE
 
 
 class _Deleter:
-    def __init__(self, eps, min_pts, labels, objects):
+    def __init__(self, eps, min_pts, labels, object_set):
         self.eps = eps
         self.min_pts = min_pts
         self.labels = labels
-        self.objects = objects
+        self.object_set = object_set
 
-    def delete(self, object_id):
-        print('\nDeleting', object_id)
-        object_to_delete = self.objects.get_object(object_id)
-        self.objects.delete_object(object_id)
+    def delete(self, object_to_delete):
+        print('\nDeleting', object_to_delete.value)
+        self.objects.delete_object(object_to_delete)
+        object_deleted = object_to_delete
 
-        neighbors = self.objects.get_neighbors(object_to_delete, self.eps)
+        neighbors = self.objects.get_neighbors(object_deleted, self.eps)
         self._update_neighbor_counts_after_deletion(neighbors)
 
         ex_cores = self._get_objects_that_lost_core_property(
-            neighbors, object_to_delete)
+            neighbors, object_deleted)
 
         neighbors_of_ex_cores = \
             self.objects.get_neighbors_of_objects(ex_cores, self.eps)

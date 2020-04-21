@@ -2,43 +2,50 @@ from typing import Iterable
 
 import numpy as np
 
-from incdbscan.incrementaldbscan._objects import ObjectId
-
 CLUSTER_LABEL_NOISE = -1
 CLUSTER_LABEL_FIRST_CLUSTER = 0
 
 
-def assert_cluster_label_of_ids(
-        object_ids: Iterable[ObjectId],
+def assert_cluster_labels(incdbscan_fit, objects: Iterable, label):
+    assert np.all(
+        incdbscan_fit.get_cluster_labels(objects) == label
+    )
+
+
+def assert_two_objects_are_in_same_cluster(incdbscan_fit, object1, object2):
+    assert incdbscan_fit.get_cluster_labels(object1) == \
+        incdbscan_fit.get_cluster_labels(object2)
+
+
+def assert_label_of_object_is_among_possible_ones(
         incdbscan_fit,
-        label):
+        obj,
+        possible_labels):
 
-    for object_id in object_ids:
-        assert incdbscan_fit.labels[object_id] == label
+    assert incdbscan_fit.get_cluster_labels(obj)[0] in possible_labels
 
 
-def insert_objects_then_assert_membership(
+def insert_objects_then_assert_cluster_labels(
         incdbscan,
         values: Iterable,
-        ids_to_insert: Iterable[ObjectId],
         expected_label):
 
-    incdbscan.insert_objects(values, ids_to_insert)
-    assert_cluster_label_of_ids(ids_to_insert, incdbscan, expected_label)
+    incdbscan.insert_objects(values)
+    assert_cluster_labels(incdbscan, values, expected_label)
 
 
 def assert_split_creates_new_labels_for_new_clusters(
         incdbscan_fit,
-        clusters: Iterable[Iterable[ObjectId]],
+        clusters: Iterable[Iterable],
         previous_common_label):
 
     all_labels = set()
 
-    for objects in clusters:
+    for cluster in clusters:
         labels_within_cluster = set()
 
-        for object_id in objects:
-            labels_within_cluster.add(incdbscan_fit.labels[object_id])
+        for obj in cluster:
+            labels_within_cluster.add(incdbscan_fit.get_cluster_labels(obj)[0])
 
         assert len(labels_within_cluster) == 1
         all_labels.update(labels_within_cluster)

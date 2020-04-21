@@ -1,26 +1,27 @@
 import warnings
-from typing import Dict, Iterable
+
+import numpy as np
 
 from ._deleter import _Deleter
 from ._inserter import _Inserter
-from ._labels import ClusterLabel, _Labels
-from ._objects import _Object, ObjectId, _Objects
+from ._labels import _Labels, CLUSTER_LABEL_UNKNOWN_OBJECT
+from ._objectset import _ObjectSet
 
 
 class IncrementalDBSCAN:
     """The incremental version of DBSCAN, a density-based clustering algorithm
     that handles outliers.
 
-    Starting from an initial clustering of objects, the object set can at any
-    time be updated by increments of any size. An increment can be either the
-    insertion or the deletion of objects.
+    After an initial clustering of an initial object set, the object set can at
+    any time be updated by increments of any size. An increment can be either
+    the insertion or the deletion of objects.
 
     After each update, the result of the clustering is the same as if the
-    updated object set (i.e., the initial object set modified by the
+    updated object set (i.e., the initial object set modified by all of the
     increments) was clustered by DBSCAN. However, this result is reached by
-    using information from the previous state of clustering, and without the
-    need of applying DBSCAN to the whole updated object set. Therefore, it is
-    more efficient.
+    using information from the previous state of the clustering, and without
+    the need of applying DBSCAN to the whole updated object set. Therefore, it
+    is more efficient.
 
     Parameters
     ----------
@@ -37,12 +38,6 @@ class IncrementalDBSCAN:
         larger the value, the faster the calculation is, at the expense of
         memory need.
 
-    Attributes
-    ----------
-    labels : dict
-        Cluster label for each object, stored as a dictionary mapping
-        object IDs to cluster labels. Label -1 means noise.
-
     References
     ----------
     Ester et al. 1998. Incremental Clustering for Mining in a Data Warehousing
@@ -57,74 +52,99 @@ class IncrementalDBSCAN:
         self.cache_size = cache_size
 
         self._labels = _Labels()
-        self._objects = _Objects(self.cache_size)
+        self._object_set = _ObjectSet()
 
         self._inserter = _Inserter(
-            self.eps, self.min_pts, self._labels, self._objects)
+            self.eps, self.min_pts, self._labels, self._object_set)
         self._deleter = _Deleter(
-            self.eps, self.min_pts, self._labels, self._objects)
+            self.eps, self.min_pts, self._labels, self._object_set)
 
-    @property
-    def labels(self) -> Dict[ObjectId, ClusterLabel]:
-        return self._labels.get_all_labels()
-
-    def insert_objects(
-            self,
-            object_values: Iterable,
-            object_ids: Iterable[ObjectId]):
+    def insert_objects(self, X):
         """Insert objects into the object set, then update clustering.
 
         Parameters
         ----------
-        object_values : array
-            An array of numpy arrays, representing the data objects to be
-            inserted into the object set.
+        X : array-like of shape (n_samples, n_features)
+            The data objects to be inserted into the object set.
 
-        object_ids : iterable of int or of str
-            The identifiers of the data objects to be inserted into the object
-            set. E.g., list of strings, or numpy array of integers.
+        Returns
+        -------
+        self
 
         """
-        for object_value, object_id in zip(object_values, object_ids):
+        for value in X:
+            self._inserter.insert(value)
 
-            if object_id not in self.labels:
-                object_to_insert = _Object(object_value, object_id)
-                self._inserter.insert(object_to_insert)
+        return self
 
-            else:
-                warnings.warn(
-                    IncrementalDBSCANWarning(
-                        f'Object with ID {object_id} was not inserted '
-                        'because it already exists in the clustering.'
-                    )
-                )
-
-    def delete_objects(self, object_ids: Iterable):
+    def delete_objects(self, X):
         """Delete objects from object set, then update clustering.
 
         Parameters
         ----------
-        object_ids : iterable of int or of str
-            The identifiers of the data objects to be deleted from the object
-            set. E.g., list of strings, or numpy array of integers.
+        X : array-like of shape (n_samples, n_features)
+            The data objects to be deleted from the object set.
+
+        Returns
+        -------
+        self
 
         """
-        for object_id in object_ids:
+        for ix, value in enumerate(X):
+            obj = self._object_set.get_object(value)
 
-            if object_id in self.labels:
-                self._deleter.delete(object_id)
+            if obj:
+                self._deleter.delete(obj)
 
             else:
                 warnings.warn(
                     IncrementalDBSCANWarning(
-                        f'Object with ID {object_id} was not deleted '
-                        f'because there is no object with this ID.'
+                        f'Object at position {ix} was not deleted because '
+                        'there is no such object in the object set.'
                     )
                 )
+
+        return self
+
+    def get_cluster_labels(self, X):
+        """Get cluster labels of objects.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            The data objects to get labels for.
+
+        Returns
+        -------
+        labels : ndarray of shape (n_samples,)
+                 Cluster labels. Effective labels start from 0. -1 means the
+                 object was found to be noise. -2 means the object was not in
+                 the object set.
+
+        """
+        labels = np.zeros(len(X))
+
+        for ix, value in enumerate(X):
+
+            label = self._labels.get_label_for_value(value)
+            labels[ix] = label
+
+            if label == CLUSTER_LABEL_UNKNOWN_OBJECT:
+                warnings.warn(
+                    IncrementalDBSCANWarning(
+                        f'No label was retrieved for object at position {ix} '
+                        'because there is no such object in the object set.'
+                    )
+                )
+
+        return labels
 
 
 class IncrementalDBSCANWarning(Warning):
     pass
+
+
+# TODO remove networkx dependency
 
 # TODO metrics in arguments
 # TODO make API more sklearn-like.

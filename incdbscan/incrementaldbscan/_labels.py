@@ -1,10 +1,12 @@
 from typing import Dict
 
-from ._objects import ObjectId
+from ._objectset import ObjectId
+from ._utils import hash_
 
 ClusterLabel = int
 
-CLUSTER_LABEL_UNCLASSIFIED: ClusterLabel = -2
+CLUSTER_LABEL_UNCLASSIFIED: ClusterLabel = -3
+CLUSTER_LABEL_UNKNOWN_OBJECT: ClusterLabel = -2
 CLUSTER_LABEL_NOISE: ClusterLabel = -1
 CLUSTER_LABEL_FIRST_CLUSTER: ClusterLabel = 0
 
@@ -25,6 +27,10 @@ class _Labels:
 
     def get_label(self, obj):
         return self._labels[obj.id]
+
+    def get_label_for_value(self, value):
+        id_ = hash_(value)
+        return self._labels.get(id_, CLUSTER_LABEL_UNKNOWN_OBJECT)
 
     def get_all_labels(self):
         return self._labels

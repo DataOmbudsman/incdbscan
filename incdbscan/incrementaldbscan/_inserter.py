@@ -1,27 +1,24 @@
 import networkx as nx
 
-from ._labels import (
-    CLUSTER_LABEL_NOISE,
-    CLUSTER_LABEL_UNCLASSIFIED
-)
-from ._objects import _Object
+from ._labels import CLUSTER_LABEL_NOISE, CLUSTER_LABEL_UNCLASSIFIED
 
 
 class _Inserter:
-    def __init__(self, eps, min_pts, labels, objects):
+    def __init__(self, eps, min_pts, labels, object_set):
         self.eps = eps
         self.min_pts = min_pts
         self.labels = labels
-        self.objects = objects
+        self.object_set = object_set
 
-    def insert(self, object_to_insert: _Object):
-        print('\nInserting', object_to_insert.id)  # TODO
-        self.objects.insert_object(object_to_insert)
-        self.labels.set_label(
-            object_to_insert, CLUSTER_LABEL_UNCLASSIFIED)
+    def insert(self, object_value):
+        print('\nInserting', object_value)  # TODO
+        object_inserted = self.object_set.insert_object(object_value)
 
-        neighbors = self.objects.get_neighbors(object_to_insert, self.eps)
-        self._update_neighbor_counts_after_insert(object_to_insert, neighbors)
+        self.labels.set_label(object_inserted, CLUSTER_LABEL_UNCLASSIFIED)
+
+        neighbors = self.object_set.get_neighbors(object_inserted, self.eps)
+        self.object_set.update_neighbor_counts_after_insertion(
+            object_inserted, neighbors)
 
         new_core_neighbors, old_core_neighbors = \
             self._filter_core_objects_split_by_novelty(neighbors)
@@ -49,12 +46,13 @@ class _Inserter:
 
                 label_of_new_object = CLUSTER_LABEL_NOISE
 
-            self.labels.set_label(object_to_insert, label_of_new_object)
+            self.labels.set_label(object_inserted, label_of_new_object)
             return
 
         print('\nnew_core_neighbors')  # TODO
         neighbors_of_new_core_neighbors = \
-            self.objects.get_neighbors_of_objects(new_core_neighbors, self.eps)
+            self.object_set.get_neighbors_of_objects(
+                new_core_neighbors, self.eps)
 
         update_seeds = self._get_update_seeds(neighbors_of_new_core_neighbors)
 
@@ -95,10 +93,7 @@ class _Inserter:
             neighbors_of_new_core_neighbors
         )
 
-    def _update_neighbor_counts_after_insert(self, new_object, neighbors):
-        for neighbor in neighbors:
-            neighbor.neighbor_count += 1
-        new_object.neighbor_count = len(neighbors)
+        return
 
     def _filter_core_objects_split_by_novelty(self, objects):
         new_cores = set()
@@ -129,7 +124,7 @@ class _Inserter:
         G = nx.Graph()
 
         for obj in objects:
-            neighbors = self.objects.get_neighbors(obj, self.eps)
+            neighbors = self.object_set.get_neighbors(obj, self.eps)
 
             for neighbor in neighbors:
                 if neighbor in objects:
