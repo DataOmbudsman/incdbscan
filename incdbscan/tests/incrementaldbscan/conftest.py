@@ -31,12 +31,12 @@ def blob_in_middle():
 
 @pytest.fixture
 def object_far_away():
-    return np.array([[10, 10]])
+    return np.array([[10., 10.]])
 
 
 @pytest.fixture
 def point_at_origin():
-    return np.array([[0, 0]])
+    return np.array([[0., 0.]])
 
 
 @pytest.fixture

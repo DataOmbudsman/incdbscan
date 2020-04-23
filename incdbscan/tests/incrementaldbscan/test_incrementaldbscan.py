@@ -1,90 +1,106 @@
-# import pytest
+import numpy as np
 
-# from incdbscan import IncrementalDBSCANWarning
-
-
-# def test_no_warning_raised_if_unknown_id_is_passed_to_insert(
-#         incdbscan4,
-#         blob_in_middle):
-
-#     object_values, object_ids = blob_in_middle
-
-#     with pytest.warns(None) as record:
-#         incdbscan4.insert_objects(object_values, object_ids)
-
-#     number_of_warnings = len(record)
-#     assert number_of_warnings == 0
+from incdbscan import IncrementalDBSCANWarning
+from utils import (
+    CLUSTER_LABEL_NOISE,
+    CLUSTER_LABEL_UNKNOWN_OBJECT,
+    delete_object_and_assert_error,
+    delete_object_and_assert_no_warning,
+    delete_object_and_assert_warning,
+    insert_object_and_assert_error,
+    get_label_and_assert_error,
+    get_label_and_assert_no_warning,
+    get_label_and_assert_warning
+)
 
 
-# def test_warning_raised_if_known_id_is_passed_to_insert(
-#         incdbscan4,
-#         blob_in_middle):
+def test_error_when_input_is_non_numeric(incdbscan3):
+    inputs_not_welcomed = np.array([
+        [1, 2, 'x'],
+        [1, 2, None],
+        [1, 2, np.nan],
+        [1, 2, np.inf],
+    ])
 
-#     object_values, object_ids = blob_in_middle
-#     incdbscan4.insert_objects(object_values, object_ids)
+    for i in range(len(inputs_not_welcomed)):
+        input_ = inputs_not_welcomed[[i]]
 
-#     with pytest.warns(IncrementalDBSCANWarning):
-#         incdbscan4.insert_objects([object_values[0]], [object_ids[0]])
-
-
-# def test_warning_raised_if_unknown_id_is_passed_to_delete(
-#         incdbscan4,
-#         blob_in_middle):
-
-#     object_values, object_ids = blob_in_middle
-#     incdbscan4.insert_objects(object_values, object_ids)
-
-#     unknown_index = 'UNKNOWN'
-
-#     with pytest.warns(IncrementalDBSCANWarning):
-#         one_known_one_unknown = [object_ids[0], unknown_index]
-#         incdbscan4.delete_objects(one_known_one_unknown)
+        insert_object_and_assert_error(incdbscan3, input_, ValueError)
+        delete_object_and_assert_error(incdbscan3, input_, ValueError)
+        get_label_and_assert_error(incdbscan3, input_, ValueError)
 
 
-# def test_no_warning_raised_if_known_index_is_passed_to_delete(
-#         incdbscan4,
-#         blob_in_middle):
+def test_handling_of_same_object_with_different_dtype(incdbscan3):
+    object_as_int = np.array([[1, 2, 3]])
+    object_as_float = np.array([[1., 2., 3.]])
 
-#     object_values, object_ids = blob_in_middle
-#     incdbscan4.insert_objects(object_values, object_ids)
+    incdbscan3.insert(object_as_int)
 
-#     with pytest.warns(None) as record:
-#         incdbscan4.delete_objects(object_ids[1:5])
+    assert incdbscan3.get_cluster_labels(object_as_int) == \
+        incdbscan3.get_cluster_labels(object_as_float)
 
-#     number_of_warnings = len(record)
-#     assert number_of_warnings == 0
+    delete_object_and_assert_no_warning(incdbscan3, object_as_float)
 
 
-# def test_labels_are_accessible_for_inserted_objects(
-#         incdbscan4,
-#         blob_in_middle):
+def test_no_warning_when_a_known_object_is_deleted(
+        incdbscan3,
+        point_at_origin):
 
-#     object_values, object_ids = blob_in_middle
-#     incdbscan4.insert_objects(object_values, object_ids)
+    incdbscan3.insert(point_at_origin)
+    delete_object_and_assert_no_warning(incdbscan3, point_at_origin)
 
-#     for object_id in object_ids:
-#         assert object_id in incdbscan4.labels
-
-
-# def test_labels_are_not_accessible_for_not_inserted_objects(
-#         incdbscan4,
-#         blob_in_middle):
-
-#     object_values, object_ids = blob_in_middle
-#     incdbscan4.insert_objects(object_values, object_ids)
-
-#     unknown_id = 'UNKNOWN'
-#     assert unknown_id not in incdbscan4.labels
+    incdbscan3.insert(point_at_origin)
+    incdbscan3.insert(point_at_origin)
+    delete_object_and_assert_no_warning(incdbscan3, point_at_origin)
+    delete_object_and_assert_no_warning(incdbscan3, point_at_origin)
 
 
-# def test_labels_are_not_accessible_for_deleted_objects(
-#         incdbscan4,
-#         blob_in_middle):
+def test_warning_when_unknown_object_is_deleted(
+        incdbscan3,
+        point_at_origin,
+        object_far_away):
 
-#     object_values, object_ids = blob_in_middle
-#     incdbscan4.insert_objects(object_values, object_ids)
+    delete_object_and_assert_warning(
+        incdbscan3, point_at_origin, IncrementalDBSCANWarning)
 
-#     first_object_id = object_ids[0]
-#     incdbscan4.delete_objects([first_object_id])
+    incdbscan3.insert(point_at_origin)
 
-#     assert first_object_id not in incdbscan4.labels
+    incdbscan3.delete(point_at_origin)
+
+    delete_object_and_assert_warning(
+        incdbscan3, point_at_origin, IncrementalDBSCANWarning)
+
+
+def test_no_warning_when_cluster_label_is_gotten_for_known_object(
+        incdbscan3,
+        point_at_origin):
+
+    expected_label = np.array([CLUSTER_LABEL_NOISE])
+
+    incdbscan3.insert(point_at_origin)
+    label = get_label_and_assert_no_warning(incdbscan3, point_at_origin)
+    assert label == expected_label
+
+    incdbscan3.insert(point_at_origin)
+    incdbscan3.delete(point_at_origin)
+    label = get_label_and_assert_no_warning(incdbscan3, point_at_origin)
+    assert label == expected_label
+
+
+def test_warning_when_cluster_label_is_gotten_for_unknown_object(
+        incdbscan3,
+        point_at_origin,
+        object_far_away):
+
+    expected_label_for_unknown = np.array([CLUSTER_LABEL_UNKNOWN_OBJECT])
+
+    label = get_label_and_assert_warning(
+        incdbscan3, point_at_origin, IncrementalDBSCANWarning)
+    assert label == expected_label_for_unknown
+
+    incdbscan3.insert(point_at_origin)
+    incdbscan3.delete(point_at_origin)
+
+    label = get_label_and_assert_warning(
+        incdbscan3, point_at_origin, IncrementalDBSCANWarning)
+    assert label == expected_label_for_unknown

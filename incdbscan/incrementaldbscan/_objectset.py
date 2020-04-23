@@ -72,12 +72,11 @@ class _ObjectSet:
         inserted.neighbor_count = total_count
 
     def delete_object(self, obj):
-        if obj.count > 1:
-            obj.count -= 1
-
-        else:
+        obj.count -= 1
+        if obj.count == 0:
             del self.objects[obj.id]
 
     @staticmethod
-    def update_neighbor_counts_after_deletion():
-        pass
+    def update_neighbor_counts_after_deletion(neighbors):
+        for neighbor in neighbors:
+            neighbor.neighbor_count -= 1

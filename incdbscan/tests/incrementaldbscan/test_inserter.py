@@ -13,7 +13,7 @@ from utils import (
 
 
 def test_new_single_object_is_labeled_as_noise(incdbscan4, object_far_away):
-    incdbscan4.insert_objects(object_far_away)
+    incdbscan4.insert(object_far_away)
     assert_cluster_labels(incdbscan4, object_far_away, CLUSTER_LABEL_NOISE)
 
 
@@ -22,24 +22,24 @@ def test_new_object_far_from_cluster_is_labeled_as_noise(
         blob_in_middle,
         object_far_away):
 
-    incdbscan4.insert_objects(blob_in_middle)
-    incdbscan4.insert_objects(object_far_away)
+    incdbscan4.insert(blob_in_middle)
+    incdbscan4.insert(object_far_away)
 
     assert_cluster_labels(incdbscan4, object_far_away, CLUSTER_LABEL_NOISE)
 
 
 def test_new_border_object_gets_label_from_core(incdbscan4):
     cluster = np.array([
-        [1, 1],
-        [0, 1],
-        [1, 0],
-        [0, 0],
+        [1., 1.],
+        [0., 1.],
+        [1., 0.],
+        [0., 0.],
     ])
 
     new_border_object = np.array([[1 + EPS, 1]])
 
-    incdbscan4.insert_objects(cluster)
-    incdbscan4.insert_objects(new_border_object)
+    incdbscan4.insert(cluster)
+    incdbscan4.insert(new_border_object)
 
     assert_two_objects_are_in_same_cluster(
         incdbscan4, cluster[[0]], new_border_object)
@@ -50,7 +50,7 @@ def test_labels_are_noise_only_until_not_enough_objects_in_cluster(
         blob_in_middle):
 
     for i in range(len(blob_in_middle)):
-        incdbscan4.insert_objects(blob_in_middle[[i]])
+        incdbscan4.insert(blob_in_middle[[i]])
 
         expected_label = (
             CLUSTER_LABEL_NOISE if i + 1 < incdbscan4.min_pts
@@ -92,14 +92,14 @@ def test_two_clusters_can_be_born_at_the_same_time(
 
     cluster_2 = reflect_horizontally(cluster_1)
 
-    incdbscan4.insert_objects(cluster_1)
-    incdbscan4.insert_objects(cluster_2)
+    incdbscan4.insert(cluster_1)
+    incdbscan4.insert(cluster_2)
 
     assert_cluster_labels(incdbscan4, cluster_1, CLUSTER_LABEL_NOISE)
     assert_cluster_labels(incdbscan4, cluster_2, CLUSTER_LABEL_NOISE)
 
     new_object = point_at_origin
-    incdbscan4.insert_objects(new_object)
+    incdbscan4.insert(new_object)
 
     cluster_1_label_expected = incdbscan4.get_cluster_labels(cluster_1[[0]])[0]
     assert_cluster_labels(incdbscan4, cluster_1, cluster_1_label_expected)
@@ -185,9 +185,9 @@ def test_merger_and_creation_can_happen_at_the_same_time(
 
     bridge_point = hourglass[[3]]
 
-    incdbscan4.insert_objects(top_right)
-    incdbscan4.insert_objects(bridge_point)
-    incdbscan4.insert_objects(bottom_right)
+    incdbscan4.insert(top_right)
+    incdbscan4.insert(bridge_point)
+    incdbscan4.insert(bottom_right)
 
     assert_cluster_labels(incdbscan4, top_right, top_right_expected_label)
     assert_cluster_labels(
@@ -218,7 +218,7 @@ def test_merger_and_creation_can_happen_at_the_same_time(
 
     # Insert object to the center
     new_object = point_at_origin
-    incdbscan4.insert_objects(new_object)
+    incdbscan4.insert(new_object)
 
     assert_cluster_labels(
         incdbscan4, top_right, merged_cluster_expected_label)
@@ -250,9 +250,9 @@ def test_two_mergers_can_happen_at_the_same_time(
 
     bridge_point_right = hourglass_on_the_right[[3]]
 
-    incdbscan4.insert_objects(top_right)
-    incdbscan4.insert_objects(bridge_point_right)
-    incdbscan4.insert_objects(bottom_right)
+    incdbscan4.insert(top_right)
+    incdbscan4.insert(bridge_point_right)
+    incdbscan4.insert(bottom_right)
 
     assert_cluster_labels(incdbscan4, top_right, top_right_expected_label)
     assert_cluster_labels(
@@ -275,9 +275,9 @@ def test_two_mergers_can_happen_at_the_same_time(
 
     bridge_point_left = hourglass_on_the_left[[3]]
 
-    incdbscan4.insert_objects(top_left)
-    incdbscan4.insert_objects(bridge_point_left)
-    incdbscan4.insert_objects(bottom_left)
+    incdbscan4.insert(top_left)
+    incdbscan4.insert(bridge_point_left)
+    incdbscan4.insert(bottom_left)
 
     assert_cluster_labels(incdbscan4, top_left, top_left_expected_label)
     assert_cluster_labels(incdbscan4, bottom_left, bottom_left_expected_label)
@@ -290,7 +290,7 @@ def test_two_mergers_can_happen_at_the_same_time(
 
     # Insert object to the center
     new_object = point_at_origin
-    incdbscan4.insert_objects(new_object)
+    incdbscan4.insert(new_object)
 
     assert_cluster_labels(
         incdbscan4,

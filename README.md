@@ -31,9 +31,10 @@ TODO
 The work by Ester et al. 1998 lays the groundwork for this implementation of IncrementalDBSCAN. However, some parts of the algorithm are not covered in the paper. In this section, these holes will be identified, and solutions are proposed to fill them.
 
 Notations used:
+- _D_: the set of data objects.
 - _N<sub>Eps</sub>(p)_: the set of all objects that are in the _Eps_-neighborhood of _p_.
-- _UpdSeed<sub>Ins</sub>_, the set of update seeds after insertion, is defined in _Definition 7_ as the set of core objects in the _Eps_-neighborhood of those objects that gain their core object property as a result of the insertion.
-- _UpdSeed<sub>Del</sub>_, the set of update seeds after deletion, is defined in _Definition 7_ as the set of core objects in the _Eps_-neighborhood of those objects that lose their core object property as a result of the deletion.
+- _UpdSeed<sub>Ins</sub>_, the set of update seeds after insertion, is defined in _Definition 7_ as the set of core objects in the _Eps_-neighborhood of those objects that gain their core object property as a result of the insertion into _D_.
+- _UpdSeed<sub>Del</sub>_, the set of update seeds after deletion, is defined in _Definition 7_ as the set of core objects in the _Eps_-neighborhood of those objects that lose their core object property as a result of the deletion from _D_.
 
 ## Absorption when _UpdSeed<sub>Ins</sub>_ is empty
 Let's suppose that cluster _C_ is already established, and a new object _p_ is inserted in the _Eps_-neighborhood of a core object _c_ of cluster _C_. Additionally, suppose that there are not enough objects in _N<sub>Eps</sub>(p)_ for _p_ to become a core object and that no other objects become core objects due to the insertion.

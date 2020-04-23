@@ -1,7 +1,9 @@
 from typing import Iterable
 
 import numpy as np
+import pytest
 
+CLUSTER_LABEL_UNKNOWN_OBJECT = -2
 CLUSTER_LABEL_NOISE = -1
 CLUSTER_LABEL_FIRST_CLUSTER = 0
 
@@ -30,7 +32,7 @@ def insert_objects_then_assert_cluster_labels(
         values: Iterable,
         expected_label):
 
-    incdbscan.insert_objects(values)
+    incdbscan.insert(values)
     assert_cluster_labels(incdbscan, values, expected_label)
 
 
@@ -45,7 +47,8 @@ def assert_split_creates_new_labels_for_new_clusters(
         labels_within_cluster = set()
 
         for obj in cluster:
-            labels_within_cluster.add(incdbscan_fit.get_cluster_labels(obj)[0])
+            label_of_object = incdbscan_fit.get_cluster_labels([obj])[0]
+            labels_within_cluster.add(label_of_object)
 
         assert len(labels_within_cluster) == 1
         all_labels.update(labels_within_cluster)
@@ -59,3 +62,46 @@ def reflect_horizontally(points):
     new_points = np.copy(points)
     new_points[:, 0] = np.negative(new_points[:, 0])
     return new_points
+
+
+def delete_object_and_assert_error(incdbscan_fit, obj, error):
+    with pytest.raises(error):
+        incdbscan_fit.delete(obj)
+
+
+def delete_object_and_assert_no_warning(incdbscan_fit, obj):
+    with pytest.warns(None) as record:
+        incdbscan_fit.delete(obj)
+
+    number_of_warnings = len(record)
+    assert number_of_warnings == 0
+
+
+def delete_object_and_assert_warning(incdbscan_fit, obj, warning):
+    with pytest.warns(warning):
+        incdbscan_fit.delete(obj)
+
+
+def get_label_and_assert_error(incdbscan_fit, obj, error):
+    with pytest.raises(error):
+        incdbscan_fit.get_cluster_labels(obj)
+
+
+def get_label_and_assert_no_warning(incdbscan_fit, obj):
+    with pytest.warns(None) as record:
+        incdbscan_fit.get_cluster_labels(obj)
+
+    number_of_warnings = len(record)
+    assert number_of_warnings == 0
+
+    return incdbscan_fit.get_cluster_labels(obj)
+
+
+def get_label_and_assert_warning(incdbscan_fit, obj, warning):
+    with pytest.warns(warning):
+        return incdbscan_fit.get_cluster_labels(obj)
+
+
+def insert_object_and_assert_error(incdbscan_fit, obj, error):
+    with pytest.raises(error):
+        incdbscan_fit.insert(obj)

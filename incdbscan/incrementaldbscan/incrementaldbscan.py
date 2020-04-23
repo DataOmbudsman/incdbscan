@@ -1,6 +1,7 @@
 import warnings
 
 import numpy as np
+from sklearn.utils.validation import check_array
 
 from ._deleter import _Deleter
 from ._inserter import _Inserter
@@ -12,9 +13,9 @@ class IncrementalDBSCAN:
     """The incremental version of DBSCAN, a density-based clustering algorithm
     that handles outliers.
 
-    After an initial clustering of an initial object set, the object set can at
-    any time be updated by increments of any size. An increment can be either
-    the insertion or the deletion of objects.
+    After an initial clustering of an initial object set (i.e., set of data
+    points), the object set can at any time be updated by increments of any
+    size. An increment can be either the insertion or the deletion of objects.
 
     After each update, the result of the clustering is the same as if the
     updated object set (i.e., the initial object set modified by all of the
@@ -59,7 +60,7 @@ class IncrementalDBSCAN:
         self._deleter = _Deleter(
             self.eps, self.min_pts, self._labels, self._object_set)
 
-    def insert_objects(self, X):
+    def insert(self, X):
         """Insert objects into the object set, then update clustering.
 
         Parameters
@@ -72,12 +73,14 @@ class IncrementalDBSCAN:
         self
 
         """
+        X = _input_check(X)
+
         for value in X:
             self._inserter.insert(value)
 
         return self
 
-    def delete_objects(self, X):
+    def delete(self, X):
         """Delete objects from object set, then update clustering.
 
         Parameters
@@ -90,6 +93,8 @@ class IncrementalDBSCAN:
         self
 
         """
+        X = _input_check(X)
+
         for ix, value in enumerate(X):
             obj = self._object_set.get_object(value)
 
@@ -122,6 +127,8 @@ class IncrementalDBSCAN:
                  the object set.
 
         """
+        X = _input_check(X)
+
         labels = np.zeros(len(X))
 
         for ix, value in enumerate(X):
@@ -144,14 +151,16 @@ class IncrementalDBSCANWarning(Warning):
     pass
 
 
+def _input_check(X):
+    return check_array(X, dtype=float, accept_large_sparse=False)
+
+
 # TODO remove networkx dependency
 
+# TODO think about label deletion... should be based.
+
 # TODO metrics in arguments
-# TODO make API more sklearn-like.
-    # Step 1: no ID argument, use hash instead ... (ID type only int?)
-    # Step 2: create predict
-    # Step 3: 1 update method -> partial_fit
-    # Step 4: fit as initial fitting
+# TODO: initial fitting
 
 # ALGO related
 # TODO functional tests

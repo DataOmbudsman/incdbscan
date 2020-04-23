@@ -14,17 +14,17 @@ class _Deleter:
 
     def delete(self, object_to_delete):
         print('\nDeleting', object_to_delete.value)
-        self.objects.delete_object(object_to_delete)
+        self.object_set.delete_object(object_to_delete)
         object_deleted = object_to_delete
 
-        neighbors = self.objects.get_neighbors(object_deleted, self.eps)
-        self._update_neighbor_counts_after_deletion(neighbors)
+        neighbors = self.object_set.get_neighbors(object_deleted, self.eps)
+        self.object_set.update_neighbor_counts_after_deletion(neighbors)
 
         ex_cores = self._get_objects_that_lost_core_property(
             neighbors, object_deleted)
 
         neighbors_of_ex_cores = \
-            self.objects.get_neighbors_of_objects(ex_cores, self.eps)
+            self.object_set.get_neighbors_of_objects(ex_cores, self.eps)
 
         update_seeds, non_core_neighbors_of_ex_cores = \
             self._separate_neighbors_by_core_property(neighbors_of_ex_cores)
@@ -52,26 +52,23 @@ class _Deleter:
 
         self._set_each_border_object_labels_to_largest_around(
             non_core_neighbors_of_ex_cores)
-        self.labels.delete_label(object_id)
 
-    def _update_neighbor_counts_after_deletion(self, neighbors):
-        for neighbor in neighbors:
-            neighbor.neighbor_count -= 1
+        # TODO HACK
+        if object_deleted.count == 0:
+            self.labels.delete_label(object_deleted.id)
 
     def _get_objects_that_lost_core_property(
             self,
             neighbors,
-            object_to_delete):
+            object_deleted):
 
-        ex_core_neighbors = [
-            obj for obj in neighbors
-            if obj.neighbor_count == self.min_pts - 1
-        ]
+        ex_core_neighbors = [obj for obj in neighbors
+                             if obj.neighbor_count == self.min_pts - 1]
 
         # The result has to contain the deleted object if it was core
 
-        if self._is_core(object_to_delete):
-            ex_core_neighbors.append(object_to_delete)
+        if self._is_core(object_deleted):
+            ex_core_neighbors.append(object_deleted)
 
         return ex_core_neighbors
 
@@ -124,7 +121,7 @@ class _Deleter:
 
         def _expand_graph(obj, seed_id):
             nodes = set(G.nodes)
-            neighbors = self.objects.get_neighbors(obj, self.eps)
+            neighbors = self.object_set.get_neighbors(obj, self.eps)
 
             for neighbor in neighbors:
                 if neighbor not in objects_to_exclude_from_components:
@@ -152,7 +149,7 @@ class _Deleter:
 
     def _objects_are_neighbors_of_each_other(self, objects):
         for obj1 in objects:
-            neighbors = self.objects.get_neighbors(obj1, self.eps)
+            neighbors = self.object_set.get_neighbors(obj1, self.eps)
             for obj2 in objects:
                 if obj2 not in neighbors:
                     return False
@@ -177,7 +174,7 @@ class _Deleter:
     def _get_cluster_labels_in_neighborhood(self, obj):
         labels = set()
 
-        for neighbor in self.objects.get_neighbors(obj, self.eps):
+        for neighbor in self.object_set.get_neighbors(obj, self.eps):
             if self._is_core(neighbor):
                 label_of_neighbor = self.labels.get_label(neighbor)
                 labels.add(label_of_neighbor)
