@@ -2,14 +2,13 @@ from collections import defaultdict
 
 import networkx as nx
 
-from ._labels import CLUSTER_LABEL_NOISE
+from ._object import CLUSTER_LABEL_NOISE
 
 
 class _Deleter:
-    def __init__(self, eps, min_pts, labels, object_set):
+    def __init__(self, eps, min_pts, object_set):
         self.eps = eps
         self.min_pts = min_pts
-        self.labels = labels
         self.object_set = object_set
 
     def delete(self, object_to_delete):
@@ -43,8 +42,8 @@ class _Deleter:
                     seeds, non_core_neighbors_of_ex_cores)
 
                 for component in components:
-                    self.labels.set_labels(
-                        component, self.labels.get_next_cluster_label())
+                    self.object_set.set_labels(
+                        component, self.object_set.get_next_cluster_label())
 
         # Updating labels of border objects that were in the neighborhood
         # of objects that lost their core property is always needed. They
@@ -52,10 +51,6 @@ class _Deleter:
 
         self._set_each_border_object_labels_to_largest_around(
             non_core_neighbors_of_ex_cores)
-
-        # TODO HACK
-        if object_deleted.count == 0:
-            self.labels.delete_label(object_deleted.id)
 
     def _get_objects_that_lost_core_property(
             self,
@@ -89,9 +84,7 @@ class _Deleter:
         return core_objects, non_core_objects
 
     def _group_objects_by_cluster(self, objects):
-        objects_with_cluster_labels = [
-            (obj, self.labels.get_label(obj)) for obj in objects
-        ]
+        objects_with_cluster_labels = [(obj, obj.label) for obj in objects]
         grouped_objects = defaultdict(list)
 
         for obj, label in objects_with_cluster_labels:
@@ -169,14 +162,13 @@ class _Deleter:
             cluster_updates[obj] = max(labels)
 
         for obj, new_cluster_label in cluster_updates.items():
-            self.labels.set_label(obj, new_cluster_label)
+            obj.label = new_cluster_label
 
     def _get_cluster_labels_in_neighborhood(self, obj):
         labels = set()
 
         for neighbor in self.object_set.get_neighbors(obj, self.eps):
             if self._is_core(neighbor):
-                label_of_neighbor = self.labels.get_label(neighbor)
-                labels.add(label_of_neighbor)
+                labels.add(neighbor.label)
 
         return labels

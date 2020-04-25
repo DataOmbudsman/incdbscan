@@ -1,20 +1,17 @@
 import networkx as nx
 
-from ._labels import CLUSTER_LABEL_NOISE, CLUSTER_LABEL_UNCLASSIFIED
+from ._object import CLUSTER_LABEL_NOISE, CLUSTER_LABEL_UNCLASSIFIED
 
 
 class _Inserter:
-    def __init__(self, eps, min_pts, labels, object_set):
+    def __init__(self, eps, min_pts, object_set):
         self.eps = eps
         self.min_pts = min_pts
-        self.labels = labels
         self.object_set = object_set
 
     def insert(self, object_value):
         print('\nInserting', object_value)  # TODO
         object_inserted = self.object_set.insert_object(object_value)
-
-        self.labels.set_label(object_inserted, CLUSTER_LABEL_UNCLASSIFIED)
 
         neighbors = self.object_set.get_neighbors(object_inserted, self.eps)
         self.object_set.update_neighbor_counts_after_insertion(
@@ -35,9 +32,8 @@ class _Inserter:
                 # similar to case "Absorption" in the paper but not defined
                 # there.
 
-                label_of_new_object = max([
-                    self.labels.get_label(obj) for obj in old_core_neighbors
-                ])
+                label_of_new_object = max(
+                    [obj.label for obj in old_core_neighbors])
 
             else:
                 print('not old_core_neighbors')
@@ -46,7 +42,7 @@ class _Inserter:
 
                 label_of_new_object = CLUSTER_LABEL_NOISE
 
-            self.labels.set_label(object_inserted, label_of_new_object)
+            object_inserted.label = label_of_new_object
             return
 
         print('\nnew_core_neighbors')  # TODO
@@ -69,8 +65,8 @@ class _Inserter:
                 # previously unclassified and noise objects, a new cluster is
                 # created. Corresponds to case "Creation" in the paper.
 
-                next_cluster_label = self.labels.get_next_cluster_label()
-                self.labels.set_labels(component, next_cluster_label)
+                next_cluster_label = self.object_set.get_next_cluster_label()
+                self.object_set.set_labels(component, next_cluster_label)
 
             else:
                 print('real_cluster_labels')  # TODO
@@ -80,10 +76,10 @@ class _Inserter:
                 # Corresponds to cases "Absorption" and "Merge" in the paper.
 
                 max_label = max(effective_cluster_labels)
-                self.labels.set_labels(component, max_label)
+                self.object_set.set_labels(component, max_label)
 
                 for label in effective_cluster_labels:
-                    self.labels.change_labels(label, max_label)
+                    self.object_set.change_labels(label, max_label)
 
         # Finally all neighbors of each new core object inherits a label from
         # its new core neighbor, thereby affecting border and noise objects,
@@ -139,7 +135,7 @@ class _Inserter:
         effective_cluster_labels = set()
 
         for obj in objects:
-            label = self.labels.get_label(obj)
+            label = obj.label
             if label not in non_effective_cluster_labels:
                 effective_cluster_labels.add(label)
 
@@ -150,5 +146,4 @@ class _Inserter:
             neighbors_of_new_core_neighbors):
 
         for new_core, neighbors in neighbors_of_new_core_neighbors.items():
-            label = self.labels.get_label(new_core)
-            self.labels.set_labels(neighbors, label)
+            self.object_set.set_labels(neighbors, new_core.label)

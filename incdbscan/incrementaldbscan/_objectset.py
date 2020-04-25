@@ -2,26 +2,17 @@ from typing import Dict, List
 
 import numpy as np
 
+from ._object import _Object, ObjectId
 from ._utils import hash_
-
-ObjectId = str
 
 
 def euclidean_distance(x, y):
     return np.linalg.norm(x - y)
 
 
-class _Object:
-    def __init__(self, value, id_):
-        self.value = value
-        self.id = id_
-        self.count = 1
-        self.neighbor_count = 0
-
-
 class _ObjectSet:
     def __init__(self, distance=euclidean_distance):
-        self.objects = dict()
+        self.objects: Dict[ObjectId, _Object] = dict()
         self.distance = distance
 
     def get_object(self, value):
@@ -80,3 +71,17 @@ class _ObjectSet:
     def update_neighbor_counts_after_deletion(neighbors):
         for neighbor in neighbors:
             neighbor.neighbor_count -= 1
+
+    @staticmethod
+    def set_labels(objects, label):
+        for obj in objects:
+            obj.label = label
+
+    def get_next_cluster_label(self):
+        labels = [obj.label for obj in self.objects.values()]
+        return max(labels) + 1
+
+    def change_labels(self, change_from, change_to):
+        for obj in self.objects.values():
+            if obj.label == change_from:
+                obj.label = change_to

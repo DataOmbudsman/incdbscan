@@ -1,12 +1,11 @@
 import warnings
 
 import numpy as np
-from sklearn.utils.validation import check_array
 
 from ._deleter import _Deleter
 from ._inserter import _Inserter
-from ._labels import _Labels
 from ._objectset import _ObjectSet
+from ._utils import input_check
 
 
 class IncrementalDBSCAN:
@@ -52,13 +51,9 @@ class IncrementalDBSCAN:
         self.min_pts = min_pts
         self.cache_size = cache_size
 
-        self._labels = _Labels()
         self._object_set = _ObjectSet()
-
-        self._inserter = _Inserter(
-            self.eps, self.min_pts, self._labels, self._object_set)
-        self._deleter = _Deleter(
-            self.eps, self.min_pts, self._labels, self._object_set)
+        self._inserter = _Inserter(self.eps, self.min_pts, self._object_set)
+        self._deleter = _Deleter(self.eps, self.min_pts, self._object_set)
 
     def insert(self, X):
         """Insert objects into the object set, then update clustering.
@@ -73,7 +68,7 @@ class IncrementalDBSCAN:
         self
 
         """
-        X = _input_check(X)
+        X = input_check(X)
 
         for value in X:
             self._inserter.insert(value)
@@ -93,7 +88,7 @@ class IncrementalDBSCAN:
         self
 
         """
-        X = _input_check(X)
+        X = input_check(X)
 
         for ix, value in enumerate(X):
             obj = self._object_set.get_object(value)
@@ -127,13 +122,13 @@ class IncrementalDBSCAN:
                  object set.
 
         """
-        X = _input_check(X)
+        X = input_check(X)
 
         labels = np.zeros(len(X))
 
         for ix, value in enumerate(X):
             obj = self._object_set.get_object(value)
-            label = self._labels.get_label(obj) if obj else np.nan
+            label = obj.label if obj else np.nan
             labels[ix] = label
 
             if np.isnan(label):
@@ -151,13 +146,7 @@ class IncrementalDBSCANWarning(Warning):
     pass
 
 
-def _input_check(X):
-    return check_array(X, dtype=float, accept_large_sparse=False)
-
-
 # TODO remove networkx dependency
-
-# TODO think about label deletion... should be based.
 
 # TODO metrics in arguments
 # TODO: initial fitting
