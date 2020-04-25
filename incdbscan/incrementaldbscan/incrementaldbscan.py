@@ -5,7 +5,7 @@ from sklearn.utils.validation import check_array
 
 from ._deleter import _Deleter
 from ._inserter import _Inserter
-from ._labels import _Labels, CLUSTER_LABEL_UNKNOWN_OBJECT
+from ._labels import _Labels
 from ._objectset import _ObjectSet
 
 
@@ -123,8 +123,8 @@ class IncrementalDBSCAN:
         -------
         labels : ndarray of shape (n_samples,)
                  Cluster labels. Effective labels start from 0. -1 means the
-                 object was found to be noise. -2 means the object was not in
-                 the object set.
+                 object is noise. numpy.nan means the object was not in the
+                 object set.
 
         """
         X = _input_check(X)
@@ -132,11 +132,11 @@ class IncrementalDBSCAN:
         labels = np.zeros(len(X))
 
         for ix, value in enumerate(X):
-
-            label = self._labels.get_label_for_value(value)
+            obj = self._object_set.get_object(value)
+            label = self._labels.get_label(obj) if obj else np.nan
             labels[ix] = label
 
-            if label == CLUSTER_LABEL_UNKNOWN_OBJECT:
+            if np.isnan(label):
                 warnings.warn(
                     IncrementalDBSCANWarning(
                         f'No label was retrieved for object at position {ix} '

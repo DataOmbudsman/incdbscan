@@ -3,7 +3,6 @@ from typing import Iterable
 import numpy as np
 import pytest
 
-CLUSTER_LABEL_UNKNOWN_OBJECT = -2
 CLUSTER_LABEL_NOISE = -1
 CLUSTER_LABEL_FIRST_CLUSTER = 0
 

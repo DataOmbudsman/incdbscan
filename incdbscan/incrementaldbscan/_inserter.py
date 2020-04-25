@@ -92,7 +92,6 @@ class _Inserter:
         self._set_cluster_label_to_that_of_new_core_neighbor(
             neighbors_of_new_core_neighbors
         )
-
         return
 
     def _filter_core_objects_split_by_novelty(self, objects):

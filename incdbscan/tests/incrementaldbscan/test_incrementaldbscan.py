@@ -3,7 +3,6 @@ import numpy as np
 from incdbscan import IncrementalDBSCANWarning
 from utils import (
     CLUSTER_LABEL_NOISE,
-    CLUSTER_LABEL_UNKNOWN_OBJECT,
     delete_object_and_assert_error,
     delete_object_and_assert_no_warning,
     delete_object_and_assert_warning,
@@ -92,15 +91,13 @@ def test_warning_when_cluster_label_is_gotten_for_unknown_object(
         point_at_origin,
         object_far_away):
 
-    expected_label_for_unknown = np.array([CLUSTER_LABEL_UNKNOWN_OBJECT])
-
     label = get_label_and_assert_warning(
         incdbscan3, point_at_origin, IncrementalDBSCANWarning)
-    assert label == expected_label_for_unknown
+    assert np.isnan(label)
 
     incdbscan3.insert(point_at_origin)
     incdbscan3.delete(point_at_origin)
 
     label = get_label_and_assert_warning(
         incdbscan3, point_at_origin, IncrementalDBSCANWarning)
-    assert label == expected_label_for_unknown
+    assert np.isnan(label)
