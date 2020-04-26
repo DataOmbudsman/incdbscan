@@ -146,8 +146,6 @@ class IncrementalDBSCANWarning(Warning):
     pass
 
 
-# TODO remove networkx dependency
-
 # TODO metrics in arguments
 # TODO: initial fitting
 
@@ -163,6 +161,7 @@ class IncrementalDBSCANWarning(Warning):
 
 # Performance related
 # TODO validate purpose of cache
+# TODO storing neighbors
 # TODO indexing: use KDTree for initial tree building
 # TODO indexing: cKDTree
 # TODO readme: performance

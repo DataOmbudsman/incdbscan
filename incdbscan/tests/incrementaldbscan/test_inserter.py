@@ -315,3 +315,22 @@ def test_two_mergers_can_happen_at_the_same_time(
         bridge_point_left,
         {top_left_expected_label, bottom_left_expected_label}
     )
+
+
+def test_object_is_core_if_it_has_more_than_enough_neighors(
+        incdbscan3,
+        point_at_origin):
+
+    neigbors = np.array([
+        [0, EPS],
+        [0, -EPS],
+        [EPS, 0],
+        [-EPS, 0],
+    ])
+    expected_label = CLUSTER_LABEL_FIRST_CLUSTER
+
+    incdbscan3.insert(neigbors)
+    incdbscan3.insert(point_at_origin)
+
+    assert_cluster_labels(incdbscan3, neigbors, expected_label)
+    assert_cluster_labels(incdbscan3, point_at_origin, expected_label)

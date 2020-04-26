@@ -15,10 +15,10 @@ class _Inserter:
 
         neighbors = self.object_set.get_neighbors(object_inserted, self.eps)
         self.object_set.update_neighbor_counts_after_insertion(
-            object_inserted, neighbors)
+            neighbors, object_inserted)
 
         new_core_neighbors, old_core_neighbors = \
-            self._filter_core_objects_split_by_novelty(neighbors)
+            self._separate_core_objects_by_novelty(neighbors, object_inserted)
 
         if not new_core_neighbors:
             print('\nnot new_core_neighbors')  # TODO
@@ -90,7 +90,7 @@ class _Inserter:
         )
         return
 
-    def _filter_core_objects_split_by_novelty(self, objects):
+    def _separate_core_objects_by_novelty(self, objects, object_inserted):
         new_cores = set()
         old_cores = set()
 
@@ -99,6 +99,10 @@ class _Inserter:
                 new_cores.add(obj)
             elif obj.neighbor_count > self.min_pts:
                 old_cores.add(obj)
+
+        if object_inserted in old_cores:
+            old_cores.remove(object_inserted)
+            new_cores.add(object_inserted)
 
         return new_cores, old_cores
 

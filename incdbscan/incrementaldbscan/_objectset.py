@@ -50,8 +50,8 @@ class _ObjectSet:
 
     @staticmethod
     def update_neighbor_counts_after_insertion(
-            inserted,
-            neighbors_of_inserted):
+            neighbors_of_inserted,
+            inserted):
 
         total_count = 0
 
