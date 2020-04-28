@@ -154,7 +154,6 @@ class IncrementalDBSCANWarning(Warning):
 # TODO remove prints
 
 # UX related
-# TODO readme: intro
 # TODO readme: API usage
 # TODO gif example
 # TODO notebook: example
