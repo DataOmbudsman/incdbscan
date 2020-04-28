@@ -12,7 +12,6 @@ class _Deleter:
         self.object_set = object_set
 
     def delete(self, object_to_delete):
-        print('\nDeleting', object_to_delete.value)
         self.object_set.delete_object(object_to_delete)
         object_deleted = object_to_delete
 
@@ -29,8 +28,6 @@ class _Deleter:
             self._separate_neighbors_by_core_property(neighbors_of_ex_cores)
 
         if update_seeds:
-            print('\nupdate_seeds', update_seeds)  # TODO
-
             # Only for update seeds belonging to the same cluster do we
             # have to consider if split is needed.
 

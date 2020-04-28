@@ -33,11 +33,6 @@ class IncrementalDBSCAN:
         The minimum number of neighbors that an object needs to have to be a
         core object of a cluster.
 
-    cache_size : int, default=256
-        Size of cache for caching neighbor retrieval within an update. The
-        larger the value, the faster the calculation is, at the expense of
-        memory need.
-
     References
     ----------
     Ester et al. 1998. Incremental Clustering for Mining in a Data Warehousing
@@ -46,10 +41,9 @@ class IncrementalDBSCAN:
 
     """
 
-    def __init__(self, eps=0.5, min_pts=5, cache_size=256):
+    def __init__(self, eps=0.5, min_pts=5):
         self.eps = eps
         self.min_pts = min_pts
-        self.cache_size = cache_size
 
         self._object_set = _ObjectSet()
         self._inserter = _Inserter(self.eps, self.min_pts, self._object_set)
@@ -151,7 +145,6 @@ class IncrementalDBSCANWarning(Warning):
 
 # ALGO related
 # TODO functional tests
-# TODO remove prints
 
 # UX related
 # TODO readme: API usage
@@ -159,10 +152,8 @@ class IncrementalDBSCANWarning(Warning):
 # TODO notebook: example
 
 # Performance related
-# TODO validate purpose of cache
 # TODO storing neighbors
 # TODO indexing: use KDTree for initial tree building
-# TODO indexing: cKDTree
 # TODO readme: performance
 
 # Packaging related

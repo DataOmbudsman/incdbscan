@@ -10,7 +10,6 @@ class _Inserter:
         self.object_set = object_set
 
     def insert(self, object_value):
-        print('\nInserting', object_value)  # TODO
         object_inserted = self.object_set.insert_object(object_value)
 
         neighbors = self.object_set.get_neighbors(object_inserted, self.eps)
@@ -21,12 +20,10 @@ class _Inserter:
             self._separate_core_objects_by_novelty(neighbors, object_inserted)
 
         if not new_core_neighbors:
-            print('\nnot new_core_neighbors')  # TODO
             # If there is no new core object, only the new object has to be
             # put in a cluster.
 
             if old_core_neighbors:
-                print('old_core_neighbors')
                 # If there are already core objects near to the new object,
                 # the new object is put in the most recent cluster. This is
                 # similar to case "Absorption" in the paper but not defined
@@ -36,7 +33,6 @@ class _Inserter:
                     [obj.label for obj in old_core_neighbors])
 
             else:
-                print('not old_core_neighbors')
                 # If the new object does not have any core neighbors,
                 # it becomes a noise. Called case "Noise" in the paper.
 
@@ -45,7 +41,6 @@ class _Inserter:
             object_inserted.label = label_of_new_object
             return
 
-        print('\nnew_core_neighbors')  # TODO
         neighbors_of_new_core_neighbors = \
             self.object_set.get_neighbors_of_objects(
                 new_core_neighbors, self.eps)
@@ -60,7 +55,6 @@ class _Inserter:
                 self._get_effective_cluster_labels_of_objects(component)
 
             if not effective_cluster_labels:
-                print('not effective_cluster_labels')  # TODO
                 # If in a connected component of update seeds there are only
                 # previously unclassified and noise objects, a new cluster is
                 # created. Corresponds to case "Creation" in the paper.
@@ -69,7 +63,6 @@ class _Inserter:
                 self.object_set.set_labels(component, next_cluster_label)
 
             else:
-                print('real_cluster_labels')  # TODO
                 # If in a connected component of updates seeds there are
                 # already clustered objects, all objects in the component
                 # will be merged into the most recent cluster.
