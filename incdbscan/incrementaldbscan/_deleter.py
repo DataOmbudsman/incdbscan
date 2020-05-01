@@ -6,26 +6,20 @@ from ._object import CLUSTER_LABEL_NOISE
 
 
 class _Deleter:
-    def __init__(self, eps, min_pts, object_set):
+    def __init__(self, eps, min_pts, objects):
         self.eps = eps
         self.min_pts = min_pts
-        self.object_set = object_set
+        self.objects = objects
 
     def delete(self, object_to_delete):
-        self.object_set.delete_object(object_to_delete)
+        self.objects.delete_object(object_to_delete)
         object_deleted = object_to_delete
 
-        neighbors = self.object_set.get_neighbors(object_deleted, self.eps)
-        self.object_set.update_neighbor_counts_after_deletion(neighbors)
-
-        ex_cores = self._get_objects_that_lost_core_property(
-            neighbors, object_deleted)
-
-        neighbors_of_ex_cores = \
-            self.object_set.get_neighbors_of_objects(ex_cores, self.eps)
+        ex_cores = self._get_objects_that_lost_core_property(object_deleted)
 
         update_seeds, non_core_neighbors_of_ex_cores = \
-            self._separate_neighbors_by_core_property(neighbors_of_ex_cores)
+            self._get_update_seeds_and_non_core_neighbors_of_ex_cores(
+                ex_cores, object_deleted)
 
         if update_seeds:
             # Only for update seeds belonging to the same cluster do we
@@ -35,12 +29,12 @@ class _Deleter:
                 self._group_objects_by_cluster(update_seeds)
 
             for seeds in update_seeds_by_cluster.values():
-                components = self._find_components_to_split_away(
-                    seeds, non_core_neighbors_of_ex_cores)
+                components = list(self._find_components_to_split_away(
+                    seeds, non_core_neighbors_of_ex_cores))
 
                 for component in components:
-                    self.object_set.set_labels(
-                        component, self.object_set.get_next_cluster_label())
+                    self.objects.set_labels(
+                        component, self.objects.get_next_cluster_label())
 
         # Updating labels of border objects that were in the neighborhood
         # of objects that lost their core property is always needed. They
@@ -49,12 +43,8 @@ class _Deleter:
         self._set_each_border_object_labels_to_largest_around(
             non_core_neighbors_of_ex_cores)
 
-    def _get_objects_that_lost_core_property(
-            self,
-            neighbors,
-            object_deleted):
-
-        ex_core_neighbors = [obj for obj in neighbors
+    def _get_objects_that_lost_core_property(self, object_deleted):
+        ex_core_neighbors = [obj for obj in object_deleted.neighbors
                              if obj.neighbor_count == self.min_pts - 1]
 
         # The result has to contain the deleted object if it was core
@@ -67,18 +57,23 @@ class _Deleter:
     def _is_core(self, obj):
         return obj.neighbor_count >= self.min_pts
 
-    def _separate_neighbors_by_core_property(self, neighbors_of_ex_cores):
-        core_objects = set()
-        non_core_objects = set()
+    def _get_update_seeds_and_non_core_neighbors_of_ex_cores(
+            self,
+            ex_cores,
+            object_deleted):
 
-        for neighbors in neighbors_of_ex_cores.values():
-            for neighbor in neighbors:
+        update_seeds = set()
+        non_core_neighbors_of_ex_cores = set()
+
+        for ex_core in ex_cores:
+            for neighbor in ex_core.neighbors:
                 if self._is_core(neighbor):
-                    core_objects.add(neighbor)
+                    update_seeds.add(neighbor)
                 else:
-                    non_core_objects.add(neighbor)
+                    non_core_neighbors_of_ex_cores.add(neighbor)
 
-        return core_objects, non_core_objects
+        update_seeds = update_seeds.difference({object_deleted})
+        return update_seeds, non_core_neighbors_of_ex_cores
 
     def _group_objects_by_cluster(self, objects):
         objects_with_cluster_labels = [(obj, obj.label) for obj in objects]
@@ -111,9 +106,8 @@ class _Deleter:
 
         def _expand_graph(obj, seed_id):
             nodes = set(G.nodes)
-            neighbors = self.object_set.get_neighbors(obj, self.eps)
 
-            for neighbor in neighbors:
+            for neighbor in obj.neighbors:
                 if neighbor not in objects_to_exclude_from_components:
                     G.add_edge(obj, neighbor)
                 if neighbor not in nodes and self._is_core(neighbor):
@@ -139,16 +133,12 @@ class _Deleter:
 
     def _objects_are_neighbors_of_each_other(self, objects):
         for obj1 in objects:
-            neighbors = self.object_set.get_neighbors(obj1, self.eps)
             for obj2 in objects:
-                if obj2 not in neighbors:
+                if obj2 not in obj1.neighbors:
                     return False
         return True
 
-    def _set_each_border_object_labels_to_largest_around(
-            self,
-            objects_to_set):
-
+    def _set_each_border_object_labels_to_largest_around(self, objects_to_set):
         cluster_updates = {}
 
         for obj in objects_to_set:
@@ -162,10 +152,5 @@ class _Deleter:
             obj.label = new_cluster_label
 
     def _get_cluster_labels_in_neighborhood(self, obj):
-        labels = set()
-
-        for neighbor in self.object_set.get_neighbors(obj, self.eps):
-            if self._is_core(neighbor):
-                labels.add(neighbor.label)
-
-        return labels
+        return set([neighbor.label for neighbor in obj.neighbors
+                    if self._is_core(neighbor)])

@@ -13,4 +13,8 @@ class _Object:
 
         self.count = 1
         self.label: ClusterLabel = CLUSTER_LABEL_UNCLASSIFIED
-        self.neighbor_count = 0
+        self.neighbors = set([self])
+
+    @property
+    def neighbor_count(self):
+        return sum([neighbor.count for neighbor in self.neighbors])

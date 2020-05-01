@@ -45,6 +45,8 @@ def test_deleting_cores_only_makes_borders_noise(incdbscan4, point_at_origin):
     incdbscan4.insert(border)
     incdbscan4.delete(point_to_delete)
 
+    print(incdbscan4.get_cluster_labels(border))
+
     assert_cluster_labels(incdbscan4, border, CLUSTER_LABEL_NOISE)
 
 

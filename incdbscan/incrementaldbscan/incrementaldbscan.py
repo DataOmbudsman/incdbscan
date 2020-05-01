@@ -4,7 +4,7 @@ import numpy as np
 
 from ._deleter import _Deleter
 from ._inserter import _Inserter
-from ._objectset import _ObjectSet
+from ._objects import _Objects
 from ._utils import input_check
 
 
@@ -45,9 +45,9 @@ class IncrementalDBSCAN:
         self.eps = eps
         self.min_pts = min_pts
 
-        self._object_set = _ObjectSet()
-        self._inserter = _Inserter(self.eps, self.min_pts, self._object_set)
-        self._deleter = _Deleter(self.eps, self.min_pts, self._object_set)
+        self._objects = _Objects(self.eps)
+        self._inserter = _Inserter(self.eps, self.min_pts, self._objects)
+        self._deleter = _Deleter(self.eps, self.min_pts, self._objects)
 
     def insert(self, X):
         """Insert objects into the object set, then update clustering.
@@ -85,7 +85,7 @@ class IncrementalDBSCAN:
         X = input_check(X)
 
         for ix, value in enumerate(X):
-            obj = self._object_set.get_object(value)
+            obj = self._objects.get_object(value)
 
             if obj:
                 self._deleter.delete(obj)
@@ -121,7 +121,7 @@ class IncrementalDBSCAN:
         labels = np.zeros(len(X))
 
         for ix, value in enumerate(X):
-            obj = self._object_set.get_object(value)
+            obj = self._objects.get_object(value)
             label = obj.label if obj else np.nan
             labels[ix] = label
 
@@ -151,8 +151,7 @@ class IncrementalDBSCANWarning(Warning):
 # TODO gif example
 # TODO notebook: example
 
-# Performance related
-# TODO storing neighbors
+# Performance relatedgit
 # TODO indexing: use KDTree for initial tree building
 # TODO readme: performance
 

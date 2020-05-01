@@ -4,20 +4,16 @@ from ._object import CLUSTER_LABEL_NOISE, CLUSTER_LABEL_UNCLASSIFIED
 
 
 class _Inserter:
-    def __init__(self, eps, min_pts, object_set):
+    def __init__(self, eps, min_pts, objects):
         self.eps = eps
         self.min_pts = min_pts
-        self.object_set = object_set
+        self.objects = objects
 
     def insert(self, object_value):
-        object_inserted = self.object_set.insert_object(object_value)
-
-        neighbors = self.object_set.get_neighbors(object_inserted, self.eps)
-        self.object_set.update_neighbor_counts_after_insertion(
-            neighbors, object_inserted)
+        object_inserted = self.objects.insert_object(object_value)
 
         new_core_neighbors, old_core_neighbors = \
-            self._separate_core_objects_by_novelty(neighbors, object_inserted)
+            self._separate_core_neighbors_by_novelty(object_inserted)
 
         if not new_core_neighbors:
             # If there is no new core object, only the new object has to be
@@ -41,11 +37,7 @@ class _Inserter:
             object_inserted.label = label_of_new_object
             return
 
-        neighbors_of_new_core_neighbors = \
-            self.object_set.get_neighbors_of_objects(
-                new_core_neighbors, self.eps)
-
-        update_seeds = self._get_update_seeds(neighbors_of_new_core_neighbors)
+        update_seeds = self._get_update_seeds(new_core_neighbors)
 
         connected_components_in_update_seeds = \
             self._get_connected_components(update_seeds)
@@ -59,8 +51,8 @@ class _Inserter:
                 # previously unclassified and noise objects, a new cluster is
                 # created. Corresponds to case "Creation" in the paper.
 
-                next_cluster_label = self.object_set.get_next_cluster_label()
-                self.object_set.set_labels(component, next_cluster_label)
+                next_cluster_label = self.objects.get_next_cluster_label()
+                self.objects.set_labels(component, next_cluster_label)
 
             else:
                 # If in a connected component of updates seeds there are
@@ -69,29 +61,28 @@ class _Inserter:
                 # Corresponds to cases "Absorption" and "Merge" in the paper.
 
                 max_label = max(effective_cluster_labels)
-                self.object_set.set_labels(component, max_label)
+                self.objects.set_labels(component, max_label)
 
                 for label in effective_cluster_labels:
-                    self.object_set.change_labels(label, max_label)
+                    self.objects.change_labels(label, max_label)
 
         # Finally all neighbors of each new core object inherits a label from
         # its new core neighbor, thereby affecting border and noise objects,
         # and the object being inserted.
 
-        self._set_cluster_label_to_that_of_new_core_neighbor(
-            neighbors_of_new_core_neighbors
-        )
-        return
+        self._set_cluster_label_around_new_core_neighbors(new_core_neighbors)
 
-    def _separate_core_objects_by_novelty(self, objects, object_inserted):
+    def _separate_core_neighbors_by_novelty(self, object_inserted):
         new_cores = set()
         old_cores = set()
 
-        for obj in objects:
+        for obj in object_inserted.neighbors:
             if obj.neighbor_count == self.min_pts:
                 new_cores.add(obj)
             elif obj.neighbor_count > self.min_pts:
                 old_cores.add(obj)
+
+        # If the inserted object is core, it is a new core
 
         if object_inserted in old_cores:
             old_cores.remove(object_inserted)
@@ -99,11 +90,11 @@ class _Inserter:
 
         return new_cores, old_cores
 
-    def _get_update_seeds(self, neighbors_of_new_core_neighbors):
+    def _get_update_seeds(self, new_core_neighbors):
         seeds = set()
 
-        for neighbors in neighbors_of_new_core_neighbors.values():
-            core_neighbors = [obj for obj in neighbors
+        for new_core_neighbor in new_core_neighbors:
+            core_neighbors = [obj for obj in new_core_neighbor.neighbors
                               if obj.neighbor_count >= self.min_pts]
             seeds.update(core_neighbors)
 
@@ -116,9 +107,7 @@ class _Inserter:
         G = nx.Graph()
 
         for obj in objects:
-            neighbors = self.object_set.get_neighbors(obj, self.eps)
-
-            for neighbor in neighbors:
+            for neighbor in obj.neighbors:
                 if neighbor in objects:
                     G.add_edge(obj, neighbor)
 
@@ -138,9 +127,6 @@ class _Inserter:
 
         return effective_cluster_labels
 
-    def _set_cluster_label_to_that_of_new_core_neighbor(
-            self,
-            neighbors_of_new_core_neighbors):
-
-        for new_core, neighbors in neighbors_of_new_core_neighbors.items():
-            self.object_set.set_labels(neighbors, new_core.label)
+    def _set_cluster_label_around_new_core_neighbors(self, new_core_neighbors):
+        for obj in new_core_neighbors:
+            self.objects.set_labels(obj.neighbors, obj.label)
