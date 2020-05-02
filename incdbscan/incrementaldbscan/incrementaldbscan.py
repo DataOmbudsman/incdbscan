@@ -152,7 +152,6 @@ class IncrementalDBSCANWarning(Warning):
 # TODO notebook: example
 
 # Performance relatedgit
-# TODO indexing: use KDTree for initial tree building
 # TODO readme: performance
 
 # Packaging related

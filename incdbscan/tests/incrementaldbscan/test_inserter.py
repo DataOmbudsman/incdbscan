@@ -41,6 +41,9 @@ def test_new_border_object_gets_label_from_core(incdbscan4):
     incdbscan4.insert(cluster)
     incdbscan4.insert(new_border_object)
 
+    print(incdbscan4.get_cluster_labels(cluster[[0]]))
+    print(incdbscan4.get_cluster_labels(new_border_object))
+
     assert_two_objects_are_in_same_cluster(
         incdbscan4, cluster[[0]], new_border_object)
 
