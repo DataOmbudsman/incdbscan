@@ -30,8 +30,8 @@ def test_error_when_input_is_non_numeric(incdbscan3):
 
 
 def test_handling_of_same_object_with_different_dtype(incdbscan3):
-    object_as_int = np.array([[1, 2, 3]])
-    object_as_float = np.array([[1., 2., 3.]])
+    object_as_int = np.array([[1, 2]])
+    object_as_float = np.array([[1., 2.]])
 
     incdbscan3.insert(object_as_int)
 
@@ -39,6 +39,24 @@ def test_handling_of_same_object_with_different_dtype(incdbscan3):
         incdbscan3.get_cluster_labels(object_as_float)
 
     delete_object_and_assert_no_warning(incdbscan3, object_as_float)
+
+
+def test_handling_of_more_than_2d_arrays(incdbscan3, incdbscan4):
+    object_3d = np.array([[1, 2, 3]])
+    object_100d = np.random.random(100).reshape(1, -1)
+
+    incdbscan3.insert(object_3d)
+    incdbscan3.insert(object_3d)
+    incdbscan3.delete(object_3d)
+
+    assert incdbscan3.get_cluster_labels(object_3d) == CLUSTER_LABEL_NOISE
+
+    incdbscan3.delete(object_3d)
+    incdbscan3.insert(object_100d)
+    incdbscan3.insert(object_100d)
+    incdbscan3.delete(object_100d)
+
+    assert incdbscan3.get_cluster_labels(object_100d) == CLUSTER_LABEL_NOISE
 
 
 def test_no_warning_when_a_known_object_is_deleted(
