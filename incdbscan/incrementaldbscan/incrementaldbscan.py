@@ -152,6 +152,8 @@ class IncrementalDBSCANWarning(Warning):
 # TODO notebook: example
 
 # Performance relatedgit
+# fit searcher javítás? még 1 próba array összeállítással
+# labels object: 17%os csoportos label change performancia
 # TODO readme: performance
 
 # Packaging related
