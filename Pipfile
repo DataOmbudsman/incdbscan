@@ -13,7 +13,7 @@ pytest = "*"
 numpy = "*"
 sklearn = "*"
 networkx = "*"
-joblib = "*"
+xxhash = "*"
 
 [requires]
 python_version = "3.7"

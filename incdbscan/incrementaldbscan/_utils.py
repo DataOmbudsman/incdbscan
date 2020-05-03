@@ -1,9 +1,9 @@
-import joblib
 from sklearn.utils.validation import check_array
+import xxhash
 
 
 def hash_(array):
-    return joblib.hash(array)
+    return xxhash.xxh32(array.tobytes()).hexdigest()
 
 
 def input_check(X):
