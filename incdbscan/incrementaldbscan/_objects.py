@@ -40,6 +40,18 @@ class _Objects:
         self._update_neighbors_during_insertion(new_object)
         return new_object
 
+    def _fit_neighbor_searcher(self):
+        values = list()
+        ids = list()
+
+        for obj in self.objects.values():
+            values.append(obj.value)
+            ids.append(obj.id)
+
+        self._values = np.array(values)
+        self._ids = np.array(ids)
+        self._neighbor_searcher = self._neighbor_searcher.fit(self._values)
+
     def _update_neighbors_during_insertion(self, object_inserted):
         neighbors = self._get_neighbors(object_inserted)
         for obj in neighbors:
@@ -57,31 +69,15 @@ class _Objects:
 
     def delete_object(self, obj):
         obj.count -= 1
-
         if obj.count == 0:
             del self.objects[obj.id]
             self._update_neighbors_during_deletion(obj)
-
-            if len(self.objects) > 0:
-                self._fit_neighbor_searcher()
 
     def _update_neighbors_during_deletion(self, object_deleted):
         effective_neighbors = \
             object_deleted.neighbors.difference(set([object_deleted]))
         for neighbor in effective_neighbors:
             neighbor.neighbors.remove(object_deleted)
-
-    def _fit_neighbor_searcher(self):
-        values = list()
-        ids = list()
-
-        for obj in self.objects.values():
-            values.append(obj.value)
-            ids.append(obj.id)
-
-        self._values = np.array(values)
-        self._ids = np.array(ids)
-        self._neighbor_searcher = self._neighbor_searcher.fit(self._values)
 
     @staticmethod
     def set_labels(objects, label):
