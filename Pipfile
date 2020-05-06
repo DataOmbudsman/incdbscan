@@ -11,9 +11,9 @@ pytest = "*"
 
 [packages]
 numpy = "*"
-sklearn = "*"
 networkx = "*"
 xxhash = "*"
+sklearn = "*"
 
 [requires]
 python_version = "3.7"

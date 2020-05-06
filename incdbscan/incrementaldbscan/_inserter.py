@@ -9,6 +9,7 @@ class _Inserter:
         self.min_pts = min_pts
         self.objects = objects
 
+    # @profile
     def insert(self, object_value):
         object_inserted = self.objects.insert_object(object_value)
 
@@ -25,8 +26,9 @@ class _Inserter:
                 # similar to case "Absorption" in the paper but not defined
                 # there.
 
-                label_of_new_object = max(
-                    [obj.label for obj in old_core_neighbors])
+                label_of_new_object = max([
+                    self.objects.get_label(obj) for obj in old_core_neighbors
+                ])
 
             else:
                 # If the new object does not have any core neighbors,
@@ -34,7 +36,7 @@ class _Inserter:
 
                 label_of_new_object = CLUSTER_LABEL_NOISE
 
-            object_inserted.label = label_of_new_object
+            self.objects.set_label(object_inserted, label_of_new_object)
             return
 
         update_seeds = self._get_update_seeds(new_core_neighbors)
@@ -121,7 +123,7 @@ class _Inserter:
         effective_cluster_labels = set()
 
         for obj in objects:
-            label = obj.label
+            label = self.objects.get_label(obj)
             if label not in non_effective_cluster_labels:
                 effective_cluster_labels.add(label)
 
@@ -129,4 +131,5 @@ class _Inserter:
 
     def _set_cluster_label_around_new_core_neighbors(self, new_core_neighbors):
         for obj in new_core_neighbors:
-            self.objects.set_labels(obj.neighbors, obj.label)
+            label = self.objects.get_label(obj)
+            self.objects.set_labels(obj.neighbors, label)

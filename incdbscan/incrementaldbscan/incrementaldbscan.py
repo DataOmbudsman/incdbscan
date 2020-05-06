@@ -122,7 +122,7 @@ class IncrementalDBSCAN:
 
         for ix, value in enumerate(X):
             obj = self._objects.get_object(value)
-            label = obj.label if obj else np.nan
+            label = self._objects.get_label(obj) if obj else np.nan
             labels[ix] = label
 
             if np.isnan(label):
@@ -153,7 +153,7 @@ class IncrementalDBSCANWarning(Warning):
 
 # Performance relatedgit
 # fit searcher javítás? még 1 próba array összeállítással
-# labels object: 17%os csoportos label change performancia
+# labels object: with reverse dict
 # TODO readme: performance
 
 # Packaging related

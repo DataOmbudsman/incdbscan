@@ -76,7 +76,9 @@ class _Deleter:
         return update_seeds, non_core_neighbors_of_ex_cores
 
     def _group_objects_by_cluster(self, objects):
-        objects_with_cluster_labels = [(obj, obj.label) for obj in objects]
+        objects_with_cluster_labels = [(obj, self.objects.get_label(obj))
+                                       for obj in objects]
+
         grouped_objects = defaultdict(list)
 
         for obj, label in objects_with_cluster_labels:
@@ -149,8 +151,9 @@ class _Deleter:
             cluster_updates[obj] = max(labels)
 
         for obj, new_cluster_label in cluster_updates.items():
-            obj.label = new_cluster_label
+            self.objects.set_label(obj, new_cluster_label)
 
     def _get_cluster_labels_in_neighborhood(self, obj):
-        return set([neighbor.label for neighbor in obj.neighbors
+        return set([self.objects.get_label(neighbor)
+                    for neighbor in obj.neighbors
                     if self._is_core(neighbor)])

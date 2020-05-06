@@ -79,16 +79,23 @@ class _Objects:
         for neighbor in effective_neighbors:
             neighbor.neighbors.remove(object_deleted)
 
-    @staticmethod
-    def set_labels(objects, label):
+    # @staticmethod
+    def get_label(self, obj):
+        return obj.label
+
+    # @staticmethod
+    def set_label(self, obj, label):
+        obj.label = label
+
+    def set_labels(self, objects, label):
         for obj in objects:
-            obj.label = label
+            self.set_label(obj, label)
 
     def get_next_cluster_label(self):
-        labels = [obj.label for obj in self.objects.values()]
+        labels = [self.get_label(obj) for obj in self.objects.values()]
         return max(labels) + 1
 
     def change_labels(self, change_from, change_to):
         for obj in self.objects.values():
-            if obj.label == change_from:
-                obj.label = change_to
+            if self.get_label(obj) == change_from:
+                self.set_label(obj, change_to)

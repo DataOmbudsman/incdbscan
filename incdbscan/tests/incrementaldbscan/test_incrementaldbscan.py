@@ -41,7 +41,7 @@ def test_handling_of_same_object_with_different_dtype(incdbscan3):
     delete_object_and_assert_no_warning(incdbscan3, object_as_float)
 
 
-def test_handling_of_more_than_2d_arrays(incdbscan3, incdbscan4):
+def test_handling_of_more_than_2d_arrays(incdbscan3):
     object_3d = np.array([[1, 2, 3]])
     object_100d = np.random.random(100).reshape(1, -1)
 
