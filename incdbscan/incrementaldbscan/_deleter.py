@@ -72,7 +72,11 @@ class _Deleter:
                 else:
                     non_core_neighbors_of_ex_cores.add(neighbor)
 
-        update_seeds = update_seeds.difference({object_deleted})
+        if object_deleted.count == 0:
+            update_seeds = update_seeds.difference({object_deleted})
+            non_core_neighbors_of_ex_cores = \
+                non_core_neighbors_of_ex_cores.difference({object_deleted})
+
         return update_seeds, non_core_neighbors_of_ex_cores
 
     def _group_objects_by_cluster(self, objects):
