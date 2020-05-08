@@ -153,7 +153,6 @@ class IncrementalDBSCANWarning(Warning):
 
 # Performance relatedgit
 # fit searcher javítás? még 1 próba array összeállítással
-# labels object: with reverse dict
 # TODO readme: performance
 
 # Packaging related

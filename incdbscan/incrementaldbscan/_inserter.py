@@ -1,6 +1,6 @@
 import networkx as nx
 
-from ._object import CLUSTER_LABEL_NOISE, CLUSTER_LABEL_UNCLASSIFIED
+from ._labels import CLUSTER_LABEL_NOISE, CLUSTER_LABEL_UNCLASSIFIED
 
 
 class _Inserter:

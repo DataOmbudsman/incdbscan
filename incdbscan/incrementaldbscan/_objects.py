@@ -1,14 +1,10 @@
-from collections import defaultdict
 from typing import Dict
 
 import numpy as np
 from sklearn.neighbors import NearestNeighbors
 
-from ._object import (
-    CLUSTER_LABEL_UNCLASSIFIED,
-    _Object,
-    ObjectId
-)
+from ._labels import LabelHandler
+from ._object import _Object, ObjectId
 from ._utils import hash_
 
 
@@ -16,8 +12,9 @@ def euclidean_distance(x, y):
     return np.linalg.norm(x - y)
 
 
-class _Objects:
+class _Objects(LabelHandler):
     def __init__(self, eps, distance=euclidean_distance):
+        super().__init__()
         self.eps = eps
         self.distance = distance
         self.objects: Dict[ObjectId, _Object] = dict()
@@ -26,7 +23,6 @@ class _Objects:
             NearestNeighbors(radius=eps, metric='euclidean')
         self._values = None
         self._ids = None
-        self._label_to_objects = defaultdict(set)
 
     def get_object(self, value):
         id_ = hash_(value)
@@ -41,8 +37,9 @@ class _Objects:
             return obj
 
         new_object = _Object(value, id_)
-        self._label_to_objects[CLUSTER_LABEL_UNCLASSIFIED].add(new_object)
         self.objects[id_] = new_object
+        self.set_label_of_inserted_object(new_object)
+
         self._fit_neighbor_searcher()
         self._update_neighbors_during_insertion(new_object)
         return new_object
@@ -79,42 +76,10 @@ class _Objects:
         if obj.count == 0:
             del self.objects[obj.id]
             self._update_neighbors_during_deletion(obj)
-            label = self.get_label(obj)
-            self._label_to_objects[label].remove(obj)
+            self.delete_label_of_deleted_object(obj)
 
     def _update_neighbors_during_deletion(self, object_deleted):
         effective_neighbors = \
             object_deleted.neighbors.difference(set([object_deleted]))
         for neighbor in effective_neighbors:
             neighbor.neighbors.remove(object_deleted)
-
-    # @staticmethod
-    def get_label(self, obj):
-        return obj.label
-
-    # @staticmethod
-    def set_label(self, obj, label):
-        previous_label = obj.label
-        self._label_to_objects[previous_label].remove(obj)
-        self._label_to_objects[label].add(obj)
-        obj.label = label
-
-    def set_labels(self, objects, label):
-        for obj in objects:
-            self.set_label(obj, label)
-
-    def get_next_cluster_label(self):
-        # labels = [self.get_label(obj) for obj in self.objects.values()]
-        # return max(labels) + 1
-        return max(self._label_to_objects.keys()) + 1
-
-    def change_labels(self, change_from, change_to):
-        # for obj in self.objects.values():
-        #     if self.get_label(obj) == change_from:
-        #         self.set_label(obj, change_to)
-
-        affected_objects = self._label_to_objects.pop(change_from)
-        self._label_to_objects[change_to].update(affected_objects)
-
-        for obj in affected_objects:
-            obj.label = change_to
