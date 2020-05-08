@@ -3,7 +3,7 @@ import networkx as nx
 from ._labels import CLUSTER_LABEL_NOISE, CLUSTER_LABEL_UNCLASSIFIED
 
 
-class _Inserter:
+class Inserter:
     def __init__(self, eps, min_pts, objects):
         self.eps = eps
         self.min_pts = min_pts

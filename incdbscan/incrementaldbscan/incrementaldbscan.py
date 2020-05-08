@@ -2,9 +2,9 @@ import warnings
 
 import numpy as np
 
-from ._deleter import _Deleter
-from ._inserter import _Inserter
-from ._objects import _Objects
+from ._deleter import Deleter
+from ._inserter import Inserter
+from ._objects import Objects
 from ._utils import input_check
 
 
@@ -45,9 +45,9 @@ class IncrementalDBSCAN:
         self.eps = eps
         self.min_pts = min_pts
 
-        self._objects = _Objects(self.eps)
-        self._inserter = _Inserter(self.eps, self.min_pts, self._objects)
-        self._deleter = _Deleter(self.eps, self.min_pts, self._objects)
+        self._objects = Objects(self.eps)
+        self._inserter = Inserter(self.eps, self.min_pts, self._objects)
+        self._deleter = Deleter(self.eps, self.min_pts, self._objects)
 
     def insert(self, X):
         """Insert objects into the object set, then update clustering.
@@ -152,7 +152,7 @@ class IncrementalDBSCANWarning(Warning):
 # TODO notebook: example
 
 # Performance relatedgit
-# fit searcher javítás? még 1 próba array összeállítással
+# fit searcher gyorsitas? array összeállítás, numba
 # TODO readme: performance
 
 # Packaging related

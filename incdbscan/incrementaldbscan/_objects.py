@@ -4,7 +4,7 @@ import numpy as np
 from sklearn.neighbors import NearestNeighbors
 
 from ._labels import LabelHandler
-from ._object import _Object, ObjectId
+from ._object import Object, ObjectId
 from ._utils import hash_
 
 
@@ -12,12 +12,12 @@ def euclidean_distance(x, y):
     return np.linalg.norm(x - y)
 
 
-class _Objects(LabelHandler):
+class Objects(LabelHandler):
     def __init__(self, eps, distance=euclidean_distance):
         super().__init__()
         self.eps = eps
         self.distance = distance
-        self.objects: Dict[ObjectId, _Object] = dict()
+        self.objects: Dict[ObjectId, Object] = dict()
 
         self._neighbor_searcher = \
             NearestNeighbors(radius=eps, metric='euclidean')
@@ -36,7 +36,7 @@ class _Objects(LabelHandler):
             obj.count += 1
             return obj
 
-        new_object = _Object(value, id_)
+        new_object = Object(value, id_)
         self.objects[id_] = new_object
         self.set_label_of_inserted_object(new_object)
 

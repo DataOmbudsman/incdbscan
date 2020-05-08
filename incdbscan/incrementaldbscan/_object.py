@@ -1,7 +1,7 @@
 ObjectId = str
 
 
-class _Object:
+class Object:
     def __init__(self, value, id_):
         self.id: ObjectId = id_
         self.value = value
