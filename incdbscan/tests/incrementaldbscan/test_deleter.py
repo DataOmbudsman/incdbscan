@@ -309,7 +309,7 @@ def test_simultaneous_split_and_non_split(
 
 
 def test_two_way_split_with_non_dense_bridge(incdbscan4, point_at_origin):
-    bridge_point = point_at_origin
+    point_to_delete = bridge_point = point_at_origin
 
     points_left = np.array([
         [0, -EPS],
@@ -328,13 +328,13 @@ def test_two_way_split_with_non_dense_bridge(incdbscan4, point_at_origin):
     ])
 
     all_points = np.vstack([
-        bridge_point, bridge_point, points_left, points_right
+        bridge_point, point_to_delete, points_left, points_right
     ])
 
     insert_objects_then_assert_cluster_labels(
         incdbscan4, all_points, CLUSTER_LABEL_FIRST_CLUSTER)
 
-    incdbscan4.delete(bridge_point)
+    incdbscan4.delete(point_to_delete)
 
     assert_split_creates_new_labels_for_new_clusters(
         incdbscan4, [points_left, points_right], CLUSTER_LABEL_FIRST_CLUSTER)
