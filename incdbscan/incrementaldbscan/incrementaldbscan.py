@@ -157,7 +157,6 @@ class IncrementalDBSCANWarning(Warning):
 # TODO functional tests
 
 # UX related
-# TODO readme: API usage
 # TODO gif example
 # TODO notebook: example
 

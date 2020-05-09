@@ -2,7 +2,7 @@
 
 `incdbscan` is an implementation of IncrementalDBSCAN, the incremental version of the DBSCAN clustering algorithm.
 
-IncrementalDBSCAN lets the user update the clustering by inserting or removing data points. The algorithm yields the same result as DBSCAN but more efficiently than reapplying DBSCAN to the modified data set.
+IncrementalDBSCAN lets the user update the clustering by inserting or deleting data points. The algorithm yields the same result as DBSCAN but more efficiently than reapplying DBSCAN to the modified data set.
 
 Thus, IncrementalDBSCAN is ideal to use when the size of the data set to cluster is so large that DBSCAN would be costly, but for the purpose of the application it is enough to update an already existing clustering by inserting or deleting some data points.
 
@@ -26,7 +26,34 @@ TODO
 
 # Usage
 
-TODO: API example.
+The algorithm is implemented in the `IncrementalDBSCAN` class.
+
+There are 3 methods to use:
+- `insert` for inserting data points into the clustering
+- `delete` for deleting data points from the clustering
+- `get_cluster_labels` for retrieving cluster labels
+
+All of the methods take a batch of data points in the form of an array of shape `(n_samples, n_features)` (similar to the `scikit-learn` API).
+
+```python
+from sklearn.datasets import load_iris
+X = load_iris()['data']
+X_1, X_2 = X[:100], X[100:]
+
+from incdbscan import IncrementalDBSCAN
+clusterer = IncrementalDBSCAN(eps=0.5, min_pts=5)
+
+# Insert 1st batch of data points and get their labels
+clusterer.insert(X_1)
+labels_part1 = clusterer.get_cluster_labels(X_1)
+
+# Insert 2nd batch and get labels of all points as a one-liner
+labels_all = clusterer.insert(X_2).get_cluster_labels(X)
+
+# Delete 1st batch and get labels for 2nd batch
+clusterer.delete(X_1)
+labels_part2 = clusterer.get_cluster_labels(X_2)
+```
 
 TODO: Notebook examples.
 
@@ -116,16 +143,16 @@ When the paper, in *Section 4.3* (_"potential Split"_), describes the splitting 
 Take the following two dimensional object set *D* as example. There are several objects, most of them marked with a star, and 3 of them with a letter: *p*, *b*, and *q*. With the left and bottom axes one can see the coordinates of the objects.
 
 <pre>
- 1   *  *  *     q     *   *   *
+ 1   *  *  *     q     *  *  *
 
  0               b
 
--1   *  *  *     p     *   *   *
-    -2    -1     0     1       2
+-1   *  *  *     p     *  *  *
+    -2    -1     0     1     2
 </pre>
 
 When we cluster these objects according to DBSCAN with *MinPts*=4 and *Eps*=1, two clusters emerge. The first cluster consists of the objects on the *y*=-1 line, while the second one with objects on the line *y*=1. Object *b*, since there are less than *MinPts* objects in *N<sub>Eps</sub>(b)*, is not a core object itself, but it belongs to either one of the clusters as a border object.
 
 What happens when we delete *b* from *D*? As a result, both *q* and *p* lose their core property. According to the definition of *UpdSeed<sub>Del</sub>*, the core objects in the neighborhood of *p* and *q*, that is, the objects marked with stars next to them, will be in *UpdSeed<sub>Del</sub>*. These objects belonged to two clusters, not _"exactly one cluster [...] before the deletion of p"_, as the paper states. The paper misses a point here.
 
-**Solution**: In this case, this implementation follows the logic of DBSCAN and reaches the conclusion of what would happen if DBSCAN was applied to *D* after the deletion of *p*. That is, four clusters are formed, two at the top and two at the bottom. So two splits need happen at the same time: both the bottom and the top cluster breaks down into two smaller clusters.
+**Solution**: In this case, this implementation follows the logic of DBSCAN and reaches the conclusion of what would happen if DBSCAN was applied to *D* after the deletion of *p*. That is, four clusters are formed, two at the top and two at the bottom. So two splits need happen at the same time: both of the bottom and the top cluster break down into two smaller clusters.
