@@ -25,13 +25,22 @@ class IncrementalDBSCAN:
 
     Parameters
     ----------
-    eps : float, default=0.5
+    eps : float, optional (default=0.5)
         The radius of neighborhood calculation. An object is the neighbor of
         another if the distance between them is no more than eps.
 
-    min_pts : int, default=5
+    min_pts : int, optional (default=1)
         The minimum number of neighbors that an object needs to have to be a
         core object of a cluster.
+
+    metric : string or callable, optional (default='minkowski')
+        The distance metric to use to calculate distance between data objects.
+        Accepts metrics that are accepted by scikit-learn's NearestNeighbors
+        class, excluding 'precomputed'. The default is 'minkowski', which is
+        equivalent to the Eucldiean distance if p=2.
+
+    p : float or int, optional (default=2)
+        Parameter for Minkowski distance if metric='minkowski'.
 
     References
     ----------
@@ -41,11 +50,13 @@ class IncrementalDBSCAN:
 
     """
 
-    def __init__(self, eps=0.5, min_pts=5):
+    def __init__(self, eps=1, min_pts=5, metric='minkowski', p=2):
         self.eps = eps
         self.min_pts = min_pts
+        self.metric = metric
+        self.p = p
 
-        self._objects = Objects(self.eps)
+        self._objects = Objects(self.eps, self.metric, self.p)
         self._inserter = Inserter(self.eps, self.min_pts, self._objects)
         self._deleter = Deleter(self.eps, self.min_pts, self._objects)
 
@@ -140,7 +151,6 @@ class IncrementalDBSCANWarning(Warning):
     pass
 
 
-# TODO metrics in arguments
 # TODO: initial fitting
 
 # ALGO related
@@ -151,8 +161,9 @@ class IncrementalDBSCANWarning(Warning):
 # TODO gif example
 # TODO notebook: example
 
-# Performance relatedgit
+# Performance related
 # fit searcher gyorsitas? array összeállítás, numba
+# delete profilozas
 # TODO readme: performance
 
 # Packaging related

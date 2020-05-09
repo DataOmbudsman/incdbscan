@@ -8,19 +8,16 @@ from ._object import Object, ObjectId
 from ._utils import hash_
 
 
-def euclidean_distance(x, y):
-    return np.linalg.norm(x - y)
-
-
 class Objects(LabelHandler):
-    def __init__(self, eps, distance=euclidean_distance):
+    def __init__(self, eps, metric, p):
         super().__init__()
         self.eps = eps
-        self.distance = distance
+        self.metric = metric
+        self.p = p
         self.objects: Dict[ObjectId, Object] = dict()
 
         self._neighbor_searcher = \
-            NearestNeighbors(radius=eps, metric='euclidean')
+            NearestNeighbors(radius=eps, metric=self.metric, p=self.p)
         self._values = None
         self._ids = None
 

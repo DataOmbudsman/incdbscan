@@ -1,12 +1,13 @@
 import numpy as np
 
-from incdbscan import IncrementalDBSCANWarning
+from incdbscan import IncrementalDBSCAN, IncrementalDBSCANWarning
 from utils import (
     CLUSTER_LABEL_NOISE,
     delete_object_and_assert_error,
     delete_object_and_assert_no_warning,
     delete_object_and_assert_warning,
     insert_object_and_assert_error,
+    insert_objects_then_assert_cluster_labels,
     get_label_and_assert_error,
     get_label_and_assert_no_warning,
     get_label_and_assert_warning
@@ -119,3 +120,24 @@ def test_warning_when_cluster_label_is_gotten_for_unknown_object(
     label = get_label_and_assert_warning(
         incdbscan3, point_at_origin, IncrementalDBSCANWarning)
     assert np.isnan(label)
+
+
+def test_different_metrics_are_available():
+    incdbscan_euclidean = \
+        IncrementalDBSCAN(eps=1.5, min_pts=3, metric='euclidean')
+    incdbscan_manhattan = \
+        IncrementalDBSCAN(eps=1.5, min_pts=3, metric='manhattan')
+
+    diagonal = np.array([
+        [0, 0],
+        [1, 1],
+        [2, 2],
+    ])
+
+    expected_label_euclidean = CLUSTER_LABEL_NOISE + 1
+    insert_objects_then_assert_cluster_labels(
+        incdbscan_euclidean, diagonal, expected_label_euclidean)
+
+    expected_label_manhattan = CLUSTER_LABEL_NOISE
+    insert_objects_then_assert_cluster_labels(
+        incdbscan_manhattan, diagonal, expected_label_manhattan)
