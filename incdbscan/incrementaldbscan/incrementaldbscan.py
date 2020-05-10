@@ -162,7 +162,6 @@ class IncrementalDBSCANWarning(Warning):
 
 # UX related
 # TODO gif example
-# TODO notebook: example
 
 # Performance related
 # fit searcher gyorsitas? array összeállítás, numba

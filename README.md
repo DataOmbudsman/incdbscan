@@ -31,7 +31,7 @@ The algorithm is implemented in the `IncrementalDBSCAN` class.
 There are 3 methods to use:
 - `insert` for inserting data points into the clustering
 - `delete` for deleting data points from the clustering
-- `get_cluster_labels` for retrieving cluster labels
+- `get_cluster_labels` for obtaining cluster labels
 
 All of the methods take a batch of data points in the form of an array of shape `(n_samples, n_features)` (similar to the `scikit-learn` API).
 
