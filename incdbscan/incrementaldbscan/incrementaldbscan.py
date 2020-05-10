@@ -37,7 +37,7 @@ class IncrementalDBSCAN:
         The distance metric to use to calculate distance between data objects.
         Accepts metrics that are accepted by scikit-learn's NearestNeighbors
         class, excluding 'precomputed'. The default is 'minkowski', which is
-        equivalent to the Eucldiean distance if p=2.
+        equivalent to the Euclidean distance if p=2.
 
     p : float or int, optional (default=2)
         Parameter for Minkowski distance if metric='minkowski'.
