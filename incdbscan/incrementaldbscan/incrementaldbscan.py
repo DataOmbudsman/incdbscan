@@ -133,16 +133,20 @@ class IncrementalDBSCAN:
 
         for ix, value in enumerate(X):
             obj = self._objects.get_object(value)
-            label = self._objects.get_label(obj) if obj else np.nan
-            labels[ix] = label
 
-            if np.isnan(label):
+            if obj:
+                label = self._objects.get_label(obj)
+
+            else:
+                label = np.nan
                 warnings.warn(
                     IncrementalDBSCANWarning(
                         f'No label was retrieved for object at position {ix} '
                         'because there is no such object in the object set.'
                     )
                 )
+
+            labels[ix] = label
 
         return labels
 
