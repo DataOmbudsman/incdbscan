@@ -1,8 +1,8 @@
 [tool.poetry]
 name = "incdbscan"
 version = "0.1.0"
-description = "Incremental DBSCAN clusterer"
-authors = ["DataOmbudsman <data.ombudsman@inbox.lv>"]
+description = "Incremental DBSCAN clustering"
+authors = ["Arpad Fulop <data.ombudsman@inbox.lv>"]
 license = "BSD-3-Clause"
 
 [tool.poetry.dependencies]

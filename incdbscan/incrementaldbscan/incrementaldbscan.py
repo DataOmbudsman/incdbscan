@@ -160,9 +160,6 @@ class IncrementalDBSCANWarning(Warning):
 # ALGO related
 # TODO functional tests
 
-# UX related
-# TODO gif example
-
 # Performance related
 # fit searcher gyorsitas? array összeállítás, numba
 # delete profilozas

@@ -10,8 +10,9 @@ The implementation is based on the following paper. To see what's new compared t
 
 > Ester, Martin; Kriegel, Hans-Peter; Sander, Jörg; Wimmer, Michael; Xu, Xiaowei (1998). *Incremental Clustering for Mining in a Data Warehousing Environment.* In: Proceedings of the 24rd International Conference on Very Large Data Bases (VLDB 1998).
 
-TODO: Animation.
-
+<p align="center">
+  <img src="./images/illustration_circles.gif" alt="indbscan illustration">
+</p>
 
 # Table of Contents
 
@@ -47,7 +48,7 @@ clusterer = IncrementalDBSCAN(eps=0.5, min_pts=5)
 clusterer.insert(X_1)
 labels_part1 = clusterer.get_cluster_labels(X_1)
 
-# Insert 2nd batch and get labels of all points as a one-liner
+# Insert 2nd batch and get labels of all points in a one-liner
 labels_all = clusterer.insert(X_2).get_cluster_labels(X)
 
 # Delete 1st batch and get labels for 2nd batch
@@ -55,7 +56,7 @@ clusterer.delete(X_1)
 labels_part2 = clusterer.get_cluster_labels(X_2)
 ```
 
-TODO: Notebook examples.
+For a longer description of usage check out the [notebook](./notebooks/incdbscan-usage.ipynb) developed just for that!
 
 # Performance
 
