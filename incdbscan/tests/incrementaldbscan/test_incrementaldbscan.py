@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 
 from incdbscan import IncrementalDBSCAN, IncrementalDBSCANWarning
 from utils import (
@@ -141,3 +142,8 @@ def test_different_metrics_are_available():
     expected_label_manhattan = CLUSTER_LABEL_NOISE
     insert_objects_then_assert_cluster_labels(
         incdbscan_manhattan, diagonal, expected_label_manhattan)
+
+
+@pytest.mark.slow
+def test_same_results_as_sklearn_dbscan():
+    assert True

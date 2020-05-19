@@ -1,2 +1,5 @@
 test:
-	python -m pytest incdbscan/tests/*
+	python -m pytest -m "not slow" incdbscan/tests/*
+
+test-slow:
+	python -m pytest -m slow incdbscan/tests/*
