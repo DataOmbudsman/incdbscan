@@ -110,6 +110,17 @@ class Deleter:
         if self._objects_are_neighbors_of_each_other(seed_objects):
             return list()
 
+
+        def _init_graph_and_nodes_to_visit():
+            G = nx.Graph()
+            nodes_to_visit = []
+
+            for seed in seed_objects:
+                G.add_node(seed)
+                nodes_to_visit.append(((seed, seed.id)))
+
+            return G, nodes_to_visit
+
         def _expand_graph(obj, seed_id):
             nodes = set(G.nodes)
 
@@ -123,8 +134,7 @@ class Deleter:
             seed_ids = set([seed_id for (node, seed_id) in nodes_to_visit])
             return len(seed_ids) > 1
 
-        G = nx.Graph()
-        nodes_to_visit = [(seed, seed.id) for seed in seed_objects]
+        G, nodes_to_visit = _init_graph_and_nodes_to_visit()
 
         while _nodes_to_visit_are_from_different_seeds():
             obj, seed_ix = nodes_to_visit.pop(0)
