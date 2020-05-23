@@ -91,12 +91,12 @@ class Deleter:
     def _find_components_to_split_away(self, seed_objects):
 
         # Traverse the objects in a BFS manner to find those components of
-        # objects that need to be split away. Starting from the seed objects,
-        # expand the graph by adding neighboring objects. Traversal terminates
-        # when all of the next nodes to be added are linked to the same seed
-        # objects -- this means that the components (that all can be linked to
-        # other seed objects) are traversed completely and they can be split
-        # away.
+        # objects that need to be split away. A component here is a group of
+        # objects that all can be linked to the same seed object. Starting from
+        # the seed objects, expand the graph by adding neighboring objects.
+        # Traversal terminates when all of the next nodes to be added are
+        # linked to the same seed object -- this means that all but one
+        # component are traversed completely and they can be split away.
 
         if len(seed_objects) == 1:
             return list()
@@ -104,16 +104,20 @@ class Deleter:
         if self._objects_are_neighbors_of_each_other(seed_objects):
             return list()
 
+        # First, initialize graph and node queue
 
-        def _init_graph_and_nodes_to_visit():
-            G = nx.Graph()
-            nodes_to_visit = []
+        G = nx.Graph()
+        nodes_to_visit = []
 
-            for seed in seed_objects:
-                G.add_node(seed)
-                nodes_to_visit.append(((seed, seed.id)))
+        for seed in seed_objects:
+            G.add_node(seed)
+            nodes_to_visit.append(((seed, seed.id)))
 
-            return G, nodes_to_visit
+        # Then, traverse graph
+
+        def _nodes_to_visit_are_from_different_seeds():
+            seed_ids = set([seed_id for (node, seed_id) in nodes_to_visit])
+            return len(seed_ids) > 1
 
         def _expand_graph(obj, seed_id):
             nodes = set(G.nodes)
@@ -124,15 +128,11 @@ class Deleter:
                 if self._is_core(neighbor) and neighbor not in nodes:
                     nodes_to_visit.append((neighbor, seed_id))
 
-        def _nodes_to_visit_are_from_different_seeds():
-            seed_ids = set([seed_id for (node, seed_id) in nodes_to_visit])
-            return len(seed_ids) > 1
-
-        G, nodes_to_visit = _init_graph_and_nodes_to_visit()
-
         while _nodes_to_visit_are_from_different_seeds():
             obj, seed_ix = nodes_to_visit.pop(0)
             _expand_graph(obj, seed_ix)
+
+        # Finally, find components that need to be split away
 
         connected_components = nx.connected_components(G)
         remaining_seed_id = nodes_to_visit[0][1]
