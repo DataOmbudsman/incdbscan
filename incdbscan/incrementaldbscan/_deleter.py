@@ -29,9 +29,7 @@ class Deleter:
                 self._group_objects_by_cluster(update_seeds)
 
             for seeds in update_seeds_by_cluster.values():
-                components = list(self._find_components_to_split_away(
-                    seeds, non_core_neighbors_of_ex_cores))
-
+                components = list(self._find_components_to_split_away(seeds))
                 for component in components:
                     self.objects.set_labels(
                         component, self.objects.get_next_cluster_label())
@@ -90,19 +88,15 @@ class Deleter:
 
         return grouped_objects
 
-    def _find_components_to_split_away(
-            self,
-            seed_objects,
-            objects_to_exclude_from_components):
+    def _find_components_to_split_away(self, seed_objects):
 
         # Traverse the objects in a BFS manner to find those components of
         # objects that need to be split away. Starting from the seed objects,
-        # expand the graph by adding neighboring objects, but objects whose
-        # update is not taken care of in this step are excluded. Traversal
-        # terminates when all of the next nodes to be added are linked to the
-        # same seed objects -- this means that the components (that all can be
-        # linked to other seed objects) are traversed completely and they can
-        # be split away.
+        # expand the graph by adding neighboring objects. Traversal terminates
+        # when all of the next nodes to be added are linked to the same seed
+        # objects -- this means that the components (that all can be linked to
+        # other seed objects) are traversed completely and they can be split
+        # away.
 
         if len(seed_objects) == 1:
             return list()
@@ -125,14 +119,9 @@ class Deleter:
             nodes = set(G.nodes)
 
             for neighbor in obj.neighbors:
-                include_edge = (
-                    neighbor not in objects_to_exclude_from_components and
-                    obj not in objects_to_exclude_from_components and
-                    (self._is_core(neighbor) or neighbor not in nodes)
-                )
-                if include_edge:
+                if self._is_core(neighbor) or neighbor not in nodes:
                     G.add_edge(obj, neighbor)
-                if neighbor not in nodes and self._is_core(neighbor):
+                if self._is_core(neighbor) and neighbor not in nodes:
                     nodes_to_visit.append((neighbor, seed_id))
 
         def _nodes_to_visit_are_from_different_seeds():
