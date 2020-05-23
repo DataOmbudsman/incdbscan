@@ -387,3 +387,43 @@ def test_simultaneous_splits_within_two_clusters(
 
     assert_label_of_object_is_among_possible_ones(
         incdbscan4, points_right[[3]], expected_cluster_labels_right)
+
+
+def test_two_non_dense_bridges(incdbscan4, point_at_origin):
+    point_to_delete = point_at_origin
+
+    points_left = np.array([
+        [-EPS, 0],
+        [-EPS, 0],
+        [-EPS, -EPS],
+        [-EPS, -EPS],
+        [-EPS, -EPS * 2],
+    ])
+    points_right = reflect_horizontally(points_left)
+
+    points_top = np.array([
+        [0, EPS],
+        [0, EPS],
+        [0, EPS * 2],
+        [0, EPS * 2],
+        [0, EPS * 3],
+        [0, EPS * 3],
+        [0, EPS * 4],
+        [0, EPS * 4],
+    ])
+
+    bottom_bridge = np.array([[0, -EPS * 2]])
+
+    all_points = np.vstack([
+        point_to_delete, points_left, points_right, points_top, bottom_bridge
+    ])
+
+    insert_objects_then_assert_cluster_labels(
+        incdbscan4, all_points, CLUSTER_LABEL_FIRST_CLUSTER)
+
+    incdbscan4.delete(point_to_delete)
+
+    expected_clusters = [points_left, points_right, points_top]
+
+    assert_split_creates_new_labels_for_new_clusters(
+        incdbscan4, expected_clusters, CLUSTER_LABEL_FIRST_CLUSTER)

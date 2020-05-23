@@ -127,7 +127,8 @@ class Deleter:
             for neighbor in obj.neighbors:
                 include_edge = (
                     neighbor not in objects_to_exclude_from_components and
-                    obj not in objects_to_exclude_from_components
+                    obj not in objects_to_exclude_from_components and
+                    (self._is_core(neighbor) or neighbor not in nodes)
                 )
                 if include_edge:
                     G.add_edge(obj, neighbor)

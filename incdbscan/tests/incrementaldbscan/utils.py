@@ -52,8 +52,6 @@ def assert_split_creates_new_labels_for_new_clusters(
         assert len(labels_within_cluster) == 1
         all_labels.update(labels_within_cluster)
 
-    print(previous_common_label, all_labels)
-
     assert previous_common_label in all_labels
     assert len(all_labels) == len(clusters)
     assert CLUSTER_LABEL_NOISE not in all_labels
