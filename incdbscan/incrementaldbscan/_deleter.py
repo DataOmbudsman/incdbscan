@@ -29,7 +29,7 @@ class Deleter:
                 self._group_objects_by_cluster(update_seeds)
 
             for seeds in update_seeds_by_cluster.values():
-                components = list(self._find_components_to_split_away(seeds))
+                components = self._find_components_to_split_away(seeds)
                 for component in components:
                     self.objects.set_labels(
                         component, self.objects.get_next_cluster_label())
