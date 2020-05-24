@@ -1,4 +1,4 @@
-from incdbscan.tests.dbscan.utils import are_lists_isomorphic
+from testutils import are_lists_isomorphic
 
 
 def test_isomorphism_check_fails_when_different_length():

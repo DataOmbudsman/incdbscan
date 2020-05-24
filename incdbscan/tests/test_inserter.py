@@ -1,7 +1,7 @@
 import numpy as np
 
 from conftest import EPS
-from utils import (
+from testutils import (
     assert_cluster_labels,
     assert_label_of_object_is_among_possible_ones,
     assert_two_objects_are_in_same_cluster,

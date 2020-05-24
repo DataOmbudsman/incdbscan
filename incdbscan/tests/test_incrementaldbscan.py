@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 
 from incdbscan import IncrementalDBSCAN, IncrementalDBSCANWarning
-from utils import (
+from testutils import (
     CLUSTER_LABEL_NOISE,
     delete_object_and_assert_error,
     delete_object_and_assert_no_warning,

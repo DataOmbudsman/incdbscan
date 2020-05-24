@@ -1,5 +1,4 @@
-from .dbscan.dbscan import DBSCAN
-from .incrementaldbscan.incrementaldbscan import (
+from .incrementaldbscan import (
     IncrementalDBSCAN,
     IncrementalDBSCANWarning
 )

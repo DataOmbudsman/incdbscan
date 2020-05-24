@@ -1,7 +1,7 @@
 import numpy as np
 
 from conftest import EPS
-from utils import (
+from testutils import (
     assert_cluster_labels,
     assert_split_creates_new_labels_for_new_clusters,
     assert_label_of_object_is_among_possible_ones,
