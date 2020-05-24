@@ -157,9 +157,6 @@ class IncrementalDBSCANWarning(Warning):
 
 # TODO: initial fitting
 
-# ALGO related
-# TODO functional tests
-
 # Performance related
 # fit searcher gyorsitas? array összeállítás, numba
 # delete profilozas
