@@ -47,9 +47,8 @@ def test_handling_of_same_object_with_different_dtype(incdbscan3):
     delete_object_and_assert_no_warning(incdbscan3, object_as_float)
 
 
-def test_handling_of_more_than_2d_arrays(incdbscan3):
+def test_handling_of_more_than_2d_arrays(incdbscan3, incdbscan4):
     object_3d = np.array([[1, 2, 3]])
-    object_100d = np.random.random(100).reshape(1, -1)
 
     incdbscan3.insert(object_3d)
     incdbscan3.insert(object_3d)
@@ -57,12 +56,13 @@ def test_handling_of_more_than_2d_arrays(incdbscan3):
 
     assert incdbscan3.get_cluster_labels(object_3d) == CLUSTER_LABEL_NOISE
 
-    incdbscan3.delete(object_3d)
-    incdbscan3.insert(object_100d)
-    incdbscan3.insert(object_100d)
-    incdbscan3.delete(object_100d)
+    object_100d = np.random.random(100).reshape(1, -1)
 
-    assert incdbscan3.get_cluster_labels(object_100d) == CLUSTER_LABEL_NOISE
+    incdbscan4.insert(object_100d)
+    incdbscan4.insert(object_100d)
+    incdbscan4.delete(object_100d)
+
+    assert incdbscan4.get_cluster_labels(object_100d) == CLUSTER_LABEL_NOISE
 
 
 def test_no_warning_when_a_known_object_is_deleted(
