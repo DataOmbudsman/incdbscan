@@ -3,7 +3,7 @@ import xxhash
 
 
 def hash_(array):
-    return xxhash.xxh32(array.tobytes()).hexdigest()
+    return xxhash.xxh64_intdigest(array.tobytes()) >> 1
 
 
 def input_check(X):
