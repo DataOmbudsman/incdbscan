@@ -9,7 +9,6 @@ class Inserter:
         self.min_pts = min_pts
         self.objects = objects
 
-    # @profile
     def insert(self, object_value):
         object_inserted = self.objects.insert_object(object_value)
 
