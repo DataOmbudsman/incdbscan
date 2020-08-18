@@ -56,7 +56,7 @@ class Inserter:
                 self.objects.set_labels(component, next_cluster_label)
 
             else:
-                # If in a connected component of updates seeds there are
+                # If in a connected component of update seeds there are
                 # already clustered objects, all objects in the component
                 # will be merged into the most recent cluster.
                 # Corresponds to cases "Absorption" and "Merge" in the paper.
