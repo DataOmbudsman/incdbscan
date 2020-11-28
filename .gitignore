@@ -5,3 +5,4 @@
 src/__pytest__/*
 *pyc
 profiling/*
+*.egg-info/
