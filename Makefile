@@ -3,3 +3,7 @@ test:
 
 test-slow:
 	python -m pytest -m slow incdbscan/tests/*
+
+profile:
+	mkdir -p profiling
+	python profile.py

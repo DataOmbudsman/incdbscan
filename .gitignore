@@ -4,3 +4,4 @@
 .ignore/*
 src/__pytest__/*
 *pyc
+profiling/*
