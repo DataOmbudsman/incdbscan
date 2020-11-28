@@ -123,9 +123,12 @@ class Deleter:
             nodes = set(G.nodes)
 
             for neighbor in obj.neighbors:
-                if self._is_core(neighbor) or neighbor not in nodes:
+                neighbor_is_core = self._is_core(neighbor)
+                neighbor_not_in_nodes = neighbor not in nodes
+
+                if neighbor_is_core or neighbor_not_in_nodes:
                     G.add_edge(obj, neighbor)
-                if self._is_core(neighbor) and neighbor not in nodes:
+                if neighbor_is_core and neighbor_not_in_nodes:
                     nodes_to_visit.append((neighbor, seed_id))
 
         while _nodes_to_visit_are_from_different_seeds():
