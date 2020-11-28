@@ -40,7 +40,7 @@ def print_profile(test):
     wrapper()
 
     timestamp = str(datetime.now())[:19]
-    filename = f'{test.__name__}_{timestamp}.txt'
+    filename = f'{timestamp}_{test.__name__}.txt'
     profile_path = BASE_PATH / 'profiling' / filename
 
     with open(profile_path, 'w') as f:
