@@ -155,7 +155,6 @@ class IncrementalDBSCANWarning(Warning):
     pass
 
 
-# TODO: is_Core-t egysdzer szamolni tarolni
 # TODO: graph storage
 # TODO: initial fitting
 

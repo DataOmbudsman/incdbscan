@@ -1,4 +1,5 @@
 from collections import defaultdict
+from functools import lru_cache
 
 import networkx as nx
 
@@ -41,6 +42,8 @@ class Deleter:
         self._set_each_border_object_labels_to_largest_around(
             non_core_neighbors_of_ex_cores)
 
+        self._is_core.cache_clear()
+
     def _get_objects_that_lost_core_property(self, object_deleted):
         ex_core_neighbors = [obj for obj in object_deleted.neighbors
                              if obj.neighbor_count == self.min_pts - 1]
@@ -52,6 +55,7 @@ class Deleter:
 
         return ex_core_neighbors
 
+    @lru_cache(maxsize=None)
     def _is_core(self, obj):
         return obj.neighbor_count >= self.min_pts
 
