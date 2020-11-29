@@ -6,4 +6,4 @@ test-slow:
 
 profile:
 	mkdir -p profiling
-	python profile.py
+	python profiling.py

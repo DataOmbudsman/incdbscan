@@ -47,6 +47,7 @@ def print_profile(test):
         profiler.print_stats(stream=f)
 
 
-for test in [test1, test2]:
-    print(f'{datetime.now()} Creating profile for {test.__name__} ...')
-    print_profile(test)
+if __name__ == "__main__":
+    for test in [test1, test2]:
+        print(f'{datetime.now()} Creating profile for {test.__name__} ...')
+        print_profile(test)
