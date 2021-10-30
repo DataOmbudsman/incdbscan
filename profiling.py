@@ -1,3 +1,4 @@
+import sys
 from datetime import datetime
 from pathlib import Path
 
@@ -31,7 +32,7 @@ def test2():
     algo.delete(data)
 
 
-def print_profile(test):
+def print_profile(test, tag=''):
     profiler = LineProfiler()
     profiler.add_module(Inserter)
     profiler.add_module(Deleter)
@@ -40,7 +41,7 @@ def print_profile(test):
     wrapper()
 
     timestamp = str(datetime.now())[:19]
-    filename = f'{timestamp}_{test.__name__}.txt'
+    filename = f'{timestamp}_{test.__name__}{tag}.txt'
     profile_path = BASE_PATH / 'profiling' / filename
 
     with open(profile_path, 'w') as f:
@@ -48,6 +49,7 @@ def print_profile(test):
 
 
 if __name__ == "__main__":
+    tag = '_' + sys.argv[1] if len(sys.argv) > 1 else ''
     for test in [test1, test2]:
         print(f'{datetime.now()} Creating profile for {test.__name__} ...')
-        print_profile(test)
+        print_profile(test, tag)

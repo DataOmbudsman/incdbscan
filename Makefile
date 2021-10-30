@@ -6,4 +6,4 @@ test-slow:
 
 profile:
 	mkdir -p profiling
-	python profiling.py
+	python profiling.py $(tag)
