@@ -12,4 +12,4 @@ class Object:
         return sum([neighbor.count for neighbor in self.neighbors])
 
     def __repr__(self):
-        return f'{self.id_}_'
+        return f'{self.id}_'
