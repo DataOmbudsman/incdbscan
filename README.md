@@ -2,7 +2,7 @@
 
 `incdbscan` is an implementation of IncrementalDBSCAN, the incremental version of the DBSCAN clustering algorithm.
 
-IncrementalDBSCAN lets the user update the clustering by inserting or deleting data points. The algorithm yields the same result as DBSCAN but more efficiently than reapplying DBSCAN to the modified data set.
+IncrementalDBSCAN lets the user update the clustering by inserting or deleting data points. The algorithm yields the same result as DBSCAN but without reapplying DBSCAN to the modified data set.
 
 Thus, IncrementalDBSCAN is ideal to use when the size of the data set to cluster is so large that DBSCAN would be costly, but for the purpose of the application it is enough to update an already existing clustering by inserting or deleting some data points.
 

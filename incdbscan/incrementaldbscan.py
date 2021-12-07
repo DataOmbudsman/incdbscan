@@ -20,8 +20,7 @@ class IncrementalDBSCAN:
     updated object set (i.e., the initial object set modified by all of the
     increments) was clustered by DBSCAN. However, this result is reached by
     using information from the previous state of the clustering, and without
-    the need of applying DBSCAN to the whole updated object set. Therefore, it
-    is more efficient.
+    the need of applying DBSCAN to the whole updated object set.
 
     Parameters
     ----------
@@ -154,12 +153,8 @@ class IncrementalDBSCAN:
 class IncrementalDBSCANWarning(Warning):
     pass
 
-
-# TODO: graph storage
-# TODO: initial fitting
-
 # Performance related
-# TODO readme: performance
+# TODO readme: performance. Initial futting, bottlenecks.
 
 # Packaging related
 # TODO pip upload
