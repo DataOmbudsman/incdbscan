@@ -2,6 +2,7 @@
 .pytest_cache/*
 .vscode/*
 .ignore/*
+.idea/*
 src/__pytest__/*
 *pyc
 profiling/*
