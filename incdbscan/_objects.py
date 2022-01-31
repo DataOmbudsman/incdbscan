@@ -53,8 +53,9 @@ class Objects(LabelHandler):
             self._update_neighbors_during_deletion(obj)
             self.delete_label_of_deleted_object(obj)
 
-    def _update_neighbors_during_deletion(self, object_deleted):
+    @staticmethod
+    def _update_neighbors_during_deletion(object_deleted):
         effective_neighbors = \
-            object_deleted.neighbors.difference(set([object_deleted]))
+            object_deleted.neighbors.difference({object_deleted})
         for neighbor in effective_neighbors:
             neighbor.neighbors.remove(object_deleted)

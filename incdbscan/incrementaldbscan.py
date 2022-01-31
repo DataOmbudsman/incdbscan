@@ -44,7 +44,7 @@ class IncrementalDBSCAN:
     References
     ----------
     Ester et al. 1998. Incremental Clustering for Mining in a Data Warehousing
-    Environment. In: Proceedings of the 24rd International Conference on Very
+    Environment. In: Proceedings of the 24th International Conference on Very
     Large Data Bases (VLDB 1998).
 
     """

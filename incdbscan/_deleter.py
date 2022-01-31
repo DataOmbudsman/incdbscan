@@ -115,7 +115,7 @@ class Deleter:
 
         for seed in seed_objects:
             G.add_node(seed)
-            nodes_to_visit.append(((seed, seed.id)))
+            nodes_to_visit.append((seed, seed.id))
 
         # Then, traverse graph
 
@@ -148,7 +148,8 @@ class Deleter:
             if all([remaining_seed_id != obj.id for obj in component]):
                 yield component
 
-    def _objects_are_neighbors_of_each_other(self, objects):
+    @staticmethod
+    def _objects_are_neighbors_of_each_other(objects):
         for obj1 in objects:
             for obj2 in objects:
                 if obj2 not in obj1.neighbors:

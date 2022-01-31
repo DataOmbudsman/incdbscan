@@ -101,7 +101,8 @@ class Inserter:
 
         return seeds
 
-    def _get_connected_components(self, objects):
+    @staticmethod
+    def _get_connected_components(objects):
         if len(objects) == 1:
             return [objects]
 
@@ -115,10 +116,8 @@ class Inserter:
         return nx.connected_components(G)
 
     def _get_effective_cluster_labels_of_objects(self, objects):
-        non_effective_cluster_labels = set([
-            CLUSTER_LABEL_UNCLASSIFIED,
-            CLUSTER_LABEL_NOISE
-        ])
+        non_effective_cluster_labels = {CLUSTER_LABEL_UNCLASSIFIED,
+                                        CLUSTER_LABEL_NOISE}
         effective_cluster_labels = set()
 
         for obj in objects:
