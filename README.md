@@ -4,7 +4,7 @@
 
 IncrementalDBSCAN lets the user update the clustering by inserting or deleting data points. The algorithm yields the same result as DBSCAN but without reapplying DBSCAN to the modified data set.
 
-Thus, IncrementalDBSCAN is ideal to use when the size of the data set to cluster is so large that DBSCAN would be costly, but for the purpose of the application it is enough to update an already existing clustering by inserting or deleting some data points.
+Thus, IncrementalDBSCAN is ideal to use when the size of the data set to cluster is so large that applying DBSCAN to the whole data set would be costly but for the purpose of the application it is enough to update an already existing clustering by inserting or deleting some data points.
 
 The implementation is based on the following paper. To see what's new compared to the paper, jump to [Notes on the IncrementalDBSCAN paper](#notes-on-the-incrementaldbscan-paper).
 
@@ -60,7 +60,11 @@ For a longer description of usage check out the [notebook](./notebooks/incdbscan
 
 # Performance
 
-TODO
+Cluso 8k/10k dataset: insertion chart.
+- Mention per-datapoint cost as well.
+- Mention batch inserting could be faster.
+Cluso 8k/10k dataset: deletion chart. Bottlenecks.
+- Mention why it's slow.
 
 # Notes on the IncrementalDBSCAN paper
 The work by Ester et al. 1998 lays the groundwork for this implementation of IncrementalDBSCAN. However, some parts of the algorithm are not covered in the paper. In this section, these holes will be identified, and solutions are proposed to fill them.
