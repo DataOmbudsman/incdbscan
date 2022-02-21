@@ -60,11 +60,19 @@ For a longer description of usage check out the [notebook](./notebooks/incdbscan
 
 # Performance
 
-Cluso 8k/10k dataset: insertion chart.
-- Mention per-datapoint cost as well.
-- Mention batch inserting could be faster.
-Cluso 8k/10k dataset: deletion chart. Bottlenecks.
-- Mention why it's slow.
+<p align="left">
+  <img src="./images/performance-insertion.png" alt="indbscan performance insertion">
+</p>
+
+The cost inserting a new object into IncrementalDBSCAN grows slower than the cost of applying DBSCAN to a whole data set.
+
+In other words, **given that** we have a data set _D_ clustered with IncrementalDBSCAN, and we want to see which cluster would a new object _P_ belong to, it is faster to insert _P_ into the current IncrementalDBSCAN clustering than to apply DBSCAN to the union of _D_ and _P_. 
+
+# TODO
+- However, máshogy is lehet a costokra nézni. See performance notebook.
+- Human terms.
+- Shortcoming.
+
 
 # Notes on the IncrementalDBSCAN paper
 The work by Ester et al. 1998 lays the groundwork for this implementation of IncrementalDBSCAN. However, some parts of the algorithm are not covered in the paper. In this section, these holes will be identified, and solutions are proposed to fill them.
