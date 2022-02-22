@@ -60,19 +60,23 @@ For a longer description of usage check out the [notebook](./notebooks/incdbscan
 
 # Performance
 
+Performance has two components: insertion and deletion cost.
+
 <p align="left">
-  <img src="./images/performance-insertion.png" alt="indbscan performance insertion">
+  <img src="./images/performance.png" alt="indbscan performance">
 </p>
 
-The cost inserting a new object into IncrementalDBSCAN grows slower than the cost of applying DBSCAN to a whole data set.
+The cost of **inserting** a new data point into IncrementalDBSCAN is quite small and **grows slower** than the cost of applying (`scikit-learns`'s) DBSCAN to a whole data set.  In other words, *given that* we have a data set _D_ clustered with IncrementalDBSCAN, and we want to see which cluster would a new object _P_ belong to, it is faster to insert _P_ into the current IncrementalDBSCAN clustering than to apply DBSCAN to the union of _D_ and _P_.
 
-In other words, **given that** we have a data set _D_ clustered with IncrementalDBSCAN, and we want to see which cluster would a new object _P_ belong to, it is faster to insert _P_ into the current IncrementalDBSCAN clustering than to apply DBSCAN to the union of _D_ and _P_. 
+The cost of **deleting** a data point from IncrementalDBSCAN **grows faster** than the cost of applying (`scikit-learns`'s) DBSCAN to the data set minus that data point. Thus, the cost of deletion in IncrementalDBSCAN is quite small below a certain data set size, but becomes larger as data set size grows.
 
-# TODO
-- However, máshogy is lehet a costokra nézni. See performance notebook.
-- Human terms.
-- Shortcoming.
+These results do not imply that it is very efficient to cluster a whole data set with a series of IncrementalDBSCAN insertions. If we measure the time to cluster a data set with DBSCAN versus to cluster the data by adding the data points one by one to IncrementalDBSCAN, IncrementalDBSCAN will be slower compared to DBSCAN. A typical performance number is that clustering 8,000 data points takes about 10-20 seconds with this implementation.
 
+See [this notebook](./notebooks/performance.ipynb) about performance for more details.
+
+# TODO shortcomings
+
+A known shortcoming of the current implementation is that batch insertion of data points is not implemented efficiently.
 
 # Notes on the IncrementalDBSCAN paper
 The work by Ester et al. 1998 lays the groundwork for this implementation of IncrementalDBSCAN. However, some parts of the algorithm are not covered in the paper. In this section, these holes will be identified, and solutions are proposed to fill them.
