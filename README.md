@@ -16,10 +16,18 @@ The implementation is based on the following paper. To see what's new compared t
 
 # Table of Contents
 
+- [Brief](#brief)
 - [Installation](#installation)
 - [Usage](#usage)
 - [Performance](#Performance)
 - [Notes on the IncrementalDBSCAN paper](#notes-on-the-incrementaldbscan-paper)
+
+# Brief
+
+The `incdbscan` package is:
+- An implementation of the IncrementalDBSCAN algorithm by Ester et al.
+- With additional corrections to the original paper
+- With ~40 unit tests covering edge cases
 
 # Installation
 
@@ -74,9 +82,10 @@ These results do not imply that it is very efficient to cluster a whole data set
 
 See [this notebook](./notebooks/performance.ipynb) about performance for more details.
 
-# TODO shortcomings
+## Known shortcomings
 
-A known shortcoming of the current implementation is that batch insertion of data points is not implemented efficiently.
+- **Batch insertion**: In the current implementation batch insertion of data points is not efficient, since pairwise distances between new points and existing points are not calculated with matrix multiplication.
+- **Deletion**: Data point deletion can take long in big data sets (big clusters), because there is a graph traversal step that can take long. Whether this can be sped up is not clear. 
 
 # Notes on the IncrementalDBSCAN paper
 The work by Ester et al. 1998 lays the groundwork for this implementation of IncrementalDBSCAN. However, some parts of the algorithm are not covered in the paper. In this section, these holes will be identified, and solutions are proposed to fill them.
