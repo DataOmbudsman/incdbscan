@@ -42,7 +42,7 @@ There are 3 methods to use:
 - `delete` for deleting data points from the clustering
 - `get_cluster_labels` for obtaining cluster labels
 
-All of the methods take a batch of data points in the form of an array of shape `(n_samples, n_features)` (similar to the `scikit-learn` API).
+All methods take a batch of data points in the form of an array of shape `(n_samples, n_features)` (similar to the `scikit-learn` API).
 
 ```python
 from sklearn.datasets import load_iris
@@ -124,7 +124,7 @@ We now insert object *p* at position 0.
 
 After the insertion, both *N<sub>Eps</sub>(a)* and *N<sub>Eps</sub>(x)* contain 4 objects, so *a* and *x* become core objects. *UpdSeed<sub>Ins</sub>* then contains the new core objects, *a* and *x*. According to the paper if _"UpdSeed<sub>Ins</sub> contains only core objects which did not belong to a cluster before the insertion of p, i.e. they were noise objects or equal to p, [...] a new cluster containing these noise objects as well as p is created."_
 
-Here *UpdSeed<sub>Ins</sub>* contains only new core objects (*a* and *x*) but all 7 of the objects cannot be part of one cluster, since not all objects would be density-reachable from any other object in the cluster (because, e.g., *a* is not directy density-reachable from *p*). Thus, the definition of a cluster (*Definition 4*) wouldn't hold. This is contradictory to the above quote from *Section 4.2*.
+Here *UpdSeed<sub>Ins</sub>* contains only new core objects (*a* and *x*) but all 7 of the objects cannot be part of one cluster, since not all objects would be density-reachable from any other object in the cluster (because, e.g., *a* is not directly density-reachable from *p*). Thus, the definition of a cluster (*Definition 4*) wouldn't hold. This is contradictory to the above quote from *Section 4.2*.
 
 Analogous examples can be constructed for absorptions and merges. E.g., a creation and an absorption can happen at the same time, or even two merges can. But the paper doesn't cover these cases.
 
@@ -150,7 +150,7 @@ This is in conflict with the results of the deletion, in which there are now two
      -4  -3  -2               2   3   4      
 </pre>
 
-**Solution**: in this implementation, the defintion of *UpdSeed<sub>Del</sub>* is extended to cover such cases. It is (informally) the set of core objects in the *Eps*-neighborhood of either (1) those objects that lose their core object property as a result of the deletion of *p* or (2) *p* itself.
+**Solution**: in this implementation, the definition of *UpdSeed<sub>Del</sub>* is extended to cover such cases. It is (informally) the set of core objects in the *Eps*-neighborhood of either (1) those objects that lose their core object property as a result of the deletion of *p* or (2) *p* itself.
 
 ## Updates needed when *UpdSeed<sub>Del</sub>* is empty
 
