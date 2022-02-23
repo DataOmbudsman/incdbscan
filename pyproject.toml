@@ -14,11 +14,10 @@ networkx = "^2.5.1"
 sortedcontainers = "^2.4.0"
 
 [tool.poetry.dev-dependencies]
-pylint = "^2.5.2"
-flake8 = "^3.8.1"
-rope = "^0.17.0"
-pytest = "^5.4.2"
-line-profiler = "^3.1.0"
+pylint = "^2.12.2"
+flake8 = "^4.0.1"
+pytest = "^7.0.1"
+line-profiler = "^3.4.0"
 ipython = "^7.19.0"
 
 [build-system]

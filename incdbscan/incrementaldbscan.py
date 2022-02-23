@@ -154,5 +154,14 @@ class IncrementalDBSCANWarning(Warning):
     pass
 
 # Packaging related
+
+# pylint hibak javitas
+# flake8 hibak javitas
+# pytest warn failure
+# poetry self update
+# python version upődate?
+# ipython update
+
+
 # TODO pip upload
 # TODO readme: installation
