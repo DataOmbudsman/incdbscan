@@ -80,8 +80,7 @@ def test_no_warning_when_a_known_object_is_deleted(
 
 def test_warning_when_unknown_object_is_deleted(
         incdbscan3,
-        point_at_origin,
-        object_far_away):
+        point_at_origin):
 
     delete_object_and_assert_warning(
         incdbscan3, point_at_origin, IncrementalDBSCANWarning)
@@ -112,8 +111,7 @@ def test_no_warning_when_cluster_label_is_gotten_for_known_object(
 
 def test_warning_when_cluster_label_is_gotten_for_unknown_object(
         incdbscan3,
-        point_at_origin,
-        object_far_away):
+        point_at_origin):
 
     label = get_label_and_assert_warning(
         incdbscan3, point_at_origin, IncrementalDBSCANWarning)

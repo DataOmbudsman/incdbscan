@@ -9,7 +9,7 @@ from ._utils import hash_
 class Objects(LabelHandler):
     def __init__(self, eps, metric, p):
         super().__init__()
-        self.objects: Dict[ObjectId, Object] = dict()
+        self.objects: Dict[ObjectId, Object] = {}
         self.neighbor_searcher = \
             NeighborSearcher(radius=eps, metric=metric, p=p)
 

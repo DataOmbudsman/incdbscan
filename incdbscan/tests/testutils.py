@@ -113,8 +113,7 @@ def are_lists_isomorphic(list_1, list_2):
     if len(distinct_elements_1) != len(distinct_elements_2):
         return False
 
-    mappings = [(item_1, item_2) for (item_1, item_2)
-                in zip(list_1, list_2)]
+    mappings = list(zip(list_1, list_2))
     distinct_mappings = set(mappings)
 
     return len(distinct_elements_1) == len(distinct_mappings)

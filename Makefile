@@ -1,3 +1,11 @@
+lint:
+	pylint \
+	--disable=missing-class-docstring \
+	--disable=missing-function-docstring \
+	--disable=missing-module-docstring \
+	--disable=too-few-public-methods \
+	incdbscan/*
+
 test:
 	python -m pytest -m "not slow" incdbscan/tests/*
 

@@ -10,7 +10,7 @@ CLUSTER_LABEL_FIRST_CLUSTER: ClusterLabel = 0
 class LabelHandler:
     def __init__(self):
         self._label_to_objects = defaultdict(set)
-        self._object_to_label = dict()
+        self._object_to_label = {}
 
     def set_label(self, obj, label):
         previous_label = self._object_to_label[obj]

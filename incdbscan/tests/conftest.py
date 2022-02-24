@@ -19,12 +19,14 @@ def incdbscan4():
 
 @pytest.fixture
 def blob_in_middle():
+    # pylint: disable=unbalanced-tuple-unpacking
     blob, _ = make_blobs(
         n_samples=10,
         centers=[[0, 0]],
         n_features=2,
         cluster_std=0.4,
-        random_state=123
+        random_state=123,
+        return_centers=False
     )
     return blob
 

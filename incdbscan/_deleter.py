@@ -103,10 +103,10 @@ class Deleter:
         # component are traversed completely and they can be split away.
 
         if len(seed_objects) == 1:
-            return list()
+            return []
 
         if self._objects_are_neighbors_of_each_other(seed_objects):
-            return list()
+            return []
 
         # First, initialize graph and node queue
 
@@ -120,7 +120,7 @@ class Deleter:
         # Then, traverse graph
 
         def _nodes_to_visit_are_from_different_seeds():
-            seed_ids = set([seed_id for (node, seed_id) in nodes_to_visit])
+            seed_ids = {seed_id for (node, seed_id) in nodes_to_visit}
             return len(seed_ids) > 1
 
         def _expand_graph(obj, seed_id):
@@ -145,7 +145,7 @@ class Deleter:
         remaining_seed_id = nodes_to_visit[0][1]
 
         for component in connected_components:
-            if all([remaining_seed_id != obj.id for obj in component]):
+            if all(remaining_seed_id != obj.id for obj in component):
                 yield component
 
     @staticmethod
@@ -170,6 +170,6 @@ class Deleter:
             self.objects.set_label(obj, new_cluster_label)
 
     def _get_cluster_labels_in_neighborhood(self, obj):
-        return set([self.objects.get_label(neighbor)
-                    for neighbor in obj.neighbors
-                    if self._is_core(neighbor)])
+        return {self.objects.get_label(neighbor)
+                for neighbor in obj.neighbors
+                if self._is_core(neighbor)}
