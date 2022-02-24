@@ -157,7 +157,6 @@ class IncrementalDBSCANWarning(Warning):
 
 # pylint hibak javitas
 # flake8 hibak javitas
-# pytest warn failure
 # poetry self update
 # python version upődate?
 # ipython update

@@ -1,3 +1,4 @@
+import warnings
 from typing import Iterable
 
 import numpy as np
@@ -69,11 +70,9 @@ def delete_object_and_assert_error(incdbscan_fit, obj, error):
 
 
 def delete_object_and_assert_no_warning(incdbscan_fit, obj):
-    with pytest.warns(None) as record:
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
         incdbscan_fit.delete(obj)
-
-    number_of_warnings = len(record)
-    assert number_of_warnings == 0
 
 
 def delete_object_and_assert_warning(incdbscan_fit, obj, warning):
@@ -87,11 +86,9 @@ def get_label_and_assert_error(incdbscan_fit, obj, error):
 
 
 def get_label_and_assert_no_warning(incdbscan_fit, obj):
-    with pytest.warns(None) as record:
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
         incdbscan_fit.get_cluster_labels(obj)
-
-    number_of_warnings = len(record)
-    assert number_of_warnings == 0
 
     return incdbscan_fit.get_cluster_labels(obj)
 
