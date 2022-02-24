@@ -110,11 +110,11 @@ class Deleter:
 
         # First, initialize graph and node queue
 
-        G = nx.Graph()
+        graph = nx.Graph()
         nodes_to_visit = []
 
         for seed in seed_objects:
-            G.add_node(seed)
+            graph.add_node(seed)
             nodes_to_visit.append((seed, seed.id))
 
         # Then, traverse graph
@@ -124,14 +124,14 @@ class Deleter:
             return len(seed_ids) > 1
 
         def _expand_graph(obj, seed_id):
-            nodes = set(G.nodes)
+            nodes = set(graph.nodes)
 
             for neighbor in obj.neighbors:
                 neighbor_is_core = self._is_core(neighbor)
                 neighbor_not_in_nodes = neighbor not in nodes
 
                 if neighbor_is_core or neighbor_not_in_nodes:
-                    G.add_edge(obj, neighbor)
+                    graph.add_edge(obj, neighbor)
                 if neighbor_is_core and neighbor_not_in_nodes:
                     nodes_to_visit.append((neighbor, seed_id))
 
@@ -141,7 +141,7 @@ class Deleter:
 
         # Finally, find components that need to be split away
 
-        connected_components = nx.connected_components(G)
+        connected_components = nx.connected_components(graph)
         remaining_seed_id = nodes_to_visit[0][1]
 
         for component in connected_components:

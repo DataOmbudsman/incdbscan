@@ -109,14 +109,14 @@ class Inserter:
         if len(objects) == 1:
             return [objects]
 
-        G = nx.Graph()
+        graph = nx.Graph()
 
         for obj in objects:
             for neighbor in obj.neighbors:
                 if neighbor in objects:
-                    G.add_edge(obj, neighbor)
+                    graph.add_edge(obj, neighbor)
 
-        return nx.connected_components(G)
+        return nx.connected_components(graph)
 
     def _get_effective_cluster_labels_of_objects(self, objects):
         non_effective_cluster_labels = {CLUSTER_LABEL_UNCLASSIFIED,
