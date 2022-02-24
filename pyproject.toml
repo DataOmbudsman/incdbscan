@@ -1,30 +1,30 @@
 [tool.poetry]
+authors = ["Arpad Fulop <data.ombudsman@inbox.lv>"]
+description = "Incremental DBSCAN clustering"
+license = "BSD-3-Clause"
 name = "incdbscan"
 version = "0.1.0"
-description = "Incremental DBSCAN clustering"
-authors = ["Arpad Fulop <data.ombudsman@inbox.lv>"]
-license = "BSD-3-Clause"
 
 [tool.poetry.dependencies]
-python = "^3.7"
-numpy = "^1.20.3"
-scikit-learn = "^1.0"
-xxhash = "^2.0.0"
 networkx = "^2.5.1"
+numpy = "^1.20.3"
+python = "^3.7"
+scikit-learn = "^1.0"
 sortedcontainers = "^2.4.0"
+xxhash = "^2.0.0"
 
 [tool.poetry.dev-dependencies]
-pylint = "^2.12.2"
 flake8 = "^4.0.1"
-pytest = "^7.0.1"
-line-profiler = "^3.4.0"
 ipython = "^7.19.0"
 isort = "^5.10.1"
+line-profiler = "^3.4.0"
+pylint = "^2.12.2"
+pytest = "^7.0.1"
 
 [build-system]
-requires = ["poetry>=0.12"]
 build-backend = "poetry.masonry.api"
+requires = ["poetry>=0.12"]
 
 [tool.isort]
-profile = "pycharm"
 known_first_party = ["testutils"]
+profile = "pycharm"
