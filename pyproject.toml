@@ -19,7 +19,12 @@ flake8 = "^4.0.1"
 pytest = "^7.0.1"
 line-profiler = "^3.4.0"
 ipython = "^7.19.0"
+isort = "^5.10.1"
 
 [build-system]
 requires = ["poetry>=0.12"]
 build-backend = "poetry.masonry.api"
+
+[tool.isort]
+profile = "pycharm"
+known_first_party = ["testutils"]

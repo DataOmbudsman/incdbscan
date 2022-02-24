@@ -6,8 +6,8 @@ import numpy as np
 from line_profiler import LineProfiler
 
 from incdbscan import IncrementalDBSCAN
-from incdbscan._inserter import Inserter
 from incdbscan._deleter import Deleter
+from incdbscan._inserter import Inserter
 
 
 BASE_PATH = Path(__file__).parent

@@ -1,12 +1,12 @@
 import numpy as np
-
 from conftest import EPS
+
 from testutils import (
+    CLUSTER_LABEL_FIRST_CLUSTER,
+    CLUSTER_LABEL_NOISE,
     assert_cluster_labels,
     assert_label_of_object_is_among_possible_ones,
     assert_two_objects_are_in_same_cluster,
-    CLUSTER_LABEL_FIRST_CLUSTER,
-    CLUSTER_LABEL_NOISE,
     insert_objects_then_assert_cluster_labels,
     reflect_horizontally
 )

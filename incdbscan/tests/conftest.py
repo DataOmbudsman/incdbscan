@@ -4,6 +4,7 @@ from sklearn.datasets import make_blobs
 
 from incdbscan import IncrementalDBSCAN
 
+
 EPS = 1.5
 
 

@@ -4,18 +4,21 @@ import numpy as np
 import pytest
 from sklearn.cluster import DBSCAN
 
-from incdbscan import IncrementalDBSCAN, IncrementalDBSCANWarning
+from incdbscan import (
+    IncrementalDBSCAN,
+    IncrementalDBSCANWarning
+)
 from testutils import (
-    are_lists_isomorphic,
     CLUSTER_LABEL_NOISE,
+    are_lists_isomorphic,
     delete_object_and_assert_error,
     delete_object_and_assert_no_warning,
     delete_object_and_assert_warning,
-    insert_object_and_assert_error,
-    insert_objects_then_assert_cluster_labels,
     get_label_and_assert_error,
     get_label_and_assert_no_warning,
-    get_label_and_assert_warning
+    get_label_and_assert_warning,
+    insert_object_and_assert_error,
+    insert_objects_then_assert_cluster_labels
 )
 
 

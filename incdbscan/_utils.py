@@ -1,5 +1,5 @@
-from sklearn.utils.validation import check_array
 import xxhash
+from sklearn.utils.validation import check_array
 
 
 def hash_(array):

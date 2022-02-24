@@ -1,3 +1,9 @@
+isort:
+	isort .
+
+isort-check:
+	isort . -c -v
+
 lint:
 	pylint \
 	--disable=missing-class-docstring \

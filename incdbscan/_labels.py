@@ -1,5 +1,6 @@
 from collections import defaultdict
 
+
 ClusterLabel = int
 
 CLUSTER_LABEL_UNCLASSIFIED: ClusterLabel = -2

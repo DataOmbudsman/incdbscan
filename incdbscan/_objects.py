@@ -2,7 +2,10 @@ from typing import Dict
 
 from ._labels import LabelHandler
 from ._neighbor_searcher import NeighborSearcher
-from ._object import Object, ObjectId
+from ._object import (
+    Object,
+    ObjectId
+)
 from ._utils import hash_
 
 

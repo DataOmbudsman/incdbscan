@@ -1,12 +1,12 @@
 import numpy as np
-
 from conftest import EPS
+
 from testutils import (
-    assert_cluster_labels,
-    assert_split_creates_new_labels_for_new_clusters,
-    assert_label_of_object_is_among_possible_ones,
     CLUSTER_LABEL_FIRST_CLUSTER,
     CLUSTER_LABEL_NOISE,
+    assert_cluster_labels,
+    assert_label_of_object_is_among_possible_ones,
+    assert_split_creates_new_labels_for_new_clusters,
     insert_objects_then_assert_cluster_labels,
     reflect_horizontally
 )
