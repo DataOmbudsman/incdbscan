@@ -156,8 +156,7 @@ class IncrementalDBSCANWarning(Warning):
 # Packaging related
 
 # python version upődate?
-# ipython update
 
-
+# TODO pyproject fields
 # TODO pip upload
 # TODO readme: installation
