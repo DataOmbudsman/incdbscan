@@ -17,10 +17,10 @@ class IncrementalDBSCAN:
     size. An increment can be either the insertion or the deletion of objects.
 
     After each update, the result of the clustering is the same as if the
-    updated object set (i.e., the initial object set modified by all increments)
-    was clustered by DBSCAN. However, this result is reached by using
-    information from the previous state of the clustering, and without the need
-    of applying DBSCAN to the whole updated object set.
+    updated object set (i.e., the initial object set modified by all
+    increments) was clustered by DBSCAN. However, this result is reached by
+    using information from the previous state of the clustering, and without
+    the need of applying DBSCAN to the whole updated object set.
 
     Parameters
     ----------
