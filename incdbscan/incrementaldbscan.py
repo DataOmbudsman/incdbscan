@@ -155,8 +155,6 @@ class IncrementalDBSCANWarning(Warning):
 
 # Packaging related
 
-# flake8 hibak javitas
-# poetry self update
 # python version upődate?
 # ipython update
 

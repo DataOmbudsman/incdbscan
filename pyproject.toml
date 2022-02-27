@@ -14,7 +14,6 @@ sortedcontainers = "^2.4.0"
 xxhash = "^2.0.0"
 
 [tool.poetry.dev-dependencies]
-flake8 = "^4.0.1"
 ipython = "^7.19.0"
 isort = "^5.10.1"
 line-profiler = "^3.4.0"
