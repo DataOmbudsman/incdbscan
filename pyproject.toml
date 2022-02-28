@@ -1,5 +1,5 @@
 [tool.poetry]
-authors = ["Arpad Fulop <data.ombudsman@inbox.lv>"]
+authors = ["Arpad Fulop <data.ombudsman@tutanota.com>"]
 description = "Incremental DBSCAN clustering"
 license = "BSD-3-Clause"
 name = "incdbscan"
