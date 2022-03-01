@@ -5,6 +5,7 @@ license = "BSD-3-Clause"
 name = "incdbscan"
 version = "0.1.0"
 readme = "README.md"
+homepage = "https://github.com/DataOmbudsman/incdbscan"
 repository = "https://github.com/DataOmbudsman/incdbscan"
 keywords = [
     "clustering",
