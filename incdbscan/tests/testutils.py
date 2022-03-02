@@ -1,10 +1,11 @@
-import requests
 import warnings
 from io import StringIO
 from typing import Iterable
 
 import numpy as np
 import pytest
+import requests
+
 
 CLUSTER_LABEL_NOISE = -1
 CLUSTER_LABEL_FIRST_CLUSTER = 0

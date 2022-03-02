@@ -36,6 +36,7 @@ matplotlib = "^3.2.1"
 pandas = "^1.2.3"
 pylint = "^2.12.2"
 pytest = "^7.0.1"
+requests = "^2.26.0"
 tqdm = "^4.55.1"
 
 [build-system]
