@@ -1,9 +1,10 @@
+import requests
 import warnings
+from io import StringIO
 from typing import Iterable
 
 import numpy as np
 import pytest
-
 
 CLUSTER_LABEL_NOISE = -1
 CLUSTER_LABEL_FIRST_CLUSTER = 0
@@ -118,3 +119,9 @@ def are_lists_isomorphic(list_1, list_2):
     distinct_mappings = set(mappings)
 
     return len(distinct_elements_1) == len(distinct_mappings)
+
+
+def read_text_data_file_from_url(url):
+    content = requests.get(url)
+    data = np.loadtxt(StringIO(content.text))
+    return data
