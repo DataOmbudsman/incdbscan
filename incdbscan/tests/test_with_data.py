@@ -5,14 +5,24 @@ import pytest
 from sklearn.cluster import DBSCAN
 
 from incdbscan import IncrementalDBSCAN
-from testutils import are_lists_isomorphic
+from testutils import (
+    are_lists_isomorphic,
+    read_text_data_file_from_url
+)
 
 
 @pytest.mark.slow
 def test_same_results_as_sklearn_dbscan():
-    base_path = Path(__file__).parent
-    data_path = base_path / 'data' / '2d-20c-no0.dat'
-    data = np.loadtxt(data_path)[:, 0:2]
+    # This is equivalent to the 2d-20c-no0 data set by Handl, J.
+    # Also available from:
+    # https://personalpages.manchester.ac.uk/staff/Julia.Handl/generators.html
+
+    url = (
+        'https://gitlab.christianhomberg.me/chr_96er/MOCK-PESA-II/raw/'
+        '54572f1f371a3e8f59999c40957df1485acad8b5/MOCK/data/MOCKDATA/'
+        '2d-20c-no0.dat'
+    )
+    data = read_text_data_file_from_url(url)[:, 0:2]
 
     EPS = 1
     MIN_PTS = 5
