@@ -154,7 +154,5 @@ class IncrementalDBSCANWarning(Warning):
     pass
 
 # Packaging related
-# TODO not include data
-# TODO put notes to separate notes
 # TODO pip upload
 # TODO readme: installation
