@@ -6,7 +6,7 @@ IncrementalDBSCAN lets the user update the clustering by inserting or deleting d
 
 Thus, IncrementalDBSCAN is ideal to use when the size of the data set to cluster is so large that applying DBSCAN to the whole data set would be costly but for the purpose of the application it is enough to update an already existing clustering by inserting or deleting some data points.
 
-The implementation is based on the following paper. To see what's new compared to the paper, jump to [Notes on the IncrementalDBSCAN paper](./notes/notes-on-paper.md).
+The implementation is based on the following paper. To see what's new compared to the paper, jump to [Notes on the IncrementalDBSCAN paper](https://github.com/DataOmbudsman/incdbscan/blob/master/notes/notes-on-paper.md).
 
 > Ester, Martin; Kriegel, Hans-Peter; Sander, Jörg; Wimmer, Michael; Xu, Xiaowei (1998). *Incremental Clustering for Mining in a Data Warehousing Environment.* In: Proceedings of the 24rd International Conference on Very Large Data Bases (VLDB 1998).
 
@@ -23,7 +23,7 @@ The implementation is based on the following paper. To see what's new compared t
 
 ## Highlights
 
-The `incdbscan` package is an implementation of the IncrementalDBSCAN algorithm by Ester et al., with about 40 unit tests covering diverse cases, and with [additional corrections](./notes/notes-on-paper.md) to the original paper.
+The `incdbscan` package is an implementation of the IncrementalDBSCAN algorithm by Ester et al., with about 40 unit tests covering diverse cases, and with [additional corrections](https://github.com/DataOmbudsman/incdbscan/blob/master/notes/notes-on-paper.md) to the original paper.
 
 ## Installation
 
@@ -60,7 +60,7 @@ clusterer.delete(X_1)
 labels_part2 = clusterer.get_cluster_labels(X_2)
 ```
 
-For a longer description of usage check out the [notebook](./notebooks/incdbscan-usage.ipynb) developed just for that!
+For a longer description of usage check out the [notebook](https://github.com/DataOmbudsman/incdbscan/blob/master/notebooks/incdbscan-usage.ipynb) developed just for that!
 
 ## Performance
 
@@ -76,7 +76,7 @@ The cost of **deleting** a data point from IncrementalDBSCAN **grows faster** th
 
 These results do not imply that it is very efficient to cluster a whole data set with a series of IncrementalDBSCAN insertions. If we measure the time to cluster a data set with DBSCAN versus to cluster the data by adding the data points one by one to IncrementalDBSCAN, IncrementalDBSCAN will be slower compared to DBSCAN. A typical performance number is that clustering 8,000 data points takes about 10-20 seconds with this implementation.
 
-See [this notebook](./notebooks/performance.ipynb) about performance for more details.
+See [this notebook](https://github.com/DataOmbudsman/incdbscan/blob/master/notebooks/performance.ipynb) about performance for more details.
 
 ### Known shortcomings
 
