@@ -27,7 +27,12 @@ The `incdbscan` package is an implementation of the IncrementalDBSCAN algorithm 
 
 ## Installation
 
-TODO
+`incdbscan` is on PyPI, and can be installed with `pip`:
+```
+pip install incdbscan
+```
+
+The package requires at least Python 3.7.1.
 
 ## Usage
 

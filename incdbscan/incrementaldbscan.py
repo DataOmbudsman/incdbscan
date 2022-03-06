@@ -152,7 +152,3 @@ class IncrementalDBSCAN:
 
 class IncrementalDBSCANWarning(Warning):
     pass
-
-# Packaging related
-# TODO pip upload
-# TODO readme: installation
