@@ -150,5 +150,32 @@ class IncrementalDBSCAN:
         return labels
 
 
+    def return_objects_labels(self):
+        '''Return objects learnt and their labels.
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        dict : key = object's hashed ID
+               value = Cluster labels. Effective labels start from 0. -1 means the
+                 object is noise. numpy.nan means the object was not in the
+                 object set. (only for core points)
+                Note: need to further map the hashed ID to original sample dimension of (,n_features)
+                Further filtering: drop those with label = -1:
+        --------
+        labelled_objects: ndarray of shape (n_objects,n_features+1)
+                 Last feature refers to Cluster labels. Effective labels start from 0. -1 means the
+                 object is noise. numpy.nan means the object was not in the
+                 object set.
+                 n_objects <= n_samples learnt/inserted since some objects are considered as noise i.e. Cluster labesl:-1
+        '''
+        objects_labels = {}
+        for x in list(self._objects.objects.keys()):
+            if self._objects.get_label(x)!=-1:
+                objects_labels[x] = self._objects.get_label(x)
+        return objects_labels
+
 class IncrementalDBSCANWarning(Warning):
     pass

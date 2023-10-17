@@ -15,9 +15,11 @@ class Objects(LabelHandler):
         self.objects: Dict[ObjectId, Object] = {}
         self.neighbor_searcher = \
             NeighborSearcher(radius=eps, metric=metric, p=p)
+        self.object_dict = {} #added
 
     def get_object(self, value):
         id_ = hash_(value)
+        self.object_dict[id_] = value #added
         return self.objects.get(id_)
 
     def insert_object(self, value):
