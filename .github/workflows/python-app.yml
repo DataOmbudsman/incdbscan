@@ -28,12 +28,11 @@ jobs:
         python -m pip install --upgrade pip
         curl -sSL https://install.python-poetry.org | python3 -
         poetry install
-        source $(poetry env info --path)/bin/activate
     - name: Lint
       run: |
-        make lint
-        make isort-check
+        poetry run make lint
+        poetry run make isort-check
     - name: Test with pytest
       run: |
-        make test
-        make test-slow
+        poetry run make test
+        poetry run make test-slow
