@@ -10,6 +10,8 @@ lint:
 	--disable=missing-function-docstring \
 	--disable=missing-module-docstring \
 	--disable=too-few-public-methods \
+	--fail-under 5 \
+	--fail-on E,F \
 	incdbscan/*
 
 test:
