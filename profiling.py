@@ -2,13 +2,12 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
-import numpy as np
 from line_profiler import LineProfiler
 
 from incdbscan import IncrementalDBSCAN
 from incdbscan._deleter import Deleter
 from incdbscan._inserter import Inserter
-from incdbscan.tests.testutils import read_text_data_file_from_url
+from incdbscan.tests.testutils import read_handl_data, read_chameleon_data
 
 
 BASE_PATH = Path(__file__).parent
@@ -16,16 +15,7 @@ DATA_PATH = BASE_PATH / 'incdbscan' / 'tests' / 'data'
 
 
 def test1():
-    # This is equivalent to the 2d-20c-no0 data set by Handl, J.
-    # Also available from:
-    # https://personalpages.manchester.ac.uk/staff/Julia.Handl/generators.html
-
-    url = (
-        'https://gitlab.christianhomberg.me/chr_96er/MOCK-PESA-II/raw/'
-        '54572f1f371a3e8f59999c40957df1485acad8b5/MOCK/data/MOCKDATA/'
-        '2d-20c-no0.dat'
-    )
-    data = read_text_data_file_from_url(url)[:, 0:2]
+    data = read_handl_data()
 
     algo = IncrementalDBSCAN(eps=1)
     algo.insert(data)
@@ -33,15 +23,7 @@ def test1():
 
 
 def test2():
-    # This is equivalent to the t4.8k data set from the Chameleon collection
-    # by Karypis, G. et al. Also available from:
-    # http://glaros.dtc.umn.edu/gkhome/cluto/cluto/download
-
-    url = (
-        'https://raw.githubusercontent.com/yeahia2508/ml-examples/'
-        'master/Data/clustering/chameleon/t4.8k.txt'
-    )
-    data = read_text_data_file_from_url(url)[:2000]
+    data = read_chameleon_data()[:2000]
 
     algo = IncrementalDBSCAN(eps=10)
     algo.insert(data)

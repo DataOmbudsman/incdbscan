@@ -134,3 +134,29 @@ def read_arff_data_file_from_url(url):
     data = pd.read_csv(StringIO(content.text), skiprows=10)
     data = data.to_numpy()
     return data
+
+
+def read_handl_data():
+    # This is equivalent to the 2d-20c-no0 data set by Handl, J.
+    # Also available from:
+    # https://personalpages.manchester.ac.uk/staff/Julia.Handl/generators.html
+
+    url = (
+        'https://raw.githubusercontent.com/deric/clustering-benchmark/'
+        'master/src/main/resources/datasets/artificial/2d-20c-no0.arff'
+    )
+    data = read_arff_data_file_from_url(url)[:, 0:2]
+    return data
+
+
+def read_chameleon_data():
+    # This is equivalent to the t4.8k data set from the Chameleon collection
+    # by Karypis, G. et al. Also available from:
+    # http://glaros.dtc.umn.edu/gkhome/cluto/cluto/download
+
+    url = (
+        'https://raw.githubusercontent.com/yeahia2508/ml-examples/'
+        'master/Data/clustering/chameleon/t4.8k.txt'
+    )
+    data = read_text_data_file_from_url(url)[:2000]
+    return data
