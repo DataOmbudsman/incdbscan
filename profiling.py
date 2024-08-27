@@ -7,7 +7,10 @@ from line_profiler import LineProfiler
 from incdbscan import IncrementalDBSCAN
 from incdbscan._deleter import Deleter
 from incdbscan._inserter import Inserter
-from incdbscan.tests.testutils import read_handl_data, read_chameleon_data
+from incdbscan.tests.testutils import (
+    read_chameleon_data,
+    read_handl_data
+)
 
 
 BASE_PATH = Path(__file__).parent
