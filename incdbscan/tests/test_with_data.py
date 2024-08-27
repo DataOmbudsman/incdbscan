@@ -5,7 +5,7 @@ from sklearn.cluster import DBSCAN
 from incdbscan import IncrementalDBSCAN
 from testutils import (
     are_lists_isomorphic,
-    read_text_data_file_from_url
+    read_arff_data_file_from_url
 )
 
 
@@ -16,11 +16,10 @@ def test_same_results_as_sklearn_dbscan():
     # https://personalpages.manchester.ac.uk/staff/Julia.Handl/generators.html
 
     url = (
-        'https://gitlab.christianhomberg.me/chr_96er/MOCK-PESA-II/raw/'
-        '54572f1f371a3e8f59999c40957df1485acad8b5/MOCK/data/MOCKDATA/'
-        '2d-20c-no0.dat'
+        'https://raw.githubusercontent.com/deric/clustering-benchmark/'
+        'master/src/main/resources/datasets/artificial/2d-20c-no0.arff'
     )
-    data = read_text_data_file_from_url(url)[:, 0:2]
+    data = read_arff_data_file_from_url(url)[:, 0:2]
 
     EPS = 1
     MIN_PTS = 5

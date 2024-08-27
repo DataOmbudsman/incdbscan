@@ -3,6 +3,7 @@ from io import StringIO
 from typing import Iterable
 
 import numpy as np
+import pandas as pd
 import pytest
 import requests
 
@@ -125,4 +126,11 @@ def are_lists_isomorphic(list_1, list_2):
 def read_text_data_file_from_url(url):
     content = requests.get(url)
     data = np.loadtxt(StringIO(content.text))
+    return data
+
+
+def read_arff_data_file_from_url(url):
+    content = requests.get(url)
+    data = pd.read_csv(StringIO(content.text), skiprows=10)
+    data = data.to_numpy()
     return data
