@@ -1,9 +1,11 @@
+NodeId = int
 ObjectId = int
 
 
 class Object:
     def __init__(self, id_):
         self.id: ObjectId = id_
+        self.node_id: NodeId = None
         self.count = 1
         self.neighbors = {self}
 

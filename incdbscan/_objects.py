@@ -1,8 +1,11 @@
 from typing import Dict
 
+import rustworkx as rx
+
 from ._labels import LabelHandler
 from ._neighbor_searcher import NeighborSearcher
 from ._object import (
+    NodeId,
     Object,
     ObjectId
 )
@@ -12,49 +15,73 @@ from ._utils import hash_
 class Objects(LabelHandler):
     def __init__(self, eps, metric, p):
         super().__init__()
-        self.objects: Dict[ObjectId, Object] = {}
+
+        self.graph = rx.PyGraph()
+        self._object_id_to_node_id: Dict[ObjectId, NodeId] = {}
+
         self.neighbor_searcher = \
             NeighborSearcher(radius=eps, metric=metric, p=p)
 
     def get_object(self, value):
-        id_ = hash_(value)
-        return self.objects.get(id_)
+        object_id = hash_(value)
+        if object_id in self._object_id_to_node_id:
+            obj = self._get_object_from_object_id(object_id)
+            return obj
+        return None
 
     def insert_object(self, value):
-        id_ = hash_(value)
+        object_id = hash_(value)
 
-        if id_ in self.objects:
-            obj = self.objects[id_]
+        if object_id in self._object_id_to_node_id:
+            obj = self._get_object_from_object_id(object_id)
             obj.count += 1
             return obj
 
-        new_object = Object(id_)
-        self.objects[id_] = new_object
+        new_object = Object(object_id)
+        
+        self._insert_graph_metadata(new_object)
         self.set_label_of_inserted_object(new_object)
-
-        self.neighbor_searcher.insert(value, id_)
+        self.neighbor_searcher.insert(value, object_id)
         self._update_neighbors_during_insertion(new_object, value)
         return new_object
+
+    def _insert_graph_metadata(self, new_object):
+        node_id = self.graph.add_node(new_object)
+        new_object.node_id = node_id
+        object_id = new_object.id
+        self._object_id_to_node_id[object_id] = node_id
 
     def _update_neighbors_during_insertion(self, object_inserted, new_value):
         neighbors = self._get_neighbors(new_value)
         for obj in neighbors:
             obj.neighbors.add(object_inserted)
             object_inserted.neighbors.add(obj)
+            self.graph.add_edge(object_inserted.node_id, obj.node_id, None)
 
     def _get_neighbors(self, query_value):
         neighbor_ids = self.neighbor_searcher.query_neighbors(query_value)
 
         for id_ in neighbor_ids:
-            yield self.objects[id_]
+            obj = self._get_object_from_object_id(id_)
+            yield obj
+
+    def _get_object_from_object_id(self, object_id):
+        node_id = self._object_id_to_node_id[object_id]
+        obj = self.graph[node_id]
+        return obj
 
     def delete_object(self, obj):
         obj.count -= 1
         if obj.count == 0:
-            del self.objects[obj.id]
+            self._delete_graph_metadata(obj)
             self.neighbor_searcher.delete(obj.id)
             self._update_neighbors_during_deletion(obj)
             self.delete_label_of_deleted_object(obj)
+
+    def _delete_graph_metadata(self, deleted_object):
+        node_id = deleted_object.node_id
+        self.graph.remove_node(node_id)
+        del self._object_id_to_node_id[deleted_object.id]
 
     @staticmethod
     def _update_neighbors_during_deletion(object_deleted):

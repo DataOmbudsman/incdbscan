@@ -1,4 +1,4 @@
-import networkx as nx
+import rustworkx as rx
 
 from ._labels import (
     CLUSTER_LABEL_NOISE,
@@ -104,19 +104,24 @@ class Inserter:
 
         return seeds
 
-    @staticmethod
-    def _get_connected_components(objects):
+    def _get_connected_components(self, objects):
         if len(objects) == 1:
             return [objects]
 
-        graph = nx.Graph()
+        node_ids = [obj.node_id for obj in objects]
+        subgraph = self.objects.graph.subgraph(node_ids)
+        components_as_ids: list[set[int]] = rx.connected_components(subgraph)
 
-        for obj in objects:
-            for neighbor in obj.neighbors:
-                if neighbor in objects:
-                    graph.add_edge(obj, neighbor)
+        components = []
+        for component in components_as_ids:
+            component_objects = set()
+            for subgraph_node_id in component:
+                original_node_id = subgraph[subgraph_node_id].node_id
+                obj = self.objects.graph[original_node_id]
+                component_objects.add(obj)
+            components.append(component_objects)
 
-        return nx.connected_components(graph)
+        return components
 
     def _get_effective_cluster_labels_of_objects(self, objects):
         non_effective_cluster_labels = {CLUSTER_LABEL_UNCLASSIFIED,
