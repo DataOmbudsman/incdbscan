@@ -77,23 +77,20 @@ class Objects(LabelHandler):
 
     def delete_object(self, obj):
         obj.count -= 1
+        remove_from_data = obj.count == 0
 
         for neighbor in obj.neighbors:
-           neighbor.neighbor_count -= 1
+            neighbor.neighbor_count -= 1
+            if remove_from_data:
+                if neighbor.id != obj.id:
+                    neighbor.neighbors.remove(obj)
 
-        if obj.count == 0:
+        if remove_from_data:
             self._delete_graph_metadata(obj)
             self.neighbor_searcher.delete(obj.id)
-            self._update_neighbors_during_deletion(obj)
             self.delete_label_of_deleted_object(obj)
 
     def _delete_graph_metadata(self, deleted_object):
         node_id = deleted_object.node_id
         self.graph.remove_node(node_id)
         del self._object_id_to_node_id[deleted_object.id]
-
-    @staticmethod
-    def _update_neighbors_during_deletion(object_deleted):
-        for obj in object_deleted.neighbors:
-            if obj.id != object_deleted.id:
-                obj.neighbors.remove(object_deleted)
