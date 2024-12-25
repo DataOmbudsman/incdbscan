@@ -35,6 +35,8 @@ class Objects(LabelHandler):
         if object_id in self._object_id_to_node_id:
             obj = self._get_object_from_object_id(object_id)
             obj.count += 1
+            for neighbor in obj.neighbors:
+                neighbor.neighbor_count += 1
             return obj
 
         new_object = Object(object_id)
@@ -54,9 +56,12 @@ class Objects(LabelHandler):
     def _update_neighbors_during_insertion(self, object_inserted, new_value):
         neighbors = self._get_neighbors(new_value)
         for obj in neighbors:
-            obj.neighbors.add(object_inserted)
-            object_inserted.neighbors.add(obj)
-            self.graph.add_edge(object_inserted.node_id, obj.node_id, None)
+            obj.neighbor_count += 1
+            if obj.id != object_inserted.id:
+                object_inserted.neighbor_count += obj.count
+                obj.neighbors.add(object_inserted)
+                object_inserted.neighbors.add(obj)
+                self.graph.add_edge(object_inserted.node_id, obj.node_id, None)
 
     def _get_neighbors(self, query_value):
         neighbor_ids = self.neighbor_searcher.query_neighbors(query_value)
@@ -72,6 +77,10 @@ class Objects(LabelHandler):
 
     def delete_object(self, obj):
         obj.count -= 1
+
+        for neighbor in obj.neighbors:
+           neighbor.neighbor_count -= 1
+
         if obj.count == 0:
             self._delete_graph_metadata(obj)
             self.neighbor_searcher.delete(obj.id)
@@ -85,7 +94,6 @@ class Objects(LabelHandler):
 
     @staticmethod
     def _update_neighbors_during_deletion(object_deleted):
-        effective_neighbors = \
-            object_deleted.neighbors.difference({object_deleted})
-        for neighbor in effective_neighbors:
-            neighbor.neighbors.remove(object_deleted)
+        for obj in object_deleted.neighbors:
+            if obj.id != object_deleted.id:
+                obj.neighbors.remove(object_deleted)

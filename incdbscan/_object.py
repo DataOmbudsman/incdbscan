@@ -8,10 +8,7 @@ class Object:
         self.node_id: NodeId = None
         self.count = 1
         self.neighbors = {self}
-
-    @property
-    def neighbor_count(self):
-        return sum([neighbor.count for neighbor in self.neighbors])
+        self.neighbor_count = 0
 
     def __repr__(self):
         return f'{self.id}_'
