@@ -8,9 +8,9 @@ from incdbscan import IncrementalDBSCAN
 from incdbscan._deleter import Deleter
 from incdbscan._inserter import Inserter
 from incdbscan._labels import LabelHandler
-from incdbscan._objects import Objects
-from incdbscan._object import Object
 from incdbscan._neighbor_searcher import NeighborSearcher
+from incdbscan._object import Object
+from incdbscan._objects import Objects
 from incdbscan.tests.testutils import (
     read_chameleon_data,
     read_handl_data
@@ -41,10 +41,10 @@ def print_profile(test, tag=''):
     profiler = LineProfiler()
     profiler.add_module(Inserter)
     profiler.add_module(Deleter)
-    #profiler.add_module(Object)
-    #profiler.add_module(Objects)
-    #profiler.add_module(LabelHandler)
-    #profiler.add_module(NeighborSearcher)
+    # profiler.add_module(Object)
+    # profiler.add_module(Objects)
+    # profiler.add_module(LabelHandler)
+    # profiler.add_module(NeighborSearcher)
 
     wrapper = profiler(test)
     wrapper()

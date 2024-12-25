@@ -40,7 +40,7 @@ class Objects(LabelHandler):
             return obj
 
         new_object = Object(object_id)
-        
+
         self._insert_graph_metadata(new_object)
         self.set_label_of_inserted_object(new_object)
         self.neighbor_searcher.insert(value, object_id)
