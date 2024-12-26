@@ -1,9 +1,12 @@
+from typing import List, Set
+
 import rustworkx as rx
 
 from ._labels import (
     CLUSTER_LABEL_NOISE,
     CLUSTER_LABEL_UNCLASSIFIED
 )
+from ._object import Object
 
 
 class Inserter:
@@ -104,13 +107,13 @@ class Inserter:
 
         return seeds
 
-    def _get_connected_components(self, objects):
+    def _get_connected_components(self, objects) -> List[Set[Object]]:
         if len(objects) == 1:
             return [objects]
 
         node_ids = [obj.node_id for obj in objects]
         subgraph = self.objects.graph.subgraph(node_ids)
-        components_as_ids: list[set[int]] = rx.connected_components(subgraph)
+        components_as_ids: List[Set[int]] = rx.connected_components(subgraph)  # pylint: disable=no-member
 
         components = []
         for component in components_as_ids:
