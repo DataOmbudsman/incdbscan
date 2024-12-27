@@ -32,7 +32,7 @@ The `incdbscan` package is an implementation of the IncrementalDBSCAN algorithm 
 pip install incdbscan
 ```
 
-The package requires at least Python 3.7.1.
+The latest version of the package requires at least Python 3.8.
 
 ## Usage
 
