@@ -1,4 +1,7 @@
-from typing import List, Set
+from typing import (
+    List,
+    Set
+)
 
 import rustworkx as rx
 
