@@ -82,12 +82,10 @@ class Deleter:
         return update_seeds, non_core_neighbors_of_ex_cores
 
     def _group_objects_by_cluster(self, objects):
-        objects_with_cluster_labels = [(obj, self.objects.get_label(obj))
-                                       for obj in objects]
-
         grouped_objects = defaultdict(list)
 
-        for obj, label in objects_with_cluster_labels:
+        for obj in objects:
+            label = self.objects.get_label(obj)
             grouped_objects[label].append(obj)
 
         return grouped_objects
