@@ -1,4 +1,8 @@
-from typing import Dict
+from typing import (
+    Dict,
+    List,
+    Set
+)
 
 import rustworkx as rx
 
@@ -94,3 +98,27 @@ class Objects(LabelHandler):
         node_id = deleted_object.node_id
         self.graph.remove_node(node_id)
         del self._object_id_to_node_id[deleted_object.id]
+
+    def get_connected_components(
+            self, objects: Set[Object]) -> List[Set[Object]]:
+
+        if len(objects) == 1:
+            return [objects]
+
+        node_ids = [obj.node_id for obj in objects]
+        subgraph = self.graph.subgraph(node_ids)
+        components_as_ids: List[Set[NodeId]] = rx.connected_components(subgraph)  # pylint: disable=no-member
+
+        def _get_original_object(subgraph, subgraph_node_id):
+            original_node_id = subgraph[subgraph_node_id].node_id
+            return self.graph[original_node_id]
+
+        components_as_objects = []
+        for component in components_as_ids:
+            component_objects = {
+                _get_original_object(subgraph, subgraph_node_id)
+                for subgraph_node_id in component
+            }
+            components_as_objects.append(component_objects)
+
+        return components_as_objects
