@@ -4,12 +4,8 @@ import rustworkx as rx
 
 from ._labels import LabelHandler
 from ._neighbor_searcher import NeighborSearcher
-from ._object import (
-    NodeId,
-    Object,
-    ObjectId
-)
-from ._utils import hash_
+from ._object import NodeId, Object, ObjectId
+from ._utils import encode_
 
 
 class Objects(LabelHandler):
@@ -19,18 +15,17 @@ class Objects(LabelHandler):
         self.graph = rx.PyGraph()  # pylint: disable=no-member
         self._object_id_to_node_id: Dict[ObjectId, NodeId] = {}
 
-        self.neighbor_searcher = \
-            NeighborSearcher(radius=eps, metric=metric, p=p)
+        self.neighbor_searcher = NeighborSearcher(radius=eps, metric=metric, p=p)
 
     def get_object(self, value):
-        object_id = hash_(value)
+        object_id = encode_(value)
         if object_id in self._object_id_to_node_id:
             obj = self._get_object_from_object_id(object_id)
             return obj
         return None
 
     def insert_object(self, value):
-        object_id = hash_(value)
+        object_id = encode_(value)
 
         if object_id in self._object_id_to_node_id:
             obj = self._get_object_from_object_id(object_id)
