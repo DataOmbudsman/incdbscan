@@ -1,4 +1,4 @@
-from collections import defaultdict
+from collections import defaultdict, deque
 from functools import lru_cache
 
 import networkx as nx
@@ -109,7 +109,7 @@ class Deleter:
         # First, initialize graph and node queue
 
         graph = nx.Graph()
-        nodes_to_visit = []
+        nodes_to_visit = deque()
 
         for seed in seed_objects:
             graph.add_node(seed)
@@ -134,7 +134,7 @@ class Deleter:
                     nodes_to_visit.append((neighbor, seed_id))
 
         while _nodes_to_visit_are_from_different_seeds():
-            obj, seed_ix = nodes_to_visit.pop(0)
+            obj, seed_ix = nodes_to_visit.popleft()
             _expand_graph(obj, seed_ix)
 
         # Finally, find components that need to be split away
