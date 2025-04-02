@@ -1,4 +1,7 @@
-from collections import defaultdict, deque
+from collections import (
+    defaultdict,
+    deque
+)
 from functools import lru_cache
 
 import networkx as nx
