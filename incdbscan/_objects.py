@@ -20,7 +20,7 @@ class Objects(LabelHandler):
     def __init__(self, eps, metric, p):
         super().__init__()
 
-        self.graph = rx.PyGraph()  # pylint: disable=no-member
+        self.graph = rx.PyGraph(multigraph=False)  # pylint: disable=no-member
         self._object_id_to_node_id: Dict[ObjectId, NodeId] = {}
 
         self.neighbor_searcher = \
