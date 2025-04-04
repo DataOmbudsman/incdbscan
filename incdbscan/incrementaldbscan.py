@@ -49,7 +49,7 @@ class IncrementalDBSCAN:
 
     """
 
-    def __init__(self, eps=1, min_pts=5, metric='minkowski', p=2):
+    def __init__(self, eps=1, min_pts=5, metric="minkowski", p=2):
         self.eps = eps
         self.min_pts = min_pts
         self.metric = metric
@@ -103,8 +103,8 @@ class IncrementalDBSCAN:
             else:
                 warnings.warn(
                     IncrementalDBSCANWarning(
-                        f'Object at position {ix} was not deleted because '
-                        'there is no such object in the object set.'
+                        f"Object at position {ix} was not deleted because "
+                        "there is no such object in the object set."
                     )
                 )
 
@@ -140,14 +140,42 @@ class IncrementalDBSCAN:
                 label = np.nan
                 warnings.warn(
                     IncrementalDBSCANWarning(
-                        f'No label was retrieved for object at position {ix} '
-                        'because there is no such object in the object set.'
+                        f"No label was retrieved for object at position {ix} "
+                        "because there is no such object in the object set."
                     )
                 )
 
             labels[ix] = label
 
         return labels
+
+    def get_values_from_label(self, label):
+        """Get objects from a specific cluster label.
+
+        Parameters
+        ----------
+        label : int
+                The cluster label to get objects from.
+
+        Returns
+        -------
+        objects : ndarray of shape (n_objects, n_features).
+                  The values that belong to the cluster with the specified
+                  label. The values may not be in the same order as they were
+                  inserted.
+
+        """
+        objects = self._objects.get_objects_from_label(label)
+        if not objects:
+            warnings.warn(
+                IncrementalDBSCANWarning(
+                    f"No values were retrieved for label {label} because "
+                    "there is no such label in the object set."
+                )
+            )
+            return np.array([])
+
+        return np.vstack([obj.get_value() for obj in objects])
 
 
 class IncrementalDBSCANWarning(Warning):

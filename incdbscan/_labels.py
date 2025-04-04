@@ -43,3 +43,6 @@ class LabelHandler:
 
         for obj in affected_objects:
             self._object_to_label[obj] = change_to
+
+    def get_objects_from_label(self, label):
+        return self._label_to_objects[label]

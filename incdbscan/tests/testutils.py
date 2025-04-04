@@ -13,37 +13,38 @@ CLUSTER_LABEL_FIRST_CLUSTER = 0
 
 
 def assert_cluster_labels(incdbscan_fit, objects: Iterable, label):
-    assert np.all(
-        incdbscan_fit.get_cluster_labels(objects) == label
-    )
+    assert np.all(incdbscan_fit.get_cluster_labels(objects) == label)
 
 
 def assert_two_objects_are_in_same_cluster(incdbscan_fit, object1, object2):
-    assert incdbscan_fit.get_cluster_labels(object1) == \
-        incdbscan_fit.get_cluster_labels(object2)
+    assert incdbscan_fit.get_cluster_labels(
+        object1
+    ) == incdbscan_fit.get_cluster_labels(object2)
 
 
-def assert_label_of_object_is_among_possible_ones(
-        incdbscan_fit,
-        obj,
-        possible_labels):
+def assert_label_of_object_is_among_possible_ones(incdbscan_fit, obj, possible_labels):
 
     assert incdbscan_fit.get_cluster_labels(obj)[0] in possible_labels
 
 
 def insert_objects_then_assert_cluster_labels(
-        incdbscan,
-        values: Iterable,
-        expected_label):
+    incdbscan, values: Iterable, expected_label
+):
 
     incdbscan.insert(values)
     assert_cluster_labels(incdbscan, values, expected_label)
 
 
+def assert_label_contains_objects(incdbscan, label, expected_values):
+    values_from_label = incdbscan.get_values_from_label(label)
+    assert np.array_equal(
+        np.sort(values_from_label.flatten()), np.sort(expected_values.flatten())
+    )
+
+
 def assert_split_creates_new_labels_for_new_clusters(
-        incdbscan_fit,
-        clusters: Iterable[Iterable],
-        previous_common_label):
+    incdbscan_fit, clusters: Iterable[Iterable], previous_common_label
+):
 
     all_labels = set()
 
@@ -142,8 +143,8 @@ def read_handl_data():
     # https://personalpages.manchester.ac.uk/staff/Julia.Handl/generators.html
 
     url = (
-        'https://raw.githubusercontent.com/deric/clustering-benchmark/'
-        'master/src/main/resources/datasets/artificial/2d-20c-no0.arff'
+        "https://raw.githubusercontent.com/deric/clustering-benchmark/"
+        "master/src/main/resources/datasets/artificial/2d-20c-no0.arff"
     )
     data = read_arff_data_file_from_url(url)[:, 0:2]
     return data
@@ -155,8 +156,8 @@ def read_chameleon_data():
     # http://glaros.dtc.umn.edu/gkhome/cluto/cluto/download
 
     url = (
-        'https://raw.githubusercontent.com/yeahia2508/ml-examples/'
-        'master/Data/clustering/chameleon/t4.8k.txt'
+        "https://raw.githubusercontent.com/yeahia2508/ml-examples/"
+        "master/Data/clustering/chameleon/t4.8k.txt"
     )
     data = read_text_data_file_from_url(url)[:2000]
     return data
