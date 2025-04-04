@@ -121,18 +121,18 @@ class Deleter:
         if self._objects_are_neighbors_of_each_other(seed_objects):
             return []
 
-        recorder = ComponentFinder(self.objects.graph, self._is_core)
+        finder = _ComponentFinder(self.objects.graph, self._is_core)
         seed_node_ids = [obj.node_id for obj in seed_objects]
-        rx.bfs_search(self.objects.graph, seed_node_ids, recorder)
+        rx.bfs_search(self.objects.graph, seed_node_ids, finder)
 
         seed_of_largest, size_of_largest = 0, 0
-        for seed_id, objects in recorder.seed_to_objects.items():
+        for seed_id, objects in finder.seed_to_objects.items():
             component_size = len(objects)
             if component_size > size_of_largest:
                 size_of_largest = component_size
                 seed_of_largest = seed_id
 
-        for seed_id, objects in recorder.seed_to_objects.items():
+        for seed_id, objects in finder.seed_to_objects.items():
             if seed_id != seed_of_largest:
                 yield objects
 
@@ -163,7 +163,7 @@ class Deleter:
                 if self._is_core(neighbor)}
 
 
-class ComponentFinder(BFSVisitor):
+class _ComponentFinder(BFSVisitor):
 
     def __init__(self, graph, is_core_fn):
         self.graph = graph
@@ -199,10 +199,9 @@ class ComponentFinder(BFSVisitor):
     def non_tree_edge(self, edge):
         source_node_id, target_node_id, _ = edge
 
-        # The case of a non-tree edge is the case of merges, that is, two
-        # components with different seeds meet. However, we only merge them if
-        # the target represents core object in the graph (i.e., dense
-        # connection).
+        # A non-tree edge is the case of merge, that is, when two components
+        # with different seeds meet. However, we only merge them if the target
+        # represents core object in the graph (i.e., dense connection).
 
         source_seed = self.node_to_seed[source_node_id]
         target_seed = self.node_to_seed[target_node_id]

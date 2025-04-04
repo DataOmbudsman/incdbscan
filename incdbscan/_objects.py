@@ -99,7 +99,7 @@ class Objects(LabelHandler):
         self.graph.remove_node(node_id)
         del self._object_id_to_node_id[deleted_object.id]
 
-    def get_connected_components(
+    def get_connected_components_within_objects(
             self, objects: Set[Object]) -> List[Set[Object]]:
 
         if len(objects) == 1:

@@ -42,7 +42,7 @@ class Inserter:
         update_seeds = self._get_update_seeds(new_core_neighbors)
 
         connected_components_in_update_seeds = \
-            self.objects.get_connected_components(update_seeds)
+            self.objects.get_connected_components_within_objects(update_seeds)
 
         for component in connected_components_in_update_seeds:
             effective_cluster_labels = \
