@@ -6,8 +6,8 @@ from line_profiler import LineProfiler
 
 from incdbscan import IncrementalDBSCAN
 from incdbscan._deleter import (
-    _ComponentFinder,
-    Deleter
+    Deleter,
+    _ComponentFinder
 )
 from incdbscan._inserter import Inserter
 from incdbscan._labels import LabelHandler
