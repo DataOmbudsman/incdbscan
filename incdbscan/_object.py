@@ -1,5 +1,9 @@
 NodeId = int
-ObjectId = int
+ObjectId = bytes
+
+import numpy as np
+
+from ._utils import decode_
 
 
 class Object:
@@ -11,4 +15,10 @@ class Object:
         self.neighbor_count = 0
 
     def __repr__(self):
-        return f'{self.id}_'
+        return f"{self._decode_id()}"
+
+    def _decode_id(self):
+        return decode_(self.id)
+
+    def get_value(self):
+        return np.stack([self._decode_id()] * self.count)
