@@ -1,5 +1,6 @@
 from functools import cached_property
 
+
 NodeId = int
 ObjectId = int
 

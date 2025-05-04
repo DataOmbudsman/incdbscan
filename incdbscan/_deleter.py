@@ -1,7 +1,4 @@
-from collections import (
-    defaultdict,
-    deque
-)
+from collections import defaultdict
 from typing import (
     Dict,
     List
