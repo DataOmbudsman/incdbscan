@@ -55,7 +55,7 @@ class IncrementalDBSCAN:
         self.metric = metric
         self.p = p
 
-        self._objects = Objects(self.eps, self.metric, self.p)
+        self._objects = Objects(self.eps, self.min_pts, self.metric, self.p)
         self._inserter = Inserter(self.eps, self.min_pts, self._objects)
         self._deleter = Deleter(self.eps, self.min_pts, self._objects)
 

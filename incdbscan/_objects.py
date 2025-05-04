@@ -17,7 +17,7 @@ from ._utils import hash_
 
 
 class Objects(LabelHandler):
-    def __init__(self, eps, metric, p):
+    def __init__(self, eps, min_pts, metric, p):
         super().__init__()
 
         self.graph = rx.PyGraph(multigraph=False)  # pylint: disable=no-member
@@ -25,6 +25,7 @@ class Objects(LabelHandler):
 
         self.neighbor_searcher = \
             NeighborSearcher(radius=eps, metric=metric, p=p)
+        self.min_pts = min_pts
 
     def get_object(self, value):
         object_id = hash_(value)
@@ -43,7 +44,7 @@ class Objects(LabelHandler):
                 neighbor.neighbor_count += 1
             return obj
 
-        new_object = Object(object_id)
+        new_object = Object(object_id, self.min_pts)
 
         self._insert_graph_metadata(new_object)
         self.set_label_of_inserted_object(new_object)

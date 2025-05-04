@@ -2,7 +2,6 @@ from collections import (
     defaultdict,
     deque
 )
-from functools import lru_cache
 from typing import (
     Dict,
     List
@@ -57,22 +56,14 @@ class Deleter:
         self._set_each_border_object_labels_to_largest_around(
             non_core_neighbors_of_ex_cores)
 
-        self._is_core.cache_clear()
-
     def _get_objects_that_lost_core_property(self, object_deleted):
-        ex_core_neighbors = [obj for obj in object_deleted.neighbors
-                             if obj.neighbor_count == self.min_pts - 1]
+        for obj in object_deleted.neighbors:
+            if obj.neighbor_count == self.min_pts - 1:
+                yield obj
 
         # The result has to contain the deleted object if it was core
-
-        if self._is_core(object_deleted):
-            ex_core_neighbors.append(object_deleted)
-
-        return ex_core_neighbors
-
-    @lru_cache(maxsize=None)
-    def _is_core(self, obj):
-        return obj.neighbor_count >= self.min_pts
+        if object_deleted.is_core:
+            yield object_deleted
 
     def _get_update_seeds_and_non_core_neighbors_of_ex_cores(
             self,
@@ -83,8 +74,11 @@ class Deleter:
         non_core_neighbors_of_ex_cores = set()
 
         for ex_core in ex_cores:
+            # The is-core property of objects that became non core need to be
+            # re-cached
+            ex_core._clear_is_core_cache()
             for neighbor in ex_core.neighbors:
-                if self._is_core(neighbor):
+                if neighbor.is_core:
                     update_seeds.add(neighbor)
                 else:
                     non_core_neighbors_of_ex_cores.add(neighbor)
@@ -121,7 +115,7 @@ class Deleter:
         if self._objects_are_neighbors_of_each_other(seed_objects):
             return []
 
-        finder = _ComponentFinder(self.objects.graph, self._is_core)
+        finder = _ComponentFinder(self.objects.graph)
         seed_node_ids = [obj.node_id for obj in seed_objects]
         rx.bfs_search(self.objects.graph, seed_node_ids, finder)
 
@@ -160,14 +154,13 @@ class Deleter:
     def _get_cluster_labels_in_neighborhood(self, obj):
         return {self.objects.get_label(neighbor)
                 for neighbor in obj.neighbors
-                if self._is_core(neighbor)}
+                if neighbor.is_core}
 
 
 class _ComponentFinder(BFSVisitor):
 
-    def __init__(self, graph, is_core_fn):
+    def __init__(self, graph):
         self.graph = graph
-        self.is_core = is_core_fn
         self.seed_to_objects: Dict[NodeId, List[Object]] = defaultdict(set)
         self.node_to_seed: Dict[NodeId, NodeId] = defaultdict(int)
 
@@ -183,7 +176,7 @@ class _ComponentFinder(BFSVisitor):
         # If the node does not represent a core object then we don't want
         # traversal to go in that direction.
 
-        if not self.is_core(self.graph[vertex_node_id]):
+        if not self.graph[vertex_node_id].is_core:
             raise PruneSearch
 
     def tree_edge(self, edge):
@@ -207,7 +200,7 @@ class _ComponentFinder(BFSVisitor):
         target_seed = self.node_to_seed[target_node_id]
         different_seeds = source_seed != target_seed
 
-        if different_seeds and self.is_core(self.graph[target_node_id]):
+        if different_seeds and self.graph[target_node_id].is_core:
             if source_seed > target_seed:
                 self.node_to_seed[target_node_id] = source_seed
             else:
