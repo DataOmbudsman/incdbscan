@@ -4,7 +4,7 @@ from typing import (
     List
 )
 
-from rustworkx import PyGraph
+import rustworkx as rx
 from rustworkx.visit import (
     BFSVisitor,
     PruneSearch
@@ -24,7 +24,7 @@ class BFSComponentFinder(BFSVisitor):
     # the seed objects, expand the graph by adding neighboring objects.
 
     def __init__(self, graph):
-        self.graph: PyGraph = graph  # graph of Objects
+        self.graph: rx.PyGraph = graph  # graph of Objects  # pylint: disable=no-member
         self.seed_to_component: Dict[NodeId, List[Object]] = defaultdict(set)
         self._node_to_seed: Dict[NodeId, NodeId] = defaultdict(int)
 
