@@ -5,10 +5,8 @@ from pathlib import Path
 from line_profiler import LineProfiler
 
 from incdbscan import IncrementalDBSCAN
-from incdbscan._deleter import (
-    Deleter,
-    _ComponentFinder
-)
+from incdbscan._bfscomponentfinder import BFSComponentFinder
+from incdbscan._deleter import Deleter
 from incdbscan._inserter import Inserter
 from incdbscan._labels import LabelHandler
 from incdbscan._neighbor_searcher import NeighborSearcher
@@ -44,7 +42,7 @@ def print_profile(test, tag=''):
     profiler = LineProfiler()
     profiler.add_module(Inserter)
     profiler.add_module(Deleter)
-    # profiler.add_module(_ComponentFinder)
+    # profiler.add_module(BFSComponentFinder)
     # profiler.add_module(Object)
     # profiler.add_module(Objects)
     # profiler.add_module(LabelHandler)

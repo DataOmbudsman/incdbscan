@@ -1,20 +1,9 @@
 from collections import defaultdict
-from typing import (
-    Dict,
-    List
-)
 
 import rustworkx as rx
-from rustworkx.visit import (
-    BFSVisitor,
-    PruneSearch
-)
 
+from ._bfscomponentfinder import BFSComponentFinder
 from ._labels import CLUSTER_LABEL_NOISE
-from ._object import (
-    NodeId,
-    Object
-)
 
 
 class Deleter:
@@ -97,35 +86,26 @@ class Deleter:
         return grouped_objects
 
     def _find_components_to_split_away(self, seed_objects):
-
-        # Traverse the objects in a BFS manner to find those components of
-        # objects that need to be split away. A component here is a group of
-        # objects that all can be linked to the same seed object. Starting from
-        # the seed objects, expand the graph by adding neighboring objects.
-        # Traversal terminates when all of the next nodes to be added are
-        # linked to the same seed object -- this means that all but one
-        # component are traversed completely and they can be split away.
-
         if len(seed_objects) == 1:
             return []
 
         if self._objects_are_neighbors_of_each_other(seed_objects):
             return []
 
-        finder = _ComponentFinder(self.objects.graph)
         seed_node_ids = [obj.node_id for obj in seed_objects]
+        finder = BFSComponentFinder(self.objects.graph)
         rx.bfs_search(self.objects.graph, seed_node_ids, finder)
 
         seed_of_largest, size_of_largest = 0, 0
-        for seed_id, objects in finder.seed_to_objects.items():
-            component_size = len(objects)
+        for seed_id, component in finder.seed_to_component.items():
+            component_size = len(component)
             if component_size > size_of_largest:
                 size_of_largest = component_size
                 seed_of_largest = seed_id
 
-        for seed_id, objects in finder.seed_to_objects.items():
+        for seed_id, component in finder.seed_to_component.items():
             if seed_id != seed_of_largest:
-                yield objects
+                yield component
 
     @staticmethod
     def _objects_are_neighbors_of_each_other(objects):
@@ -152,56 +132,3 @@ class Deleter:
         return {self.objects.get_label(neighbor)
                 for neighbor in obj.neighbors
                 if neighbor.is_core}
-
-
-class _ComponentFinder(BFSVisitor):
-
-    def __init__(self, graph):
-        self.graph = graph
-        self.seed_to_objects: Dict[NodeId, List[Object]] = defaultdict(set)
-        self.node_to_seed: Dict[NodeId, NodeId] = defaultdict(int)
-
-    def discover_vertex(self, vertex_node_id):
-        # If this is the first time discovering a node then the node itself
-        # will be its own seed. This is the way we keep track of singleton
-        # nodes (i.e., ones without edges).
-
-        if vertex_node_id not in self.node_to_seed:
-            self.node_to_seed[vertex_node_id] = vertex_node_id
-            self.seed_to_objects[vertex_node_id].add(self.graph[vertex_node_id])
-
-        # If the node does not represent a core object then we don't want
-        # traversal to go in that direction.
-
-        if not self.graph[vertex_node_id].is_core:
-            raise PruneSearch
-
-    def tree_edge(self, edge):
-        source_node_id, target_node_id, _ = edge
-
-        # The target of the edge is a new node we see for the first time. Its
-        # seed will be the seed of the source.
-
-        self.node_to_seed[target_node_id] = self.node_to_seed[source_node_id]
-        seed = self.node_to_seed[target_node_id]
-        self.seed_to_objects[seed].add(self.graph[target_node_id])
-
-    def non_tree_edge(self, edge):
-        source_node_id, target_node_id, _ = edge
-
-        # A non-tree edge is the case of merge, that is, when two components
-        # with different seeds meet. However, we only merge them if the target
-        # represents core object in the graph (i.e., dense connection).
-
-        source_seed = self.node_to_seed[source_node_id]
-        target_seed = self.node_to_seed[target_node_id]
-        different_seeds = source_seed != target_seed
-
-        if different_seeds and self.graph[target_node_id].is_core:
-            if source_seed > target_seed:
-                self.node_to_seed[target_node_id] = source_seed
-            else:
-                self.node_to_seed[source_node_id] = target_seed
-
-        seed = self.node_to_seed[target_node_id]
-        self.seed_to_objects[seed].add(self.graph[target_node_id])
