@@ -32,7 +32,7 @@ The `incdbscan` package is an implementation of the IncrementalDBSCAN algorithm 
 pip install incdbscan
 ```
 
-The latest version of the package requires at least Python 3.8.
+The latest version of the package requires at least Python 3.9.
 
 ## Usage
 
@@ -83,7 +83,7 @@ These results do not imply that it is very efficient to cluster a whole data set
 
 See [this notebook](https://github.com/DataOmbudsman/incdbscan/blob/master/notebooks/performance.ipynb) about performance for more details.
 
-### Known shortcomings
+### Known limitations
 
-- **Batch insertion**: In the current implementation batch insertion of data points is not efficient, since pairwise distances between new points and existing points are not calculated with matrix multiplication.
-- **Deletion**: Data point deletion can take long in big data sets (big clusters), because there is a graph traversal step that can take long. Whether this can be sped up is not clear. 
+- **Batch insertion**: In the current implementation batch insertion of data points is not efficient, since pairwise distance calculation between new and existing data points is not yet vectorized. 
+- **Deletion**: Data point deletion can take long in big data sets (big clusters) because of a graph traversal step. There isn't any clear direction of making it more efficient algorithmically. 
