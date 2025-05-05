@@ -16,6 +16,7 @@ class Object:
 
     @cached_property
     def is_core(self):
+        # Note that this property is only valid during deletion
         return self.neighbor_count >= self.min_pts
 
     def _clear_is_core_cache(self):
