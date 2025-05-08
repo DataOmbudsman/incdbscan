@@ -22,7 +22,7 @@ class BFSComponentFinder(BFSVisitor):
     # objects that need to be split away. A component here is a group of
     # objects that all can be linked to the same seed object. Starting from
     # the seed objects, expand the graph by adding neighboring objects.
-    # Note that it could even faster if the traversal terminted when all of
+    # Note that it could be even faster if the traversal terminted when all of
     # the next nodes to be visited are linked to the same seed object -- this
     # means that all but one component are traversed completely and they can
     # be split away.
