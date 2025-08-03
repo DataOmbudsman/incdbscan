@@ -60,9 +60,6 @@ class Deleter:
         non_core_neighbors_of_ex_cores = set()
 
         for ex_core in ex_cores:
-            # The is-core property of objects that became non core need to be
-            # re-cached
-            ex_core._clear_is_core_cache()
             for neighbor in ex_core.neighbors:
                 if neighbor.is_core:
                     update_seeds.add(neighbor)

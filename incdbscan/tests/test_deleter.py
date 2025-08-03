@@ -427,3 +427,57 @@ def test_two_non_dense_bridges(incdbscan4, point_at_origin):
 
     assert_split_creates_new_labels_for_new_clusters(
         incdbscan4, expected_clusters, CLUSTER_LABEL_FIRST_CLUSTER)
+
+
+def test_point_whose_neighbor_changes_its_core_property(incdbscan3):
+    some_points_in_the_top = np.array([
+        [0, EPS * 1],  # this is the point that is core, then non core, then core
+        [0, EPS * 2],  # this is the neighbor of the above point
+    ])
+
+    another_point_in_the_top = np.array([
+        [0, EPS * 3],
+    ])
+
+    all_points_in_the_top = np.vstack([
+        some_points_in_the_top,
+        another_point_in_the_top
+    ])
+
+    point_to_delete = np.array([
+        [0, 0],
+    ])
+
+    points_right = np.array([
+        [EPS * 1, 0],
+        [EPS * 2, 0],
+        [EPS * 3, 0],
+    ])
+
+    # Step 1
+    incdbscan3.insert(some_points_in_the_top)
+    incdbscan3.insert(point_to_delete)
+    assert_cluster_labels(incdbscan3, some_points_in_the_top, CLUSTER_LABEL_FIRST_CLUSTER)
+    assert_cluster_labels(incdbscan3, point_to_delete, CLUSTER_LABEL_FIRST_CLUSTER)
+
+    # Step 2
+    incdbscan3.delete(point_to_delete)
+    assert_cluster_labels(incdbscan3, some_points_in_the_top, CLUSTER_LABEL_NOISE)
+
+    # Step 3
+    cluster_label_second_cluster = CLUSTER_LABEL_FIRST_CLUSTER + 1
+    incdbscan3.insert(another_point_in_the_top)
+    incdbscan3.insert(point_to_delete)
+    incdbscan3.insert(points_right)
+    assert_cluster_labels(incdbscan3, all_points_in_the_top, cluster_label_second_cluster)
+    assert_cluster_labels(incdbscan3, point_to_delete, cluster_label_second_cluster)
+    assert_cluster_labels(incdbscan3, points_right, cluster_label_second_cluster)
+
+    # Step 4
+    expected_clusters = [all_points_in_the_top, points_right]
+    incdbscan3.delete(point_to_delete)
+    assert_split_creates_new_labels_for_new_clusters(
+        incdbscan3,
+        expected_clusters,
+        cluster_label_second_cluster
+    )
