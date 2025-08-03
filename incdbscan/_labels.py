@@ -30,6 +30,7 @@ class LabelHandler:
     def delete_label_of_deleted_object(self, obj):
         label = self.get_label(obj)
         self._label_to_objects[label].remove(obj)
+        del self._object_to_label[obj]
 
     def get_label(self, obj):
         return self._object_to_label[obj]
