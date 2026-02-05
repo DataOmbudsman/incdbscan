@@ -1,7 +1,5 @@
 from collections import defaultdict
 
-import rustworkx as rx
-
 from ._bfscomponentfinder import BFSComponentFinder
 from ._labels import CLUSTER_LABEL_NOISE
 
@@ -89,20 +87,10 @@ class Deleter:
         if self._objects_are_neighbors_of_each_other(seed_objects):
             return []
 
-        seed_node_ids = [obj.node_id for obj in seed_objects]
         finder = BFSComponentFinder(self.objects.graph)
-        rx.bfs_search(self.objects.graph, seed_node_ids, finder)
-
-        seed_of_largest, size_of_largest = 0, 0
-        for seed_id, component in finder.seed_to_component.items():
-            component_size = len(component)
-            if component_size > size_of_largest:
-                size_of_largest = component_size
-                seed_of_largest = seed_id
-
-        for seed_id, component in finder.seed_to_component.items():
-            if seed_id != seed_of_largest:
-                yield component
+        seed_node_ids = [obj.node_id for obj in seed_objects]
+        components = finder.find_components(seed_node_ids)
+        return components
 
     @staticmethod
     def _objects_are_neighbors_of_each_other(objects):

@@ -76,3 +76,7 @@ class BFSComponentFinder(BFSVisitor):
 
         seed = self._node_to_seed[target_node_id]
         self.seed_to_component[seed].add(self.graph[target_node_id])
+
+    def find_components(self, seeds):
+        rx.bfs_search(self._graph, seeds, self)
+        return self._seed_to_component.values()
