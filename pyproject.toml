@@ -27,21 +27,21 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-numpy = "^2.0.0"
-python = ">=3.9.0,<4.0"
+numpy = ">=1.26.4"
+python = ">=3.10.0,<4.0"
 rustworkx = "^0.15.0"
 scikit-learn = "^1.5.0"
 sortedcontainers = "^2.4.0"
 xxhash = "^3.5.0"
 
 [tool.poetry.group.dev.dependencies]
-isort = "^6.0.1"
-jupyterlab = "^4.4.0"
-line-profiler = "^4.2.0"
-matplotlib = "^3.9.4"
-pandas = "^2.2.3"
-pylint = "^3.3.6"
-pytest = "^8.3.5"
+isort = "^7.0.0"
+jupyterlab = "^4.5.0"
+line-profiler = "^5.0.0"
+matplotlib = "^3.10.1"
+pandas = "^2.3.1"
+pylint = "^4.0.1"
+pytest = "^9.0.1"
 requests = "^2.32.3"
 tqdm = "^4.67.1"
 
