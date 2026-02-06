@@ -69,7 +69,7 @@ For a longer description of usage check out the [notebook](https://github.com/Da
 
 ## Performance
 
-Performance has two components: insertion and deletion cost. The results below are based on measurements using data sets of 1K, 10K data points.
+Performance has two components: insertion and deletion cost. The results below are based on measurements using data sets in the 1K-10K size range.
 
 <p align="left">
   <img src="./images/performance.png" alt="indbscan performance">
