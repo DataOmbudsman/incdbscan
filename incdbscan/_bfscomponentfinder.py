@@ -35,6 +35,7 @@ class BFSComponentFinder(BFSVisitor):
         self._seed_to_component: Dict[NodeId, Set[Object]] = defaultdict(set)
         self._node_to_seed: Dict[NodeId, NodeId] = {}
         self._queue = deque()
+        self._origin_node_id = None
 
     def _preprocess(self, seeds):
         # We create a fake node in the graph that is connected to all seeds to
