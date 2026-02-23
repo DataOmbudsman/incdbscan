@@ -110,16 +110,7 @@ class Objects(LabelHandler):
         subgraph = self.graph.subgraph(node_ids)
         components_as_ids: List[Set[NodeId]] = rx.connected_components(subgraph)  # pylint: disable=no-member
 
-        def _get_original_object(subgraph, subgraph_node_id):
-            original_node_id = subgraph[subgraph_node_id].node_id
-            return self.graph[original_node_id]
-
-        components_as_objects = []
-        for component in components_as_ids:
-            component_objects = {
-                _get_original_object(subgraph, subgraph_node_id)
-                for subgraph_node_id in component
-            }
-            components_as_objects.append(component_objects)
-
-        return components_as_objects
+        return [
+            {subgraph[node_id] for node_id in component}
+            for component in components_as_ids
+        ]
