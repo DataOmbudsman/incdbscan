@@ -41,8 +41,9 @@ class Deleter:
             non_core_neighbors_of_ex_cores)
 
     def _get_objects_that_lost_core_property(self, object_deleted):
+        threshold = self.min_pts - 1
         for obj in object_deleted.neighbors:
-            if obj.neighbor_count == self.min_pts - 1:
+            if obj.neighbor_count == threshold:
                 yield obj
 
         # The result has to contain the deleted object if it was core
