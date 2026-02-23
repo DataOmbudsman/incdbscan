@@ -15,6 +15,8 @@ class LabelHandler:
 
     def set_label(self, obj, label):
         previous_label = self._object_to_label[obj]
+        if previous_label == label:
+            return
         self._label_to_objects[previous_label].remove(obj)
         self._label_to_objects[label].add(obj)
         self._object_to_label[obj] = label
