@@ -39,6 +39,9 @@ class LabelHandler:
         return max(self._label_to_objects.keys()) + 1
 
     def change_labels(self, change_from, change_to):
+        if change_from == change_to:
+            return
+
         affected_objects = self._label_to_objects.pop(change_from)
         self._label_to_objects[change_to].update(affected_objects)
 
