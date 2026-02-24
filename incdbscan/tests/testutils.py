@@ -158,5 +158,5 @@ def read_chameleon_data():
         'https://raw.githubusercontent.com/yeahia2508/ml-examples/'
         'master/Data/clustering/chameleon/t4.8k.txt'
     )
-    data = read_text_data_file_from_url(url)[:2000]
+    data = read_text_data_file_from_url(url)
     return data
