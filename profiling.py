@@ -9,7 +9,10 @@ from incdbscan._bfscomponentfinder import BFSComponentFinder
 from incdbscan._deleter import Deleter
 from incdbscan._inserter import Inserter
 from incdbscan._labels import LabelHandler
-from incdbscan._neighbor_searcher import NeighborSearcher
+from incdbscan._neighbor_searcher import (
+    _BaseNeighborSearcher,
+    NeighborSearcher
+)
 from incdbscan._object import Object
 from incdbscan._objects import Objects
 from incdbscan.tests.testutils import (
@@ -47,6 +50,7 @@ def print_profile(test, tag=''):
     # profiler.add_module(Objects)
     # profiler.add_module(LabelHandler)
     # profiler.add_module(NeighborSearcher)
+    # profiler.add_module(_BaseNeighborSearcher)
 
     wrapper = profiler(test)
     wrapper()
