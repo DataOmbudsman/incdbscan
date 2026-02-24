@@ -15,5 +15,11 @@ class Object:
     def is_core(self):
         return self.neighbor_count >= self.min_pts
 
+    # Don't serialize the neighbor set
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        state['neighbors'] = set()
+        return state
+
     def __repr__(self):
         return f'{self.id}_'

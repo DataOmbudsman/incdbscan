@@ -27,6 +27,17 @@ class Objects(LabelHandler):
             NeighborSearcher(radius=eps, metric=metric, p=p)
         self.min_pts = min_pts
 
+    # Reconstruct neighbor sets of objects during deserialization
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+        for node_id in self.graph.node_indices():
+            obj = self.graph[node_id]
+            obj.neighbors = {
+                self.graph[nid]
+                for nid in self.graph.neighbors(node_id)
+            }
+            obj.neighbors.add(obj)
+
     def get_object(self, value):
         object_id = hash_(value)
         if object_id in self._object_id_to_node_id:
