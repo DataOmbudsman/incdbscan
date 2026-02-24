@@ -10,8 +10,8 @@ from incdbscan._deleter import Deleter
 from incdbscan._inserter import Inserter
 from incdbscan._labels import LabelHandler
 from incdbscan._neighbor_searcher import (
-    _BaseNeighborSearcher,
-    NeighborSearcher
+    NeighborSearcher,
+    _BaseNeighborSearcher
 )
 from incdbscan._object import Object
 from incdbscan._objects import Objects
