@@ -32,7 +32,7 @@ The `incdbscan` package is an implementation of the IncrementalDBSCAN algorithm 
 pip install incdbscan
 ```
 
-The latest version of the package requires at least Python 3.9.
+The latest version of the package requires at least Python 3.10.
 
 ## Usage
 
@@ -75,11 +75,11 @@ Performance has two components: insertion and deletion cost. The results below a
   <img src="./images/performance.png" alt="indbscan performance">
 </p>
 
-The cost of **inserting** a new data point with IncrementalDBSCAN is quite small and **grows slower** than the cost of applying (`scikit-learns`'s) DBSCAN to a whole data set.  In other words, *given that* we have a data set _D_ clustered with IncrementalDBSCAN, and we want to see which cluster would a new object _P_ belong to, it is faster to insert _P_ into the current IncrementalDBSCAN clustering than to apply DBSCAN to the union of _D_ and _P_.
+The cost of **inserting** a new data point with IncrementalDBSCAN is quite small and **grows slower** than the cost of applying (`scikit-learns`'s) DBSCAN to a whole data set.  In other words, *given that* we have a data set _D_ clustered with IncrementalDBSCAN, and we want to see which cluster would a new object _P_ belong to, it is faster to insert _P_ into the current IncrementalDBSCAN clustering than to apply DBSCAN to the union of _D_ and {_P_}.
 
-The cost of **deleting** a data point with IncrementalDBSCAN **grows slower** than the cost of applying DBSCAN to the data set minus that data point. In other words, *given that* we have a data set _D_ clustered with IncrementalDBSCAN, and we want to see what happens to the clustering after removing an object _P_ from the data set, it is faster to delete _P_ from the existing IncrementalDBSCAN clustering than to apply DBSCAN to the difference of _D_ and {_P_}.
+The cost of **deleting** a data point with IncrementalDBSCAN is quite small and **grows slower** than the cost of applying DBSCAN to the data set minus that data point. In other words, *given that* we have a data set _D_ clustered with IncrementalDBSCAN, and we want to see what happens to the clustering after removing an object _P_ from the data set, it is faster to delete _P_ from the existing IncrementalDBSCAN clustering than to apply DBSCAN to the difference of _D_ and {_P_}.
 
-These results do not imply that it is very efficient to cluster a whole data set with a series of IncrementalDBSCAN insertions. If we measure the time to cluster a data set with DBSCAN versus to cluster the data by adding the data points one by one to IncrementalDBSCAN, IncrementalDBSCAN will be slower compared to DBSCAN. A typical performance number is that clustering 8,000 data points takes about 10-20 seconds with this implementation.
+These results do not imply that it is very efficient to cluster a whole data set with a series of IncrementalDBSCAN insertions. If we measure the time to cluster a data set with DBSCAN versus to cluster the data by adding the data points one by one to IncrementalDBSCAN, IncrementalDBSCAN will be slower compared to DBSCAN. A typical performance number is that clustering 8,000 data points takes about 10 seconds with this implementation.
 
 See [this notebook](https://github.com/DataOmbudsman/incdbscan/blob/master/notebooks/performance.ipynb) about performance for more details.
 
