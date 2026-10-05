@@ -73,10 +73,7 @@ class IncrementalDBSCAN:
 
         """
         X = input_check(X)
-
-        for value in X:
-            self._inserter.insert(value)
-
+        self._inserter.insert(X)
         return self
 
     def delete(self, X):

@@ -10,7 +10,11 @@ class Inserter:
         self.min_pts = min_pts
         self.objects = objects
 
-    def insert(self, object_value):
+    def insert(self, object_values):
+        for object_value in object_values:
+            self._insert_single(object_value)
+
+    def _insert_single(self, object_value):
         object_inserted = self.objects.insert_object(object_value)
 
         new_core_neighbors, old_core_neighbors = \
