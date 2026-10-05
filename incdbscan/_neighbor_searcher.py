@@ -22,7 +22,8 @@ _MINKOWSKI_P = {
 class _BaseNeighborSearcher:
     def __init__(self):
         self.values = np.array([])
-        self.ids = SortedList()
+        self.ids = SortedList()  # for writing
+        self._ids_cache = []  # for faster lookup
 
     def register(self, new_value, new_id):
         self.ids.add(new_id)
@@ -31,6 +32,7 @@ class _BaseNeighborSearcher:
 
     def rebuild(self):
         self._rebuild()
+        self._ids_cache = list(self.ids)
 
     def _insert_into_values(self, new_value, position):
         extended = np.insert(self.values, position, new_value, axis=0)
@@ -48,7 +50,7 @@ class _BaseNeighborSearcher:
         neighbor_indices = self._get_neighbor_indices(query_value)
 
         for ix in neighbor_indices:
-            yield self.ids[ix]
+            yield self._ids_cache[ix]
 
     def delete(self, id_):
         position = self.ids.index(id_)
