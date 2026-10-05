@@ -48,9 +48,10 @@ def test_alias_normalization_through_neighbor_searcher(metric, p):
 
     for i, (point_low, point_high) in enumerate(points_zipped):
         low_searcher.register(point_low, new_id=i)
-        low_searcher.rebuild()
         high_searcher.register(point_high, new_id=i)
-        high_searcher.rebuild()
+
+    low_searcher.rebuild()
+    high_searcher.rebuild()
 
     for point_low, point_high in points_zipped:
         assert sorted(low_searcher.query_neighbors(point_low)) == \

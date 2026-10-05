@@ -62,6 +62,8 @@ class Objects(LabelHandler):
             ids_in_batch.add(object_id)
             self.neighbor_searcher.register(value, object_id)
 
+        self.neighbor_searcher.rebuild()
+
     def incorporate_object(self, value):
         object_id = hash_(value)
 
@@ -76,7 +78,6 @@ class Objects(LabelHandler):
 
         self._insert_graph_metadata(new_object)
         self.set_label_of_inserted_object(new_object)
-        self.neighbor_searcher.rebuild()
         self._update_neighbors_during_insertion(new_object, value)
         return new_object
 
