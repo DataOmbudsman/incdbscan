@@ -11,6 +11,8 @@ class Inserter:
         self.objects = objects
 
     def insert(self, object_values):
+        self.objects.register_objects(object_values)
+
         for object_value in object_values:
             self._process_one(object_value)
 

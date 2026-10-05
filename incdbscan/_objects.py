@@ -45,6 +45,23 @@ class Objects(LabelHandler):
             return obj
         return None
 
+    def register_objects(self, values):
+        # Making sure each object is registered only once
+        ids_in_batch = set()
+        ids_registered_earlier = self._object_id_to_node_id
+
+        for value in values:
+            object_id = hash_(value)
+            already_known = (
+                object_id in ids_in_batch
+                or object_id in ids_registered_earlier
+            )
+            if already_known:
+                continue
+
+            ids_in_batch.add(object_id)
+            self.neighbor_searcher.register(value, object_id)
+
     def insert_object(self, value):
         object_id = hash_(value)
 
@@ -59,7 +76,6 @@ class Objects(LabelHandler):
 
         self._insert_graph_metadata(new_object)
         self.set_label_of_inserted_object(new_object)
-        self.neighbor_searcher.register(value, object_id)
         self.neighbor_searcher.rebuild()
         self._update_neighbors_during_insertion(new_object, value)
         return new_object
@@ -84,8 +100,9 @@ class Objects(LabelHandler):
         neighbor_ids = self.neighbor_searcher.query_neighbors(query_value)
 
         for id_ in neighbor_ids:
-            obj = self._get_object_from_object_id(id_)
-            yield obj
+            if id_ in self._object_id_to_node_id:
+                obj = self._get_object_from_object_id(id_)
+                yield obj
 
     def _get_object_from_object_id(self, object_id):
         node_id = self._object_id_to_node_id[object_id]
