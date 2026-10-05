@@ -45,7 +45,7 @@ class Objects(LabelHandler):
             return obj
         return None
 
-    def register_objects(self, values):
+    def index_objects(self, values):
         # Making sure each object is registered only once
         ids_in_batch = set()
         ids_registered_earlier = self._object_id_to_node_id
@@ -62,7 +62,7 @@ class Objects(LabelHandler):
             ids_in_batch.add(object_id)
             self.neighbor_searcher.register(value, object_id)
 
-    def insert_object(self, value):
+    def incorporate_object(self, value):
         object_id = hash_(value)
 
         if object_id in self._object_id_to_node_id:

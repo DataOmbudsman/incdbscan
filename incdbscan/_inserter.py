@@ -11,13 +11,13 @@ class Inserter:
         self.objects = objects
 
     def insert(self, object_values):
-        self.objects.register_objects(object_values)
+        self.objects.index_objects(object_values)
 
         for object_value in object_values:
             self._process_one(object_value)
 
     def _process_one(self, object_value):
-        object_inserted = self.objects.insert_object(object_value)
+        object_inserted = self.objects.incorporate_object(object_value)
 
         new_core_neighbors, old_core_neighbors = \
             self._separate_core_neighbors_by_novelty(object_inserted)
