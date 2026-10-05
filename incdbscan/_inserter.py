@@ -12,9 +12,9 @@ class Inserter:
 
     def insert(self, object_values):
         for object_value in object_values:
-            self._insert_single(object_value)
+            self._process_one(object_value)
 
-    def _insert_single(self, object_value):
+    def _process_one(self, object_value):
         object_inserted = self.objects.insert_object(object_value)
 
         new_core_neighbors, old_core_neighbors = \

@@ -28,10 +28,10 @@ class _BaseNeighborSearcher:
         self.ids.add(new_id)
         position = self.ids.index(new_id)
 
-        self._insert_into_array(new_value, position)
+        self._insert_into_values(new_value, position)
         self._rebuild()
 
-    def _insert_into_array(self, new_value, position):
+    def _insert_into_values(self, new_value, position):
         extended = np.insert(self.values, position, new_value, axis=0)
         if not self.values.size:
             extended = extended.reshape(1, -1)
