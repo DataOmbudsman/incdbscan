@@ -24,11 +24,12 @@ class _BaseNeighborSearcher:
         self.values = np.array([])
         self.ids = SortedList()
 
-    def insert(self, new_value, new_id):
+    def register(self, new_value, new_id):
         self.ids.add(new_id)
         position = self.ids.index(new_id)
-
         self._insert_into_values(new_value, position)
+
+    def rebuild(self):
         self._rebuild()
 
     def _insert_into_values(self, new_value, position):
@@ -113,10 +114,13 @@ class NeighborSearcher:
             self._effective_searcher = _SklearnNeighborSearcher(
                 self._radius, self._metric, self._p)
 
-    def insert(self, new_value, new_id):
+    def register(self, new_value, new_id):
         if self._effective_searcher is None:
             self._pick_effective_searcher(new_value)
-        self._effective_searcher.insert(new_value, new_id)
+        self._effective_searcher.register(new_value, new_id)
+
+    def rebuild(self):
+        self._effective_searcher.rebuild()
 
     def query_neighbors(self, query_value):
         return self._effective_searcher.query_neighbors(query_value)
