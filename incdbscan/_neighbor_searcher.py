@@ -116,10 +116,12 @@ class NeighborSearcher:
             self._effective_searcher = _SklearnNeighborSearcher(
                 self._radius, self._metric, self._p)
 
-    def register(self, new_value, new_id):
+    def register(self, new_values, new_ids):
+        # new_values is a sequence; e.g., a list of arrays or a 2D array
         if self._effective_searcher is None:
-            self._pick_effective_searcher(new_value)
-        self._effective_searcher.register(new_value, new_id)
+            self._pick_effective_searcher(new_values[0])
+        for new_value, new_id in zip(new_values, new_ids):
+            self._effective_searcher.register(new_value, new_id)
 
     def rebuild(self):
         self._effective_searcher.rebuild()

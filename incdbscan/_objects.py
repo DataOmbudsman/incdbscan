@@ -50,6 +50,9 @@ class Objects(LabelHandler):
         ids_in_batch = set()
         ids_registered_earlier = self._object_id_to_node_id
 
+        values_to_register = []
+        ids_to_register = []
+
         for value in values:
             object_id = hash_(value)
             already_known = (
@@ -60,8 +63,11 @@ class Objects(LabelHandler):
                 continue
 
             ids_in_batch.add(object_id)
-            self.neighbor_searcher.register(value, object_id)
+            values_to_register.append(value)
+            ids_to_register.append(object_id)
 
+        self.neighbor_searcher.register(
+            values_to_register, ids_to_register)
         self.neighbor_searcher.rebuild()
 
     def incorporate_object(self, value):

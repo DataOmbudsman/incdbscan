@@ -46,9 +46,9 @@ def test_alias_normalization_through_neighbor_searcher(metric, p):
     low_searcher = NeighborSearcher(radius, metric, p)
     high_searcher = NeighborSearcher(radius, metric, p)
 
-    for i, (point_low, point_high) in enumerate(points_zipped):
-        low_searcher.register(point_low, new_id=i)
-        high_searcher.register(point_high, new_id=i)
+    ids = list(range(len(points_zipped)))
+    low_searcher.register(points_low_dimension, ids)
+    high_searcher.register(points_high_dimension, ids)
 
     low_searcher.rebuild()
     high_searcher.rebuild()
@@ -60,20 +60,20 @@ def test_alias_normalization_through_neighbor_searcher(metric, p):
 
 def test_p_less_than_1_falls_back_to_sklearn():
     neighbor_searcher = NeighborSearcher(radius=1.0, metric='minkowski', p=0.5)
-    neighbor_searcher.register(np.zeros(5), 0)
+    neighbor_searcher.register([np.zeros(5)], [0])
     assert isinstance(
         neighbor_searcher._effective_searcher, _SklearnNeighborSearcher)
 
 
 def test_high_dim_falls_back_to_sklearn():
     neighbor_searcher = NeighborSearcher(radius=1.0, metric='euclidean', p=2)
-    neighbor_searcher.register(np.zeros(20), 0)
+    neighbor_searcher.register([np.zeros(20)], [0])
     assert isinstance(
         neighbor_searcher._effective_searcher, _SklearnNeighborSearcher)
 
 
 def test_low_dim_uses_ckdtree():
     neighbor_searcher = NeighborSearcher(radius=1.0, metric='euclidean', p=2)
-    neighbor_searcher.register(np.zeros(5), 0)
+    neighbor_searcher.register([np.zeros(5)], [0])
     assert isinstance(
         neighbor_searcher._effective_searcher, _CKDTreeNeighborSearcher)
