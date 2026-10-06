@@ -83,3 +83,29 @@ def test_register_with_empty_batch_does_not_fail():
     neighbor_searcher = NeighborSearcher(radius=1.0, metric='euclidean', p=2)
     neighbor_searcher.register([], [])
     assert neighbor_searcher._effective_searcher is None
+
+
+def test_register_after_delete_uses_up_to_date_positions():
+    neighbor_searcher = NeighborSearcher(radius=1.5, metric='euclidean', p=2)
+
+    batch_1 = np.array([
+        [0.0, 0.0],
+        [1.0, 0.0],
+        [0.0, 1.0],
+    ])
+
+    batch_2 = np.array([
+        [1.0, 1.0],
+        [5.0, 5.0],
+    ])
+
+    neighbor_searcher.register(batch_1, [0, 1, 2])
+    neighbor_searcher.rebuild()
+
+    neighbor_searcher.delete(1)
+
+    neighbor_searcher.register(batch_2, [3, 4])
+    neighbor_searcher.rebuild()
+
+    neighbors = sorted(neighbor_searcher.query_neighbors(batch_1[0]))
+    assert neighbors == [0, 2, 3]
