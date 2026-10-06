@@ -25,20 +25,24 @@ class _BaseNeighborSearcher:
         self.ids = SortedList()  # for writing
         self._ids_cache = []  # for faster lookup
 
-    def register(self, new_value, new_id):
-        self.ids.add(new_id)
-        position = self.ids.index(new_id)
-        self._insert_into_values(new_value, position)
+    def register(self, new_values, new_ids):
+        order = np.argsort(new_ids)
+        sorted_ids = np.asarray(new_ids)[order]
+        sorted_values = np.asarray(new_values)[order]
+
+        if self.values.size:
+            existing_ids = np.array(self.ids)
+            positions = np.searchsorted(existing_ids, sorted_ids)
+            self.values = np.insert(
+                self.values, positions, sorted_values, axis=0)
+        else:
+            self.values = sorted_values
+
+        self.ids.update(sorted_ids)
 
     def rebuild(self):
         self._rebuild()
         self._ids_cache = list(self.ids)
-
-    def _insert_into_values(self, new_value, position):
-        extended = np.insert(self.values, position, new_value, axis=0)
-        if not self.values.size:
-            extended = extended.reshape(1, -1)
-        self.values = extended
 
     def _rebuild(self):
         raise NotImplementedError
@@ -122,8 +126,7 @@ class NeighborSearcher:
             return
         if self._effective_searcher is None:
             self._pick_effective_searcher(new_values[0])
-        for new_value, new_id in zip(new_values, new_ids):
-            self._effective_searcher.register(new_value, new_id)
+        self._effective_searcher.register(new_values, new_ids)
 
     def rebuild(self):
         self._effective_searcher.rebuild()
