@@ -118,6 +118,8 @@ class NeighborSearcher:
 
     def register(self, new_values, new_ids):
         # new_values is a sequence; e.g., a list of arrays or a 2D array
+        if not len(new_values):
+            return
         if self._effective_searcher is None:
             self._pick_effective_searcher(new_values[0])
         for new_value, new_id in zip(new_values, new_ids):

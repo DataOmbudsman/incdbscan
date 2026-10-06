@@ -77,3 +77,9 @@ def test_low_dim_uses_ckdtree():
     neighbor_searcher.register([np.zeros(5)], [0])
     assert isinstance(
         neighbor_searcher._effective_searcher, _CKDTreeNeighborSearcher)
+
+
+def test_register_with_empty_batch_does_not_fail():
+    neighbor_searcher = NeighborSearcher(radius=1.0, metric='euclidean', p=2)
+    neighbor_searcher.register([], [])
+    assert neighbor_searcher._effective_searcher is None
