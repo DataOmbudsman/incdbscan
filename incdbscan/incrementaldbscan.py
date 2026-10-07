@@ -24,11 +24,11 @@ class IncrementalDBSCAN:
 
     Parameters
     ----------
-    eps : float, optional (default=0.5)
+    eps : float, optional (default=1)
         The radius of neighborhood calculation. An object is the neighbor of
         another if the distance between them is no more than eps.
 
-    min_pts : int, optional (default=1)
+    min_pts : int, optional (default=5)
         The minimum number of neighbors that an object needs to have to be a
         core object of a cluster.
 
