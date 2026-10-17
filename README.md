@@ -32,7 +32,7 @@ The `incdbscan` package is an implementation of the IncrementalDBSCAN algorithm 
 pip install incdbscan
 ```
 
-The latest version of the package requires at least Python 3.10.
+The latest version of the package requires at least Python 3.11.
 
 ## Usage
 
@@ -79,11 +79,8 @@ The cost of **inserting** a new data point with IncrementalDBSCAN is quite small
 
 The cost of **deleting** a data point with IncrementalDBSCAN is quite small and **grows slower** than the cost of applying DBSCAN to the data set minus that data point. In other words, *given that* we have a data set _D_ clustered with IncrementalDBSCAN, and we want to see what happens to the clustering after removing an object _P_ from the data set, it is faster to delete _P_ from the existing IncrementalDBSCAN clustering than to apply DBSCAN to the difference of _D_ and {_P_}.
 
-These results do not imply that it is very efficient to cluster a whole data set with a series of IncrementalDBSCAN insertions. If we measure the time to cluster a data set with DBSCAN versus to cluster the data by adding the data points one by one to IncrementalDBSCAN, IncrementalDBSCAN will be slower compared to DBSCAN. A typical performance number is that clustering 8,000 data points takes about 10 seconds with this implementation.
+These results do not imply that it is efficient to cluster a whole data set with IncrementalDBSCAN insertions. If we measure the time to cluster a data set of a given size with DBSCAN versus IncrementalDBSCAN, IncrementalDBSCAN will be slower compared to DBSCAN. The advantage of IncrementalDBSCAN is the efficiency of making additional changes (insertions, deletions) to an already clustered data set, not clustering from scratch.  
+
+A typical performance number is that clustering 8,000 data points takes about 600-700 ms with this implementation.
 
 See [this notebook](https://github.com/DataOmbudsman/incdbscan/blob/master/notebooks/performance.ipynb) about performance for more details.
-
-### Known limitations
-
-- **Batch insertion**: In the current implementation batch insertion of data points is not efficient, since pairwise distance calculation between new and existing data points is not yet vectorized. 
-- **Deletion**: Data point deletion can take long in big data sets (big clusters) because of a graph traversal step. There isn't any clear direction of making it more efficient algorithmically. 
