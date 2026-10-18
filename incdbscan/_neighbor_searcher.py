@@ -122,7 +122,7 @@ class NeighborSearcher:
 
     def register(self, new_values, new_ids):
         # new_values is a sequence; e.g., a list of arrays or a 2D array
-        if not len(new_values):
+        if not len(new_values):  # pylint: disable=use-implicit-booleaness-not-len
             return
         if self._effective_searcher is None:
             self._pick_effective_searcher(new_values[0])
